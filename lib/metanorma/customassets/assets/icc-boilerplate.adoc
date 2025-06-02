@@ -1,8 +1,6 @@
 == copyright-statement
 === Copyright notice
 
-Copyright © 1994-{{docyear}} International Color Consortium
-
 Copyright (c) {{ docyear }} International Color Consortium
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
