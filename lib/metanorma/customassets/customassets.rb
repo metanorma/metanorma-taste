@@ -4,6 +4,10 @@ module Metanorma
       @flavor = flavor
     end
 
+    def self.aliases
+      { icc: :iso }
+    end
+
     def process_input_adoc_overrides(attrs, options)
       case @flavor
       when :icc
