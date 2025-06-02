@@ -12,7 +12,8 @@ c.process_input_adoc_hdr(attributes, options)
 
 The function `process_input_doc_hdr` rewrites the document attributes of a document (given as an array of docuemnt attribute lines
 from the document header), and the options hash passed to `Metanorma::Compile.process_input_adoc()`, to conform with the expectations
-of the flavour named in the class initialisation.
+of the flavour named in the class initialisation. Any document attributes are inserted before the current attributes of the document,
+so that the document can override them if necessary with its own values.
 
 The module method `aliases` maps the flavour to predefined Metanorma flavours, and indicates that the nominated flavour is a customisation
 of that flavour.
