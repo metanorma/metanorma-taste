@@ -41,7 +41,7 @@ RSpec.describe Metanorma::CustomAssets do
         
         # Verify the boilerplate file contains expected content
         boilerplate_content = File.read(expected_boilerplate_path)
-        expect(boilerplate_content).to include("Copyright © 1994-{{docyear}} International Color Consortium®")
+        expect(boilerplate_content).to include("Copyright (c) {{ docyear }} International Color Consortium")
         expect(boilerplate_content).to include("International Color Consortium and the ICC logo are registered trademarks")
         expect(boilerplate_content).to include("Visit the ICC Web site: http://www.color.org")
       end
