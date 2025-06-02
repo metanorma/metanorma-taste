@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
     || f.match(%r{Rakefile|bin/rspec}) \
     || f.match(%r{flake|\.(?:direnv|pryrc|irbrc|nix)})
   end
-  spec.extra_rdoc_files = %w[README.adoc CHANGELOG.adoc LICENSE.txt]
+  spec.extra_rdoc_files = %w[README.adoc LICENSE.txt]
   spec.bindir        = "bin"
   # spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
