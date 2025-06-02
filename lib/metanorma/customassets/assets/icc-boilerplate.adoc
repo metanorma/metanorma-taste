@@ -1,41 +1,72 @@
 == copyright-statement
 === Copyright notice
 
-Copyright © 1994-{{docyear}} International Color Consortium®
+Copyright © 1994-{{docyear}} International Color Consortium
+
+Copyright (c) {{ docyear }} International Color Consortium
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
-the Specification and associated documentation files (the “Specification”) to
-deal in the Specification without restriction, including without limitation the
-rights to use, copy, modify, merge, publish, distribute, and/or sublicense
-copies of the Specification, and to permit persons to whom the Specification is
-furnished to do so, subject to the following conditions.
+this Specification (the "Specification") to exploit the Specification without
+restriction including, without limitation, the rights to use, copy, modify,
+merge, publish, distribute, and/or sublicense, copies of the Specification, and
+to permit persons to whom the Specification is furnished to do so, subject to
+the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Specification.
+Elements of this Specification may be the subject of intellectual property
+rights of third parties throughout the world including, without limitation,
+patents, patent application, utility, models, copyrights, trade secrets or other
+proprietary rights ("Third Party IP Rights"). Although no Third Party IP Rights
+have been brought to the attention of the International Color Consortium (the
+"ICC") by its members, or as a result of the publication of this Specification
+in certain trade journals, the ICC has not conducted any independent
+investigation regarding the existence of Third Party IP Rights. The ICC shall
+not be held responsible for identifying Third Party IP Rights that may be
+implicated by the practice of this Specification or the permissions granted
+above, for conducting inquiries into the applicability, existence, validity, or
+scope of any Third Party IP Rights that are brought to the ICC's attention, or
+for obtaining licensing assurances with respect to any Third Party IP Rights.
 
-The Specification is provided "as is", without warranty of any kind, express,
-implied, or otherwise, including but not limited to the warranties of
-merchantability, fitness for a particular purpose and noninfringement. In no
-event shall the International Color Consortium be liable for any claim, damages
-or other liability, whether in an action of contract, tort or otherwise, arising
-from, out of, or in connection with the Specification or the use or other
-dealings in the Specification.
+THE SPECIFICATION IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS,
+IMPLIED, OR OTHERWISE INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NONINFRINGEMENT, QUIET
+ENJOYMENT, SYSTEM INTEGRATION, AND DATA ACCURACY. IN NO EVENT SHALL THE ICC BE
+LIABLE FOR ANY CLAIM, DAMAGES, LOSSES, EXPENSES OR OTHER LIABILITY, WHETHER IN
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, CAUSED BY, ARISING OR RESULTING FROM,
+OR THAT RELATE TO THE SPECIFICATION OR THE PRACTICE OR OTHER EXPLOITATION OF THE
+SPECIFICATION. FURTHER, YOU HEREBY AGREE TO DEFEND, INDEMNIFY AND HOLD HARMLESS
+THE ICC, AND ITS DIRECTORS AND EMPLOYEES, FROM AND AGAINST ANY AND ALL THIRD
+PARTY CLAIMS, ACTIONS SUITS, DAMAGES, LOSSES, COSTS, EXPENSES, OR OTHER
+LIABILITIES (INCLUDING REASONABLE ATTORNEY'S FEES AND EXPENSES) THAT WERE CAUSED
+BY, ARISE OR RESULT FROM, OR RELATE TO, YOUR PRACTICE OR OTHER EXPLOITATION OF
+THE SPECIFICATION (INCLUDING, WITHOUT LIMITATION, CLAIMS OF INFRINGEMENT).
 
-Except as contained in this notice, the name of the International Color
-Consortium shall not be used in advertising or otherwise to promote the use or
-other dealings in this Specification without prior written authorization from
-the International Color Consortium.
+The above copyright notice, permission, and conditions and disclaimers shall be
+included in all copies of any material portion of the Specification. Except as
+contained in this statement, the name "International Color Consortium" shall not
+be used in advertising or otherwise to promote the use or other dealings in this
+Specification without prior written authorization from the ICC.
 
-== license-statement
 === Licenses and trademarks
 
 International Color Consortium and the ICC logo are registered trademarks of the
-International Color Consortium. Rather than put a trademark symbol in every
-occurrence of other trademarked names, we state that we are using the names only
-in an editorial fashion, and to the benefit of the trademark owner, with no
-intention of infringement of the trademark.
+International Color Consortium.
 
-== feedback-statement
+Rather than put a trademark symbol in every occurrence of other trademarked
+names, we state that we are using the names only in an editorial fashion, and to
+the benefit of the trademark owner, with no intention of infringement of the
+trademark.
+
 === For additional information on the ICC
 
 Visit the ICC Web site: http://www.color.org
+
+
+== feedback-statement
+
+=== {blank}
+
+// [align=center]
+// **International Color Consortium**:
+// Standardizing [css color:blue]#color# fidelity since 1993.
+
+// (c) ICC {{ docyear }} - All rights reserved
