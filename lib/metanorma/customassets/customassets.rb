@@ -21,6 +21,8 @@ module Metanorma
           ":i18nyaml: #{f2}",
           ":publisher: International Color Consortium",
           ":publisher_abbr: ICC",
+          ":presentation-metadata-color-secondary: #376795",
+          ":presentation-metadata-backcover-text: color.org",
         ]
         attrs.insert(insertion_index, *new_attrs)
         options[":boilerplate-authority:"] = f1
