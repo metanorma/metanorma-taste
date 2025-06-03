@@ -1,0 +1,11 @@
+---
+flavor: elf
+owner: EXPRESS Language Foundation
+base-flavor: iso
+copyright-notice: copyright.adoc
+i18n-dictionary: i18n.yaml
+base-override:
+  publisher: EXPRESS Language Foundation
+  publisher_abbr: ELF
+  presentation-metadata-color-secondary: '#3f65a2'
+  presentation-metadata-backcover-text: expresslang.org

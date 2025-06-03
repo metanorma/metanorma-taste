@@ -1,0 +1,26 @@
+== copyright-statement
+=== {blank}
+(c) {{ docyear }} EXPRESS Language Foundation.
+
+All rights reserved. Unless otherwise specified, or required in the context of
+its implementation, no part of this publication may be reproduced or utilized
+otherwise in any form or by any means, electronic or mechanical, including
+photocopying, or posting on the internet or an intranet, without prior written
+permission. Permission can be requested from the EXPRESS Language Foundation.
+
+EXPRESS Language Foundation +
+2093 Philadelphia Pike Ste 3311 +
+Claymont, Delaware 19703 +
+USA
+
+E-mail: link:mailto:info@expresslang.org[info@expresslang.org]
+
+Published in the USA
+
+
+== feedback-statement
+
+=== {blank}
+
+[align=center]
+Don't panic, [css color:#3f65a2]#**EXPRESS**#.
