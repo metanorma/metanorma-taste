@@ -1,0 +1,11 @@
+---
+flavor: icc
+owner: International Color Consortium
+base-flavor: iso
+copyright-notice: copyright.adoc
+i18n-dictionary: i18n.yaml
+base-override:
+  publisher: International Color Consortium
+  publisher_abbr: ICC
+  presentation-metadata-color-secondary: '#376795'
+  presentation-metadata-backcover-text: color.org

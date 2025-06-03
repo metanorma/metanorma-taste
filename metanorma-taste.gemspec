@@ -1,31 +1,40 @@
-lib = File.expand_path("lib", __dir__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "metanorma/taste/version"
+# frozen_string_literal: true
+
+require_relative "lib/metanorma/taste/version"
+
+all_files_in_git = Dir.chdir(File.expand_path(__dir__)) do
+  `git ls-files -z`.split("\x0")
+end
 
 Gem::Specification.new do |spec|
-  spec.name          = "metanorma-taste"
-  spec.version       = Metanorma::Taste::VERSION
-  spec.authors       = ["Ribose Inc."]
-  spec.email         = ["open.source@ribose.com"]
+  spec.name = "metanorma-taste"
+  spec.version = Metanorma::Taste::VERSION
+  spec.authors = ["Ribose Inc."]
+  spec.email = ["open.source@ribose.com"]
 
-  spec.summary       = "Working with Metanorma Tastes"
-  spec.description   = "Library to process and handle default Metanorma Tastes."
-  spec.homepage      = "https://github.com/metanorma/metanorma-taste"
-  spec.license       = "BSD-2-Clause"
+  spec.summary = "Metanorma Taste Library"
+  spec.description = "Library to process and handle default Metanorma Tastes, providing configuration-driven customization of Metanorma flavours."
+  spec.homepage = "https://github.com/metanorma/metanorma-taste"
+  spec.license = "BSD-2-Clause"
+  spec.required_ruby_version = Gem::Requirement.new(">= 3.1.0")
 
-  spec.files         = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(test|spec|features|bin|.github)/}) \
-    || f.match(%r{Rakefile|bin/rspec}) \
-    || f.match(%r{flake|\.(?:direnv|pryrc|irbrc|nix)})
-  end
+  spec.metadata["homepage_uri"] = spec.homepage
+  spec.metadata["source_code_uri"] = spec.homepage
+  spec.metadata["bug_tracker_uri"] = "#{spec.homepage}/issues"
+
+  # Specify which files should be added to the gem when it is released.
+  spec.files = all_files_in_git
+    .reject { |f| f.match(%r{\A(?:test|spec|features|bin|\.github)/}) }
+    .reject { |f| f.match(%r{Rakefile|bin/rspec}) }
+    .reject { |f| f.match(%r{flake|\.(?:direnv|pryrc|irbrc|nix)}) }
+
   spec.extra_rdoc_files = %w[README.adoc LICENSE.txt]
-  spec.bindir        = "bin"
-  # spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.bindir = "bin"
   spec.require_paths = ["lib"]
-  spec.required_ruby_version = ">= 3.1.0"
 
   spec.add_development_dependency "debug"
   spec.add_development_dependency "equivalent-xml", "~> 0.6"
+  spec.add_development_dependency "metanorma"
   spec.add_development_dependency "metanorma-iso"
   spec.add_development_dependency "mnconvert"
   spec.add_development_dependency "pry"
@@ -37,5 +46,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "sassc-embedded", "~> 1"
   spec.add_development_dependency "simplecov", "~> 0.15"
   spec.add_development_dependency "xml-c14n"
-  spec.add_development_dependency "metanorma"
 end
