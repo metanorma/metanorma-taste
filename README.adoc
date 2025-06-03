@@ -1,27 +1,422 @@
-= metanorma-custom-assets
-Assets with which to customise Metanorma flavours based on other flavours
+= Metanorma Taste: lightweight customizable Metanorma flavours
 
-image:https://img.shields.io/gem/v/metanorma-custom-assets.svg["Gem Version", link="https://rubygems.org/gems/metanorma-custom-assets"]
-image:https://github.com/metanorma/metanorma-custom-assets/workflows/rake/badge.svg["Build Status", link="https://github.com/metanorma/metanorma-custom-assets/actions?workflow=rake"]
-image:https://codeclimate.com/github/metanorma/metanorma-custom-assets/badges/gpa.svg["Code Climate", link="https://codeclimate.com/github/metanorma/metanorma-custom-assets"]
-image:https://img.shields.io/github/issues-pr-raw/metanorma/metanorma-custom-assets.svg["Pull Requests", link="https://github.com/metanorma/metanorma-custom-assets/pulls"]
-image:https://img.shields.io/github/commits-since/metanorma/metanorma-custom-assets/latest.svg["Commits since latest",link="https://github.com/metanorma/metanorma-custom-assets/releases"]
+image:https://img.shields.io/gem/v/metanorma-taste.svg["Gem Version", link="https://rubygems.org/gems/metanorma-taste"]
+image:https://github.com/metanorma/metanorma-taste/workflows/rake/badge.svg["Build Status", link="https://github.com/metanorma/metanorma-taste/actions?workflow=rake"]
+image:https://img.shields.io/github/issues-pr-raw/metanorma/metanorma-taste.svg["Pull Requests", link="https://github.com/metanorma/metanorma-taste/pulls"]
+image:https://img.shields.io/github/commits-since/metanorma/metanorma-taste/latest.svg["Commits since latest",link="https://github.com/metanorma/metanorma-taste/releases"]
+
+== Metanorma Taste
+
+=== Overview
+
+A **Metanorma Taste** is a lightweight, configuration-only customization of an existing Metanorma flavor.
+
+Unlike a full Metanorma flavor, a taste does not define its own document
+structure, validation rules, or processing logic. Instead, it provides
+organizational branding and content customization on top of a base flavor.
+
+Think of it as "taste" being one aspect of "flavor" in real life -- a taste
+modifies the presentation and branding without changing the fundamental
+characteristics of the underlying flavor.
+
+=== Features
+
+**Configuration-Only**:: Tastes are defined purely through YAML configuration
+files and content assets (copyright notices, i18n dictionaries, stylesheets). No
+code is required.
+
+**Base flavor dependency**:: Every taste must specify a `base-flavor` (e.g.,
+`iso`, `ietf`, `ieee`) that provides the document structure and validation
+logic.
+
+**Lightweight customization**:: Tastes can override document attributes, provide
+custom copyright notices, modify presentation styling, and add
+internationalization content.
+
+
+=== Limitations
+
+Since tastes are configuration-only overlays on existing flavors, they have
+important limitations.
+
+**Document structure constraints**:: A taste cannot define document structures
+not allowed by the underlying base flavor. For example, an ISO-based taste
+cannot add document types that ISO doesn't support.
+
+**Validation inheritance**:: All document validation rules from the base flavor
+apply unchanged. This includes:
+
+* ISO/IEC warnings on terms and definitions requirements
+* Provision requirements and numbering rules
+* Document structure validation
+* Metadata requirements
+
+**Processing logic**:: Tastes cannot modify the core document processing,
+rendering, or output generation logic of the base flavor.
+
+**Customization scope**:: Tastes can only customize from document attributes or
+presentation attributes supported by the base flavor.
+
+
+== Installation
+
+The gem is distributed within Metanorma.
+
 
 == Usage
-[source,console]
+
+=== Compiling documents
+
+If a taste abbreviation is used instead of a flavor in compiling a Metanorma document, e.g. as the document attribute `:flavor: icc` or
+`:mn-document-class: icc`, this gem is used to process that document as an instance of its base flavor, and will substitute the necessary
+configuration files and document attributes required to get the document to render as expected.
+
+=== Basic usage
+
+[source,ruby]
 ----
-require "metanorma-custom-assets"
+require "metanorma-taste"
 
-c = Metanorma::CustomAssets.new(:icc)
-c.process_input_adoc_hdr(attributes, options)
+# Get a registered taste (returns Metanorma::Taste::Icc instance)
+taste = Metanorma::TasteRegister.get(:icc)
+# => Metanorma::Taste::Icc
+
+# Process document attributes and options
+taste.process_input_adoc_overrides(attributes, options)
 ----
 
-The function `process_input_doc_hdr` rewrites the document attributes of a document (given as an array of docuemnt attribute lines
-from the document header), and the options hash passed to `Metanorma::Compile.process_input_adoc()`, to conform with the expectations
-of the flavour named in the class initialisation. Any document attributes are inserted before the current attributes of the document,
-so that the document can override them if necessary with its own values.
+=== Listing tastes
 
-The module method `aliases` maps the flavour to predefined Metanorma flavours, and indicates that the nominated flavour is a customisation
-of that flavour.
+[source,ruby]
+----
+# List all available tastes
+Metanorma::TasteRegister.instance.available_tastes
+# => [:icc]
+
+# Get information about a specific taste
+Metanorma::TasteRegister.instance.taste_info(:icc)
+# => { flavor: :icc, owner: "International Color Consortium", base_flavor: :iso, ... }
+
+# Get flavor aliases (mapping to base flavours)
+Metanorma::Taste.aliases
+# => { icc: :iso }
+
+# Demonstrate dynamic class creation
+taste = Metanorma::TasteRegister.get(:icc)
+puts taste.class.to_s
+# => "Metanorma::Taste::Icc"
+----
+
+== Official tastes
+
+=== General
+
+Official tastes are maintained by the Metanorma team and provide standardized
+customizations for specific organizations or purposes. They are designed to
+be used with the Metanorma framework and provide consistent branding and
+presentation across documents.
+
+=== Adding official tastes
+
+Official tastes are maintained and version tested by the Metanorma team and are
+not user-configurable.
+
+Official tastes are only available to organizations that have an existing
+relationship with Metanorma. To request a new official taste, please open an
+issue on the Metanorma GitHub repository.
+
+Official tastes are located at the `data/` directory of the metanorma-taste gem.
+
+Each official taste has its own directory with the taste package structure.
+
+See <<creating-a-taste,Creating a taste>> for instructions on how to create a
+taste.
+
+=== Available taste codes
+
+All taste short codes must be unique among tastes. The following tastes are
+currently available:
+
+[cols="a,a,a,a", options="header"]
+|===
+|Code |Organization |Base Flavor |Description
+
+|`icc`
+|International Color Consortium
+|`iso`
+|ICC specifications and standards with ICC branding and copyright
+
+|===
 
 
+== Community tastes
+
+=== General
+
+Community tastes are user-defined Metanorma tastes. They are not maintained by
+the Metanorma team, but are available for use by your own community.
+
+=== Adding community tastes
+
+WARNING: This is to be implemented in a future release.
+
+Community tastes can be hosted on GitHub repositories or distributed as zip
+files.
+
+See <<creating-a-taste,Creating a taste>> for instructions on how to create a
+taste.
+
+== Taste package
+
+=== General
+
+A taste package is a directory structure that contains all the necessary files
+to define a Metanorma taste. It includes configuration files, copyright notices, internationalization dictionaries, and stylesheets if any.
+
+=== Directory structure
+
+Tastes are configured using a directory-based structure under `data/`:
+
+[source]
+----
+data/
+└── {taste-code}/
+    ├── config.yaml
+    ├── copyright.adoc (optional)
+    └── i18n.yaml (optional)
+----
+
+
+=== Configuration schema
+
+==== config.yaml
+
+The main configuration file for each taste:
+
+[source,yaml]
+----
+flavor: string             # The name of the custom flavor (e.g., "icc")
+owner: string              # Organization name (e.g., "International Color Consortium")
+base-flavor: string        # Base Metanorma flavor to extend (e.g., "iso")
+copyright-notice: string   # Path to boilerplate file (e.g., "copyright.adoc"), which includes
+                           # copyright, license, legal, and feedback notices
+i18n-dictionary: string    # Path to internationalization dictionary (e.g., "i18n.yaml")
+base-override:             # Hash of document attributes to override from base flavor
+  publisher: string        # Publisher name override
+  publisher_abbr: string   # Publisher abbreviation
+  presentation-metadata-*: # Template style attributes for presentation
+----
+
+.Taste configuration example from ICC
+[example]
+====
+[source,yaml]
+----
+flavor: icc
+owner: International Color Consortium
+base-flavor: iso
+copyright-notice: copyright.adoc
+i18n-dictionary: i18n.yaml
+base-override:
+  publisher: International Color Consortium
+  publisher_abbr: ICC
+  presentation-metadata-color-secondary: '#376795'
+  presentation-metadata-backcover-text: color.org
+----
+====
+
+==== i18n.yaml
+
+Internationalization dictionary for custom text translations:
+
+[source,yaml]
+----
+doctype_dict:             # Document type translations
+  international-standard: string  # Custom name for document types
+  # Add more document type mappings as needed
+----
+
+.i18n.yaml example from ICC
+[example]
+====
+[source,yaml]
+----
+doctype_dict:
+  international-standard: Specification
+----
+====
+
+
+==== copyright.adoc
+
+Organization-specific copyright, legal, license and feedback text. This file can contain:
+
+* Copyright statements with template variables (e.g., `{{ docyear }}`)
+* License information
+* Legal disclaimers
+* Organization contact information
+
+The file is in the Metanorma AsciiDoc format, with the following syntax:
+
+[source,asciidoc]
+----
+== copyright-statement
+...
+----
+
+.Copyright notice from ICC
+[example]
+====
+[source,asciidoc]
+----
+== copyright-statement
+=== Copyright notice
+
+Copyright (c) {{ docyear }} Your Organization Name
+
+[Legal text here...]
+
+== feedback-statement
+=== Contact Information
+
+[Organization contact details...]
+----
+====
+
+The same file format is used internally for Metanorma flavors, and is documented in
+https://www.metanorma.org/develop/topics/metadata-and-boilerplate/[Metadata and predefined text]
+on the metaorma.org site.
+
+=== Base-Override configuration
+
+The `base-override` section allows customization of any document attribute
+supported by the base flavor.
+
+This includes:
+
+Document attributes:
+
+* `publisher`: Organization name
+* `publisher_abbr`: Organization abbreviation
+* `doctype`: Document type mappings
+* Custom organization-specific attributes
+
+Template style attributes:
+
+* `presentation-metadata-*`: Visual styling attributes
+* Color schemes, logos, layout preferences
+* Typography and formatting options
+
+The availability of these attributes depends on the base flavor's supported
+document attributes and template system.
+
+For example, the ISO flavor supports specific presentation metadata attributes.
+
+Other flavors may have different customization options. Please check the base
+flavor documentation for available attributes.
+
+
+== Data model
+
+The metanorma-taste system follows this architecture:
+
+[source]
+----
++------------------+       +-------------------+
+|   TasteRegister  |       |   Taste::Base     |
+|   (Singleton)    |       |                   |
+| +available_tastes|<>---->| +flavor           |
+| +get(flavor)     |       | +config           |
+| +taste_info()    |       | +taste_info       |
++--------+---------+       | +process_input_*  |
+         |                 +-------------------+
+         |
+         | scans
++--------v---------+       +-------------------+
+|   data/ directory|       |   Dynamic Classes |
+|                  |       |                   |
+| +{taste}/        |------>| Taste::Icc        |
+|   config.yaml    |       | Taste::Foo        |
+|   copyright.adoc |       | (auto-generated)  |
+|   i18n.yaml      |       +-------------------+
++------------------+
+----
+
+=== Components
+
+`TasteRegister`:: (Singleton) Manages taste discovery and registration. Scans
+the `data/` directory on initialization and creates a registry of available
+tastes.
+
+`Taste::Base`:: Base class containing the core logic for processing document
+attributes and applying taste-specific overrides.
+
+`Taste::*` dynamic taste classes:: Automatically generated classes (e.g.,
+`Taste::Icc`) that inherit from `Taste::Base` and are configured with
+taste-specific data.
+
+Configuration files:: YAML and AsciiDoc files that define the behavior and
+content for each taste.
+
+
+=== Workflow
+
+. Discovery: On gem load, `TasteRegister` scans `data/` directory for taste configurations
+. Registration: Each valid taste directory is registered with its configuration
+. Access: Users call `TasteRegister.get(:flavor)` to obtain a configured taste instance
+. Processing: The taste instance applies overrides and customizations to document attributes
+. Integration: The customized attributes are used by Metanorma for document processing
+
+
+[[creating-a-taste]]
+== Creating a taste
+
+=== Overview
+
+Creating a new Metanorma taste is straightforward and involves defining a
+configuration directory with the necessary files.
+
+=== Directory structure
+
+To create a new taste:
+
+. Create directory: Add a new directory under `data/` with your unique taste code
+. Add configuration: Create `config.yaml` with your taste settings
+. Add content: Optionally add `copyright.adoc` and `i18n.yaml` files
+. Test: The taste will be automatically discovered and available via the TasteRegister
+
+Example for a new `acme` taste:
+
+[source]
+----
+data/acme/
+├── config.yaml
+├── copyright.adoc
+└── i18n.yaml
+----
+
+The taste will be accessible as:
+
+[source,ruby]
+----
+taste = Metanorma::TasteRegister.get(:acme)
+# Returns an instance of Metanorma::Taste::Acme
+----
+
+=== Taste code
+
+* Must be unique among all tastes
+* Should be short and descriptive (typically 2-5 characters)
+* Must be valid Ruby constant names when capitalized
+* Should reflect the owner organization's name
+
+
+== Copyright
+
+This gem is developed, maintained and funded by
+https://www.ribose.com[Ribose Inc.]
+
+== License
+
+The gem is available as open source under the terms of the
+https://opensource.org/licenses/BSD-2-Clause[2-Clause BSD License].
