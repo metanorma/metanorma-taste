@@ -65,6 +65,12 @@ The gem is distributed within Metanorma.
 
 == Usage
 
+=== Compiling documents
+
+If a taste abbreviation is used instead of a flavor in compiling a Metanorma document, e.g. as the document attribute `:flavor: icc` or
+`:mn-document-class: icc`, this gem is used to process that document as an instance of its base flavor, and will substitute the necessary
+configuration files and document attributes required to get the document to render as expected.
+
 === Basic usage
 
 [source,ruby]
@@ -189,10 +195,11 @@ The main configuration file for each taste:
 
 [source,yaml]
 ----
-flavor: string              # The name of the custom flavor (e.g., "icc")
+flavor: string             # The name of the custom flavor (e.g., "icc")
 owner: string              # Organization name (e.g., "International Color Consortium")
 base-flavor: string        # Base Metanorma flavor to extend (e.g., "iso")
-copyright-notice: string   # Path to copyright notice file (e.g., "copyright.adoc")
+copyright-notice: string   # Path to boilerplate file (e.g., "copyright.adoc"), which includes
+                           # copyright, license, legal, and feedback notices
 i18n-dictionary: string    # Path to internationalization dictionary (e.g., "i18n.yaml")
 base-override:             # Hash of document attributes to override from base flavor
   publisher: string        # Publisher name override
@@ -242,7 +249,7 @@ doctype_dict:
 
 ==== copyright.adoc
 
-Organization-specific copyright and legal text. This file can contain:
+Organization-specific copyright, legal, license and feedback text. This file can contain:
 
 * Copyright statements with template variables (e.g., `{{ docyear }}`)
 * License information
@@ -276,6 +283,9 @@ Copyright (c) {{ docyear }} Your Organization Name
 ----
 ====
 
+The same file format is used internally for Metanorma flavors, and is documented in
+https://www.metanorma.org/develop/topics/metadata-and-boilerplate/[Metadata and predefined text]
+on the metaorma.org site.
 
 === Base-Override configuration
 
