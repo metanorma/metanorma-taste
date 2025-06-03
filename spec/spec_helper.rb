@@ -1,7 +1,7 @@
 # Add the lib directory to the load path
 $LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 
-require "metanorma-custom-assets"
+require "metanorma-taste"
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

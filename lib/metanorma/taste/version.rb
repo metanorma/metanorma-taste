@@ -1,5 +1,5 @@
 module Metanorma
-  class CustomAssets
+  class Taste
     VERSION = "0.0.1".freeze
   end
 end

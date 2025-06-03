@@ -1,5 +1,5 @@
 module Metanorma
-  class CustomAssets
+  class Taste
     def initialize(flavor)
       @flavor = flavor
     end

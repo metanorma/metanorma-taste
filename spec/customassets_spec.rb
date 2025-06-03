@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe Metanorma::CustomAssets do
+RSpec.describe Metanorma::Taste do
   describe ".aliases" do
     it "returns the correct mapping of flavors" do
       expect(described_class.aliases).to eq({ icc: :iso })
@@ -12,18 +12,18 @@ RSpec.describe Metanorma::CustomAssets do
     let(:options) { {} }
 
     context "with :icc flavor" do
-      let(:custom_assets) { described_class.new(:icc) }
+      let(:taste) { described_class.new(:icc) }
       let(:expected_boilerplate_path) do
         # Use the same path construction logic as in the implementation
         File.join(
-          File.dirname(Metanorma::CustomAssets
+          File.dirname(Metanorma::Taste
           .instance_method(:process_input_adoc_overrides)
           .source_location.first), "assets", "icc-boilerplate.adoc"
         )
       end
 
       it "adds the correct attributes and updates options" do
-        result = custom_assets.process_input_adoc_overrides(attrs, options)
+        result = taste.process_input_adoc_overrides(attrs, options)
 
         # Check that the method returns the modified attrs array
         expect(result).to eq(attrs)
@@ -38,7 +38,7 @@ RSpec.describe Metanorma::CustomAssets do
       end
 
       it "generates output with the correct boilerplate path" do
-        custom_assets.process_input_adoc_overrides(attrs, options)
+        taste.process_input_adoc_overrides(attrs, options)
 
         # Verify the boilerplate file exists
         expect(File.exist?(expected_boilerplate_path)).to be true
@@ -55,13 +55,13 @@ RSpec.describe Metanorma::CustomAssets do
     end
 
     context "with other flavor" do
-      let(:custom_assets) { described_class.new(:other) }
+      let(:taste) { described_class.new(:other) }
 
       it "does not modify the attributes or options" do
         original_attrs = attrs.dup
         original_options = options.dup
 
-        result = custom_assets.process_input_adoc_overrides(attrs, options)
+        result = taste.process_input_adoc_overrides(attrs, options)
 
         # Check that the method returns the unmodified attrs array
         expect(result).to eq(original_attrs)
