@@ -146,6 +146,11 @@ currently available:
 |`iso`
 |ICC specifications and standards with ICC branding and copyright
 
+|`elf`
+|Express Language Foundation
+|`iso`
+|ELF specifications and standards with ELF branding and copyright
+
 |===
 
 
