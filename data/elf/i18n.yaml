@@ -1,2 +1,3 @@
-doctype_dict:
-  international-standard: Standard
+doctype:
+  standard: Standard
+  guide: Guide
