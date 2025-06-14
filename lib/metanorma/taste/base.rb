@@ -18,7 +18,7 @@ module Metanorma
         # If attrs has fewer than 2 elements, this will handle it appropriately
         insertion_index = [attrs.length, 2].min
 
-        new_attrs = build_attribute_overrides
+        attrs, new_attrs = build_attribute_overrides(attrs)
         attrs.insert(insertion_index, *new_attrs) unless new_attrs.empty?
 
         # Set boilerplate authority if copyright notice exists
@@ -32,45 +32,67 @@ module Metanorma
 
       private
 
-      def build_attribute_overrides
+      def build_attribute_overrides(attrs)
         overrides = []
-
-        # Add copyright notice if available
-        copyright_file = copyright_notice_path
-        if copyright_file && File.exist?(copyright_file)
-          overrides << ":boilerplate-authority: #{copyright_file}"
-        end
-
-        # Add i18n dictionary if available
-        i18n_file = i18n_dictionary_path
-        if i18n_file && File.exist?(i18n_file)
-          overrides << ":i18nyaml: #{i18n_file}"
-        end
-
+        build_attribute_copyright_overrides(overrides)
+        build_attribute_i18n_overrides(overrides)
         # Add base-override attributes
         @taste_info[:base_override].each do |key, value|
           overrides << ":#{key}: #{value}"
         end
+        build_attribute_doctype_overrides(attrs, overrides)
+        [attrs, overrides]
+      end
 
-        overrides
+      # Add copyright notice if available
+      def build_attribute_copyright_overrides(overrides)
+        copyright_file = copyright_notice_path
+        if copyright_file && File.exist?(copyright_file)
+          overrides << ":boilerplate-authority: #{copyright_file}"
+        end
+      end
+
+      # Add i18n dictionary if availablee
+      def build_attribute_i18n_overrides(overrides)
+        i18n_file = i18n_dictionary_path
+        if i18n_file && File.exist?(i18n_file)
+          overrides << ":i18nyaml: #{i18n_file}"
+        end
+      end
+
+      def build_attribute_doctype_overrides(attrs, overrides)
+        doctype_idx, dt = build_attribute_doctype_overrides_prep(attrs)
+        dt.nil? and return
+        overrides << ":presentation-metadata-doctype-alias: #{dt['taste']}"
+        attrs[doctype_idx] = ":doctype: #{dt['base']}"
+        dt["override_attributes"]&.each do |key, value|
+          overrides << ":#{key}: #{value}"
+        end
+      end
+
+      def build_attribute_doctype_overrides_prep(attrs)
+        doctype_idx = attrs.index { |e| /^:doctype:/.match?(e) } or
+          return [nil, nil, nil]
+        old_doctype = attrs[doctype_idx].sub(/^:doctype:/, "").strip
+        dt = @taste_info[:doctypes].detect do |e|
+          e["taste"] == old_doctype
+        end or return [nil, nil, nil]
+        [doctype_idx, dt]
       end
 
       def copyright_notice_path
-        return nil unless @taste_info[:copyright_notice]
-
+        @taste_info[:copyright_notice] or return nil
         File.join(@taste_info[:directory], @taste_info[:copyright_notice])
       end
 
       def i18n_dictionary_path
-        return nil unless @taste_info[:i18n_dictionary]
-
+        @taste_info[:i18n_dictionary] or return nil
         File.join(@taste_info[:directory], @taste_info[:i18n_dictionary])
       end
 
       def load_i18n_dictionary
         i18n_file = i18n_dictionary_path
-        return {} unless i18n_file && File.exist?(i18n_file)
-
+        i18n_file && File.exist?(i18n_file) or return {}
         YAML.load_file(i18n_file)
       rescue StandardError
         {}
