@@ -1,2 +1,7 @@
 doctype_dict:
-  international-standard: Specification
+  specification: Specification
+  ics: Interoperability Conformance Specification
+  white-paper: White Paper
+  proposal: Proposal
+  votable-proposal: Votable Proposal
+  technical-note: Technical Note

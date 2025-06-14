@@ -210,6 +210,10 @@ base-override:             # Hash of document attributes to override from base f
   publisher: string        # Publisher name override
   publisher_abbr: string   # Publisher abbreviation
   presentation-metadata-*: # Template style attributes for presentation
+doctypes:                  # Array of doctypes built over base flavour doctypes
+  - taste:                 # taste-specific machine-readable doctype name
+    base:                  # Base Metanorma flavor corresponding machine-readable doctype name
+    override-attributes:   # Hash of document attributes to override from base flavor for this doctype
 ----
 
 .Taste configuration example from ICC
@@ -227,6 +231,11 @@ base-override:
   publisher_abbr: ICC
   presentation-metadata-color-secondary: '#376795'
   presentation-metadata-backcover-text: color.org
+doctypes:
+- taste: specification # Specification # The name goes into i18n.yaml
+  base: international-standard
+  override-attributes:
+  - presentation-metadata-color-secondary: '#376795'
 ----
 ====
 
@@ -241,13 +250,16 @@ doctype_dict:             # Document type translations
   # Add more document type mappings as needed
 ----
 
+Note that any taste-specific doctypes need to have a renderable corresponding entry under
+`doctype_dict`. The same is the case for the native doctypes in the base flavor's i18n.yaml files.
+
 .i18n.yaml example from ICC
 [example]
 ====
 [source,yaml]
 ----
 doctype_dict:
-  international-standard: Specification
+  specification: Specification
 ----
 ====
 

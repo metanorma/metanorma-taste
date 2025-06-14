@@ -77,6 +77,7 @@ module Metanorma
         copyright_notice: config["copyright-notice"],
         i18n_dictionary: config["i18n-dictionary"],
         base_override: config["base-override"] || {},
+        doctypes: config["doctypes"] || {}
       }
     end
 

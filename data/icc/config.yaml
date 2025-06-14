@@ -9,3 +9,20 @@ base-override:
   publisher_abbr: ICC
   presentation-metadata-color-secondary: '#376795'
   presentation-metadata-backcover-text: color.org
+doctypes:
+- taste: specification # Specification # The name goes into i18n.yaml
+  base: international-standard
+  override-attributes:
+  - presentation-metadata-color-secondary: '#376795'
+- taste: ics # Interoperability Conformance Specification
+  base: international-standard
+  override-attributes:
+  - presentation-metadata-color-secondary: '#376795'
+- taste: white-paper # White Paper
+  base: international-standard
+- taste: proposal # Proposal
+  base: international-standard
+- taste: votable-proposal # Votable Proposal
+  base: international-standard
+- taste: technical-note # Technical Note
+  base: international-standard

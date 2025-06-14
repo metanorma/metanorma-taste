@@ -16,6 +16,11 @@ RSpec.describe Metanorma::TasteRegister do
       expect(info[:owner]).to eq("International Color Consortium")
       expect(info[:base_flavor]).to eq(:iso)
       expect(info[:base_override]).to include("publisher" => "International Color Consortium")
+      expect(info[:doctypes]).to include(
+      {"taste" => "specification", "base"=> "international-standard", "override-attributes" =>
+  [{"presentation-metadata-color-secondary" => '#376795'}]}
+      )
+
     end
   end
 
@@ -46,7 +51,7 @@ RSpec.describe Metanorma::TasteRegister do
   end
 
   describe "#process_input_adoc_overrides" do
-    let(:attrs) { [] }
+    let(:attrs) { [":doctype: specification"] }
     let(:options) { {} }
     let(:taste) { described_class.get(:icc) }
 
@@ -74,6 +79,8 @@ RSpec.describe Metanorma::TasteRegister do
       expect(attrs).to include(":publisher_abbr: ICC")
       expect(attrs).to include(":presentation-metadata-color-secondary: #376795")
       expect(attrs).to include(":presentation-metadata-backcover-text: color.org")
+      expect(attrs).to include(":doctype: international-standard")
+      expect(attrs).to include(":presentation-metadata-doctype-alias: specification")
 
       # Check that the options hash is updated
       expect(options[":boilerplate-authority:"]).to eq(expected_boilerplate_path)
