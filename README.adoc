@@ -55,7 +55,9 @@ apply unchanged. This includes:
 rendering, or output generation logic of the base flavor.
 
 **Customization scope**:: Tastes can only customize from document attributes or
-presentation attributes supported by the base flavor.
+presentation attributes supported by the base flavor. Any document attributes
+or presentation attributes specific to the taste need to be specified as
+`:semantic-metadata-...` or `presentation-metadata-...`.
 
 
 == Installation
@@ -153,6 +155,16 @@ currently available:
 
 |===
 
+=== Document attributes specific to tastes
+
+A number of document attributes are supplied for tastes behind the scenes, based on user
+choices; for example, `:presentation-metadata-backcover-text:`, specifying the taste
+SDO URL in ISO-based tastes. Other such attributes need to be specified by the user;
+they include the following:
+
+`icc`::
+`:semantic-metadata-white-paper-level:`::: The level at which a White Paper is pitched
+(introductory, intermediate, etc.)
 
 == Community tastes
 
