@@ -34,8 +34,12 @@ module Metanorma
 
       def build_attribute_overrides(attrs)
         overrides = []
-        build_attribute_copyright_overrides(overrides)
-        build_attribute_i18n_overrides(overrides)
+        #build_attribute_copyright_overrides(overrides)
+        #build_attribute_i18n_overrides(overrides)
+        #build_attribute_publisher_logo_overrides(overrides)
+        file_attr_override(:copyright_notice, "boilerplate-authority", overrides)
+        file_attr_override(:publisher_logo, "publisher_logo", overrides)
+        file_attr_override(:i18n_dictionary, "i18nyaml", overrides)
         # Add base-override attributes
         @taste_info[:base_override].each do |key, value|
           overrides << ":#{key}: #{value}"
@@ -52,11 +56,27 @@ module Metanorma
         end
       end
 
-      # Add i18n dictionary if availablee
+      # Add copyright notice if available
+      def build_attribute_publisher_logo_overrides(overrides)
+        copyright_file = publisher_logo_path
+        if copyright_file && File.exist?(copyright_file)
+          overrides << ":publisher_logo: #{copyright_file}"
+        end
+      end
+
+      # Add i18n dictionary if available
       def build_attribute_i18n_overrides(overrides)
         i18n_file = i18n_dictionary_path
         if i18n_file && File.exist?(i18n_file)
           overrides << ":i18nyaml: #{i18n_file}"
+        end
+      end
+
+      def file_attr_override(source_attr_name, target_attr_name, overrides)
+        s = @taste_info[source_attr_name] or return nil
+        f = File.join(@taste_info[:directory], s)
+        if f && File.exist?(f)
+          overrides << ":#{target_attr_name}: #{f}"
         end
       end
 
@@ -83,6 +103,11 @@ module Metanorma
       def copyright_notice_path
         @taste_info[:copyright_notice] or return nil
         File.join(@taste_info[:directory], @taste_info[:copyright_notice])
+      end
+
+      def publisher_logo_path
+        @taste_info[:publisher_logo] or return nil
+        File.join(@taste_info[:directory], @taste_info[:publisher_logo])
       end
 
       def i18n_dictionary_path

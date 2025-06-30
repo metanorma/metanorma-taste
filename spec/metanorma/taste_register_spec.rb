@@ -65,6 +65,11 @@ RSpec.describe Metanorma::TasteRegister do
       info = described_class.instance.taste_info(:icc)
       File.join(info[:directory], info[:i18n_dictionary])
     end
+    let(:expected_logo_path) do
+      # Get the actual path from the taste info
+      info = described_class.instance.taste_info(:icc)
+      File.join(info[:directory], info[:publisher_logo])
+    end
 
     it "adds the correct attributes and updates options" do
       result = taste.process_input_adoc_overrides(attrs, options)
@@ -75,6 +80,7 @@ RSpec.describe Metanorma::TasteRegister do
       # Check that the attrs array contains the expected values
       expect(attrs).to include(":boilerplate-authority: #{expected_boilerplate_path}")
       expect(attrs).to include(":i18nyaml: #{expected_i18n_path}")
+      expect(attrs).to include(":publisher_logo: #{expected_logo_path}")
       expect(attrs).to include(":publisher: International Color Consortium")
       expect(attrs).to include(":publisher_abbr: ICC")
       expect(attrs).to include(":presentation-metadata-color-secondary: #376795")

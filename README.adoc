@@ -206,6 +206,7 @@ base-flavor: string        # Base Metanorma flavor to extend (e.g., "iso")
 copyright-notice: string   # Path to boilerplate file (e.g., "copyright.adoc"), which includes
                            # copyright, license, legal, and feedback notices
 i18n-dictionary: string    # Path to internationalization dictionary (e.g., "i18n.yaml")
+publisher-logo: string     # Path to publisher logo (e.g., "icc.png")
 base-override:             # Hash of document attributes to override from base flavor
   publisher: string        # Publisher name override
   publisher_abbr: string   # Publisher abbreviation
