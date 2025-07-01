@@ -1,0 +1,26 @@
+== copyright-statement
+=== {blank}
+(c) {{ docyear }} Enosema Foundation.
+
+All rights reserved. Unless otherwise specified, or required in the context of
+its implementation, no part of this publication may be reproduced or utilized
+otherwise in any form or by any means, electronic or mechanical, including
+photocopying, or posting on the internet or an intranet, without prior written
+permission. Permission can be requested from the Enosema Foundation.
+
+Enosema Foundation +
+2885 Sanford Ave Sw Suite 32361 +
+Grandville MI 49418-1342 +
+USA
+
+E-mail: link:mailto:info@enosema.org[info@enosema.org]
+
+Published in the USA
+
+
+== feedback-statement
+
+=== {blank}
+
+[align=center]
+[css color:#007724]#**Making meaning meaningful**#

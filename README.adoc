@@ -151,6 +151,11 @@ currently available:
 |`iso`
 |ELF specifications and standards with ELF branding and copyright
 
+|`enosema`
+|Enosema Foundation
+|`iso`
+|Enosema specifications and standards with Enosema branding and copyright
+
 |===
 
 

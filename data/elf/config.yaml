@@ -4,6 +4,7 @@ owner: EXPRESS Language Foundation
 base-flavor: iso
 copyright-notice: copyright.adoc
 i18n-dictionary: i18n.yaml
+publisher-logo: logo.svg
 base-override:
   publisher: EXPRESS Language Foundation
   publisher_abbr: ELF
