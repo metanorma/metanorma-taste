@@ -32,18 +32,5 @@ Gem::Specification.new do |spec|
   spec.bindir = "bin"
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "debug"
-  spec.add_development_dependency "equivalent-xml", "~> 0.6"
-  spec.add_development_dependency "metanorma"
-  spec.add_development_dependency "metanorma-iso"
-  spec.add_development_dependency "mnconvert"
-  spec.add_development_dependency "pry"
-  spec.add_development_dependency "rake", "~> 13.0"
-  spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "rspec-command", "~> 1.0"
-  spec.add_development_dependency "rubocop", "~> 1"
-  spec.add_development_dependency "rubocop-performance"
-  spec.add_development_dependency "sassc-embedded", "~> 1"
-  spec.add_development_dependency "simplecov", "~> 0.15"
-  spec.add_development_dependency "xml-c14n"
+  spec.add_dependency "lutaml-model", "~>0.7"
 end
