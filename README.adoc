@@ -67,9 +67,12 @@ The gem is distributed within Metanorma.
 
 === Compiling documents
 
-If a taste abbreviation is used instead of a flavor in compiling a Metanorma document, e.g. as the document attribute `:flavor: icc` or
-`:mn-document-class: icc`, this gem is used to process that document as an instance of its base flavor, and will substitute the necessary
-configuration files and document attributes required to get the document to render as expected.
+If a taste abbreviation is used instead of a flavor in compiling a Metanorma
+document, e.g. as the document attribute `:flavor: icc` or
+`:mn-document-class: icc`, this gem is used to process that document as an
+instance of its base flavor, and will substitute the necessary configuration
+files and document attributes required to get the document to render as
+expected.
 
 === Basic usage
 
@@ -90,20 +93,20 @@ taste.process_input_adoc_overrides(attributes, options)
 [source,ruby]
 ----
 # List all available tastes
-Metanorma::TasteRegister.instance.available_tastes
-# => [:icc]
+Metanorma::TasteRegister.available_tastes
+# => [:icc, :elf, :enosema]
 
 # Get information about a specific taste
-info = Metanorma::TasteRegister.instance.taste_info(:icc)
+config = Metanorma::TasteRegister.get_config(:icc)
 # => #<Metanorma::Taste::TasteConfig:...>
-puts info.owner
+puts config.owner
 # => "International Color Consortium"
-puts info.base_flavor
+puts config.base_flavor
 # => "iso"
 
 # Get flavor aliases (mapping to base flavours)
-Metanorma::Taste.aliases
-# => { icc: :iso }
+Metanorma::TasteRegister.aliases
+# => { icc: :iso, elf: :iso, enosema: :iso }
 
 # Demonstrate dynamic class creation
 taste = Metanorma::TasteRegister.get(:icc)
@@ -354,7 +357,7 @@ The metanorma-taste system follows this architecture:
 |   (Singleton)    |       |                   |
 | +available_tastes|<>---->| +flavor           |
 | +get(flavor)     |       | +config           |
-| +taste_info()    |       | +taste_info       |
+| +get_config()    |       | +directory        |
 +--------+---------+       | +process_input_*  |
          |                 +-------------------+
          |
@@ -363,10 +366,10 @@ The metanorma-taste system follows this architecture:
 |   data/ directory|       |   Dynamic Classes |
 |                  |       |                   |
 | +{taste}/        |------>| Taste::Icc        |
-|   config.yaml    |       | Taste::Foo        |
-|   copyright.adoc |       | (auto-generated)  |
-|   i18n.yaml      |       +-------------------+
-+------------------+
+|   config.yaml    |       | Taste::Elf        |
+|   copyright.adoc |       | Taste::Enosema    |
+|   i18n.yaml      |       | (auto-generated)  |
++------------------+       +-------------------+
 ----
 
 === Components

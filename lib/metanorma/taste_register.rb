@@ -16,12 +16,13 @@ module Metanorma
   #   icc_taste = TasteRegister.get("icc")
   #
   #   # List available tastes
-  #   TasteRegister.instance.available_tastes
+  #   TasteRegister.available_tastes
   #   # => [:icc, :elf, :enosema]
   #
-  #   # Get taste information
-  #   TasteRegister.instance.taste_info("icc")
-  #   # => { flavor: :icc, owner: "International Color Consortium", ... }
+  #   # Get taste configuration
+  #   config = TasteRegister.get_config("icc")
+  #   # => #<Metanorma::Taste::TasteConfig:...>
+  #   puts config.owner  # => "International Color Consortium"
   class TasteRegister
     include Singleton
 
@@ -71,7 +72,7 @@ module Metanorma
     # @return [Array<Symbol>] Array of available flavor names
     #
     # @example
-    #   TasteRegister.instance.available_tastes
+    #   TasteRegister.available_tastes
     #   # => [:icc, :elf, :enosema]
     def available_tastes
       @taste_configs.keys
@@ -83,9 +84,13 @@ module Metanorma
     # @return [TasteConfig, nil] The taste configuration object, or nil if not found
     #
     # @example
-    #   config = TasteRegister.instance.taste_info("icc")
+    #   config = TasteRegister.get_config("icc")
     #   puts config.owner  # => "International Color Consortium"
-    def taste_info(flavor)
+    def self.get_config(flavor)
+      instance.get_config(flavor)
+    end
+
+    def get_config(flavor)
       flavor_sym = normalize_flavor_name(flavor)
       config = @taste_configs[flavor_sym]
       return nil unless config
@@ -102,6 +107,10 @@ module Metanorma
     # @example
     #   aliases = TasteRegister.instance.aliases
     #   # => { icc: :iso, elf: :iso, enosema: :iso }
+    def self.aliases
+      instance.aliases
+    end
+
     def aliases
       @taste_configs.each_with_object({}) do |(flavor, config), aliases|
         aliases[flavor] = config.base_flavor&.to_sym if config.base_flavor
