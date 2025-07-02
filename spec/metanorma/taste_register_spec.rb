@@ -12,15 +12,14 @@ RSpec.describe Metanorma::TasteRegister do
   describe "#taste_info" do
     it "returns taste information" do
       info = register.taste_info(:icc)
-      expect(info[:flavor]).to eq(:icc)
-      expect(info[:owner]).to eq("International Color Consortium")
-      expect(info[:base_flavor]).to eq(:iso)
-      expect(info[:base_override]).to include("publisher" => "International Color Consortium")
-      expect(info[:doctypes]).to include(
-      {"taste" => "specification", "base"=> "international-standard", "override-attributes" =>
-  [{"presentation-metadata-color-secondary" => '#376795'}]}
-      )
-
+      expect(info).to be_a(Metanorma::Taste::TasteConfig)
+      expect(info.flavor).to eq("icc")
+      expect(info.owner).to eq("International Color Consortium")
+      expect(info.base_flavor).to eq("iso")
+      expect(info.base_override.publisher).to eq("International Color Consortium")
+      expect(info.doctypes.first.taste).to eq("specification")
+      expect(info.doctypes.first.base).to eq("international-standard")
+      expect(info.directory).to end_with(File.join("data", "icc"))
     end
   end
 
@@ -46,7 +45,7 @@ RSpec.describe Metanorma::TasteRegister do
     it "raises an error for unknown taste" do
       expect do
         register.get(:unknown)
-      end.to raise_error(RuntimeError, "Unknown taste: unknown")
+      end.to raise_error(Metanorma::TasteRegister::UnknownTasteError, "Unknown taste: unknown")
     end
   end
 
@@ -58,17 +57,17 @@ RSpec.describe Metanorma::TasteRegister do
     let(:expected_boilerplate_path) do
       # Get the actual path from the taste info
       info = described_class.instance.taste_info(:icc)
-      File.join(info[:directory], info[:copyright_notice])
+      File.join(info.directory, info.copyright_notice)
     end
     let(:expected_i18n_path) do
       # Get the actual path from the taste info
       info = described_class.instance.taste_info(:icc)
-      File.join(info[:directory], info[:i18n_dictionary])
+      File.join(info.directory, info.i18n_dictionary)
     end
     let(:expected_logo_path) do
       # Get the actual path from the taste info
       info = described_class.instance.taste_info(:icc)
-      File.join(info[:directory], info[:publisher_logo])
+      File.join(info.directory, info.publisher_logo)
     end
 
     it "adds the correct attributes and updates options" do
