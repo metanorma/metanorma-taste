@@ -9,9 +9,9 @@ RSpec.describe Metanorma::TasteRegister do
     end
   end
 
-  describe "#taste_info" do
+  describe "#get_config" do
     it "returns taste information" do
-      info = register.taste_info(:icc)
+      info = register.get_config(:icc)
       expect(info).to be_a(Metanorma::Taste::TasteConfig)
       expect(info.flavor).to eq("icc")
       expect(info.owner).to eq("International Color Consortium")
@@ -56,17 +56,17 @@ RSpec.describe Metanorma::TasteRegister do
 
     let(:expected_boilerplate_path) do
       # Get the actual path from the taste info
-      info = described_class.instance.taste_info(:icc)
+      info = described_class.instance.get_config(:icc)
       File.join(info.directory, info.copyright_notice)
     end
     let(:expected_i18n_path) do
       # Get the actual path from the taste info
-      info = described_class.instance.taste_info(:icc)
+      info = described_class.instance.get_config(:icc)
       File.join(info.directory, info.i18n_dictionary)
     end
     let(:expected_logo_path) do
       # Get the actual path from the taste info
-      info = described_class.instance.taste_info(:icc)
+      info = described_class.instance.get_config(:icc)
       File.join(info.directory, info.publisher_logo)
     end
 
