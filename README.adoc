@@ -94,8 +94,12 @@ Metanorma::TasteRegister.instance.available_tastes
 # => [:icc]
 
 # Get information about a specific taste
-Metanorma::TasteRegister.instance.taste_info(:icc)
-# => { flavor: :icc, owner: "International Color Consortium", base_flavor: :iso, ... }
+info = Metanorma::TasteRegister.instance.taste_info(:icc)
+# => #<Metanorma::Taste::TasteConfig:...>
+puts info.owner
+# => "International Color Consortium"
+puts info.base_flavor
+# => "iso"
 
 # Get flavor aliases (mapping to base flavours)
 Metanorma::Taste.aliases
