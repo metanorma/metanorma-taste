@@ -148,6 +148,7 @@ module Metanorma
           copyright_notice: "boilerplate-authority",
           publisher_logo: "publisher_logo",
           i18n_dictionary: "i18nyaml",
+          htmlcoverpage: "htmlcoverpage",
         }
       end
 

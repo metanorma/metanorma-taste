@@ -5,6 +5,7 @@ base-flavor: iso
 copyright-notice: copyright.adoc
 i18n-dictionary: i18n.yaml
 publisher-logo: icc-full.svg
+htmlcoverpage: htmlcoverpage.html
 base-override:
   publisher: International Color Consortium
   publisher_abbr: ICC

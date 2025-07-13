@@ -14,6 +14,7 @@ module Metanorma
       attribute :copyright_notice, :string
       attribute :i18n_dictionary, :string
       attribute :publisher_logo, :string
+      attribute :htmlcoverpage, :string
       attribute :base_override, BaseOverride
       attribute :doctypes, DoctypeConfig, collection: true
       attribute :directory, :string
@@ -25,6 +26,7 @@ module Metanorma
         map "copyright-notice", to: :copyright_notice
         map "i18n-dictionary", to: :i18n_dictionary
         map "publisher-logo", to: :publisher_logo
+        map "htmlcoverpage", to: :htmlcoverpage
         map "base-override", to: :base_override
         map "doctypes", to: :doctypes
       end
