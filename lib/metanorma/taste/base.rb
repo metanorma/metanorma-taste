@@ -43,6 +43,9 @@ module Metanorma
         publisher_abbr: "publisher_abbr",
         presentation_metadata_color_secondary: "presentation-metadata-color-secondary",
         presentation_metadata_backcover_text: "presentation-metadata-backcover-text",
+        body_font: "body-font",
+        header_font: "header-font",
+        monospace_font: "monospace-font",
       }.freeze
 
       # Initialize a new Base processor
