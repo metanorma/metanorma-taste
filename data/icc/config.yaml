@@ -10,8 +10,8 @@ base-override:
   publisher_abbr: ICC
   presentation-metadata-color-secondary: '#376795'
   presentation-metadata-backcover-text: color.org
-  body-font: Arial
-  header-font: Arial
+  body-font: Arial, 'Helvetica Neue', Helvetica, sans-serif
+  header-font: Arial, 'Helvetica Neue', Helvetica, sans-serif
 doctypes:
 - taste: specification # Specification # The name goes into i18n.yaml
   base: international-standard
