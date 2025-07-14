@@ -149,6 +149,15 @@ module Metanorma
           publisher_logo: "publisher_logo",
           i18n_dictionary: "i18nyaml",
           htmlcoverpage: "htmlcoverpage",
+          htmlintropage: "htmlintropage",
+          htmlstylesheet: "htmlstylesheet",
+          htmlstylesheet_override: "htmlstylesheet-override",
+          wordcoverpage: "wordcoverpage",
+          wordintropage: "wordintropage",
+          wordstylesheet: "wordstylesheet",
+          wordstylesheet_override: "wordstylesheet-override",
+          pdfstylesheet: "pdfstylesheet",
+          pdfstylesheet_override: "pdfstylesheet-override",
         }
       end
 
