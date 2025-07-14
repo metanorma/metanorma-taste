@@ -60,19 +60,20 @@ RSpec.describe Metanorma::TasteRegister do
       File.join(info.directory, info.copyright_notice)
     end
     let(:expected_i18n_path) do
-      # Get the actual path from the taste info
       info = described_class.instance.get_config(:icc)
       File.join(info.directory, info.i18n_dictionary)
     end
     let(:expected_logo_path) do
-      # Get the actual path from the taste info
       info = described_class.instance.get_config(:icc)
       File.join(info.directory, info.publisher_logo)
     end
     let(:expected_htmlcoverpage) do
-      # Get the actual path from the taste info
       info = described_class.instance.get_config(:icc)
       File.join(info.directory, info.htmlcoverpage)
+    end
+    let(:expected_htmlstylesheet_override) do
+      info = described_class.instance.get_config(:icc)
+      File.join(info.directory, info.htmlstylesheet_override)
     end
 
     it "adds the correct attributes and updates options" do
@@ -86,6 +87,7 @@ RSpec.describe Metanorma::TasteRegister do
       expect(attrs).to include(":i18nyaml: #{expected_i18n_path}")
       expect(attrs).to include(":publisher_logo: #{expected_logo_path}")
       expect(attrs).to include(":htmlcoverpage: #{expected_htmlcoverpage}")
+      expect(attrs).to include(":htmlstylesheet-override: #{expected_htmlstylesheet_override}")
       expect(attrs).to include(":publisher: International Color Consortium")
       expect(attrs).to include(":publisher_abbr: ICC")
       expect(attrs).to include(":body-font: Arial, 'Helvetica Neue', Helvetica, sans-serif")
