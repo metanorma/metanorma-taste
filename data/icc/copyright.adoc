@@ -1,14 +1,19 @@
 == copyright-statement
+
+// This is approved by ICC at metanorma/metanorma-taste#16
+// Modified from mn-samples-icc's copyright-2004.adoc with the removal of the
+// phrase 'modify, '.
+
 === Copyright notice
 
-Copyright (c) {{ docyear }} International Color Consortium
+Copyright (c) {{ docyear }} International Color Consortium (R)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this Specification (the "Specification") to exploit the Specification without
-restriction including, without limitation, the rights to use, copy, modify,
-merge, publish, distribute, and/or sublicense, copies of the Specification, and
-to permit persons to whom the Specification is furnished to do so, subject to
-the following conditions:
+restriction including, without limitation, the rights to use, copy, merge,
+publish, distribute, and/or sublicense, copies of the Specification, and to
+permit persons to whom the Specification is furnished to do so, subject to the
+following conditions:
 
 Elements of this Specification may be the subject of intellectual property
 rights of third parties throughout the world including, without limitation,
