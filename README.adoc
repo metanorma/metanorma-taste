@@ -9,7 +9,8 @@ image:https://img.shields.io/github/commits-since/metanorma/metanorma-taste/late
 
 === Overview
 
-A **Metanorma Taste** is a lightweight, configuration-only customization of an existing Metanorma flavor.
+A **Metanorma Taste** is a lightweight, configuration-only customization of an
+existing Metanorma flavor.
 
 Unlike a full Metanorma flavor, a taste does not define its own document
 structure, validation rules, or processing logic. Instead, it provides
