@@ -1,0 +1,7 @@
+doctype_dict:
+  specification: Specification
+  application-note: Application Note
+  best-practice: Best Practice
+  technical-note: Technical Note
+  international-standard: International Standard
+  international-technical-specification: International Technical Specification
