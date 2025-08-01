@@ -1,0 +1,41 @@
+---
+flavor: pdfa
+owner: PDF Association Inc.
+base-flavor: iso
+copyright-notice: copyright.adoc
+i18n-dictionary: i18n.yaml
+publisher-logo: pdfa-logo.svg
+htmlcoverpage: htmlcoverpage.html
+htmlstylesheet-override: htmlstylesheet-override.scss
+base-override:
+  publisher: PDF Association
+  publisher_abbr: PDFA
+  presentation-metadata-color-secondary: '#d03f4e'
+  presentation-metadata-backcover-text: pdfa.org
+  body-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
+  header-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
+doctypes:
+- taste: specification # Specification # The name goes into i18n.yaml
+  base: international-standard
+  override-attributes:
+  - presentation-metadata-color-secondary: '#d03f4e'
+- taste: international-standard # International Standard
+  base: international-standard
+  override-attributes:
+  - presentation-metadata-color-secondary: '#8b985b'
+- taste: international-technical-specification # International Technical Specification
+  base: technical-specification
+  override-attributes:
+  - presentation-metadata-color-secondary: '#8b985b'
+- taste: application-note # Application Note
+  base: technical-specification
+  override-attributes:
+  - presentation-metadata-color-secondary: '#ca9831'
+- taste: technical-note # Technical Note
+  base: technical-specification
+  override-attributes:
+  - presentation-metadata-color-secondary: '#ca9831'
+- taste: best-practice # Best Practice
+  base: technical-specification
+  override-attributes:
+  - presentation-metadata-color-secondary: '#4891af'
