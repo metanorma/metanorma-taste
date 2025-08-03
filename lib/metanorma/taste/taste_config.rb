@@ -49,8 +49,8 @@ module Metanorma
         map "standardstylesheet", to: :wordstylesheet
         map "standardstylesheet-override", to: :wordstylesheet_override
         map "header", to: :header
-        map "pdfstylesheet", to: :pdfstylesheet
-        map "pdfstylesheet-override", to: :pdfstylesheet_override
+        map "pdf-stylesheet", to: :pdfstylesheet
+        map "pdf-stylesheet-override", to: :pdfstylesheet_override
         map "base-override", to: :base_override
         map "doctypes", to: :doctypes
       end

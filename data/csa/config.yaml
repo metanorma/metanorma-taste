@@ -13,7 +13,7 @@ standardstylesheet: csa.scss
 wordstylesheet: wordstyle.scss
 wordintropage: word_csa_intro.html
 header: header.html
-pdfstylesheet: csa.standard.xsl
+pdf-stylesheet: csa.standard.xsl
 base-override:
   publisher: Cloud Security Allowance
   publisher_abbr: CSA

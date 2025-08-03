@@ -235,8 +235,8 @@ wordstylesheet-override: string     # Word output CSS stylesheet, overriding bas
 standardstylesheet: string # Word output secondary CSS stylesheet
 standardstylesheet-override: string # Word output secondary CSS stylesheet, overriding base flavor stylesheet
 header: string             # Word output header and footer content
-pdfstylesheet: string      # PDF output XSLT stylesheet
-pdfstylesheet-override: string      # PDF output XSLT stylesheet, overriding base flavor stylesheet
+pdf-stylesheet: string     # PDF output XSLT stylesheet
+pdf-stylesheet-override: string     # PDF output XSLT stylesheet, overriding base flavor stylesheet
 base-override:             # Hash of document attributes to override from base flavor
   publisher: string        # Publisher name override
   publisher_abbr: string   # Publisher abbreviation

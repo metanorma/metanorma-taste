@@ -160,8 +160,8 @@ module Metanorma
           header: "header",
           standardstylesheet: "standardstylesheet",
           standardstylesheet_override: "standardstylesheet-override",
-          pdfstylesheet: "pdfstylesheet",
-          pdfstylesheet_override: "pdfstylesheet-override",
+          pdfstylesheet: "pdf-stylesheet",
+          pdfstylesheet_override: "pdf-stylesheet-override",
         }
       end
 
