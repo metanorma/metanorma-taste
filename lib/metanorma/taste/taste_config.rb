@@ -22,6 +22,9 @@ module Metanorma
       attribute :wordintropage, :string
       attribute :wordstylesheet, :string
       attribute :wordstylesheet_override, :string
+      attribute :header, :string
+      attribute :standardstylesheet, :string
+      attribute :standardstylesheet_override, :string
       attribute :pdfstylesheet, :string
       attribute :pdfstylesheet_override, :string
       attribute :base_override, BaseOverride
@@ -43,6 +46,9 @@ module Metanorma
         map "wordintropage", to: :wordintropage
         map "wordstylesheet", to: :wordstylesheet
         map "wordstylesheet-override", to: :wordstylesheet_override
+        map "standardstylesheet", to: :wordstylesheet
+        map "standardstylesheet-override", to: :wordstylesheet_override
+        map "header", to: :header
         map "pdfstylesheet", to: :pdfstylesheet
         map "pdfstylesheet-override", to: :pdfstylesheet_override
         map "base-override", to: :base_override

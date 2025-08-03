@@ -164,6 +164,10 @@ currently available:
 |`iso`
 |Enosema specifications and standards with Enosema branding and copyright
 
+|`csa`
+|Cloud Security Alliance
+|`cc`
+|Cloud Security Alliance specifications and standards with CSA branding and copyright
 |===
 
 
@@ -220,6 +224,19 @@ copyright-notice: string   # Path to boilerplate file (e.g., "copyright.adoc"), 
                            # copyright, license, legal, and feedback notices
 i18n-dictionary: string    # Path to internationalization dictionary (e.g., "i18n.yaml")
 publisher-logo: string     # Path to publisher logo (e.g., "icc.png")
+htmlcoverpage: string      # HTML output cover page
+htmlintropage: string      # HTML output introductory page
+htmlstylesheet: string     # HTML output CSS stylesheet
+htmlstylesheet-override: string     # HTML output CSS stylesheet, overriding base flavor stylesheet
+wordcoverpage: string      # Word output cover page
+wordintropage: string      # Word output introductory page
+wordstylesheet: string     # Word output CSS stylesheet
+wordstylesheet-override: string     # Word output CSS stylesheet, overriding base flavor stylesheet
+standardstylesheet: string # Word output secondary CSS stylesheet
+standardstylesheet-override: string # Word output secondary CSS stylesheet, overriding base flavor stylesheet
+header: string             # Word output header and footer content
+pdfstylesheet: string      # PDF output XSLT stylesheet
+pdfstylesheet-override: string      # PDF output XSLT stylesheet, overriding base flavor stylesheet
 base-override:             # Hash of document attributes to override from base flavor
   publisher: string        # Publisher name override
   publisher_abbr: string   # Publisher abbreviation

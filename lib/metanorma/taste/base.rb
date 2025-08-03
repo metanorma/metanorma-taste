@@ -156,6 +156,9 @@ module Metanorma
           wordintropage: "wordintropage",
           wordstylesheet: "wordstylesheet",
           wordstylesheet_override: "wordstylesheet-override",
+          header: "header",
+          standardstylesheet: "standardstylesheet",
+          standardstylesheet_override: "standardstylesheet-override",
           pdfstylesheet: "pdfstylesheet",
           pdfstylesheet_override: "pdfstylesheet-override",
         }

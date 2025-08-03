@@ -1,0 +1,35 @@
+== copyright-statement
+=== {blank}
+© {{ docyear }} Cloud Security Alliance, LLC.
+
+{% if unpublished %}
+== license-statement
+=== Warning for Drafts
+
+This document is not a CSA Standard. It is distributed for review and
+comment, and is subject to change without notice and may not be referred to as
+a Standard. Recipients of this draft are invited to submit, with their
+comments, notification of any relevant patent rights of which they are aware
+and to provide supporting documentation.
+{% endif %}
+
+== legal-statement
+=== {blank}
+All rights reserved. Unless otherwise specified, no part of this
+publication may be reproduced or utilized otherwise in any form or by any
+means, electronic or mechanical, including photocopying, or posting on the
+internet or an intranet, without prior written permission. Permission can
+be requested from the address below.
+
+== feedback-statement
+=== {blank}
+Cloud Security Alliance
+
+[align="left"]
+2212 Queen Anne Ave N +
+Seattle +
+WA 98109 +
+United States of America +
+ +
+copyright@cloudsecurityalliance.com +
+https://www.cloudsecurityalliance.com[www.cloudsecurityalliance.com]

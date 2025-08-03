@@ -1,0 +1,820 @@
+/*
+    0 CSS RESET
+*/
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+@use 'base_style/all' as *;
+
+body {
+  @include bodyStyle1(15px, 1.4em, #1d1d1d, #ffffff, 300);
+  // @include sidebarNavContainer(323px);
+}
+
+main {
+  margin: 0 3em 0 6em;
+}
+
+#toc, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) {
+  @include toc(#4D7EA5, #4D7EA5, #4D7EA5);
+  @include sidebarToc();
+
+  .toc-active a {
+    color: white;
+  }
+
+  li a {
+    text-transform: none;
+  }
+
+  ul {
+    a:hover {
+      box-shadow: none;
+      color: white;
+    }
+  }
+}
+
+#toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) {
+   margin-top: 0;
+   margin-bottom: 0;
+   font-size: 100%;
+ }
+
+
+li {
+  margin-left: 1em;
+  list-style-position: outside;
+}
+
+nav {
+  @include sidebarNav(#f7f7f7, 323px, 30px);
+}
+
+#toggle {
+  @include sidebarNavToggle(white, #4D7EA5)
+}
+
+/*
+    2. Responsive navigation layout
+*/
+
+@media screen and (min-width: 768px) {
+  .container {
+    padding-left: 360px;
+  }
+
+  .rule.toc {
+    display: none;
+  }
+
+  h1.toc-contents {
+    margin-top: 1em;
+  }
+
+  ul#toc-list, ul#toc-list > :is(.h1, .h2, .h3, .h4, .h5, .h6) {
+    padding: 0;
+    margin: 0;
+  }
+}
+
+/*
+    Document types + stages
+*/
+
+.document-type-band {
+  @include docBand($order: 2, $offset: 180px);
+
+  .document-type {
+    top: 20px;
+  }
+}
+
+.document-stage-band {
+  @include docBand(1, 160px);
+  &> :first-child {
+    font-weight: 300;
+  }
+}
+
+p.document-stage {
+  @include docBandTitle(120px);
+}
+
+#governance-band p.document-type {
+  height: 230px !important;
+}
+
+p.document-stage {
+  font-weight: 300;
+  height: 160px;
+}
+
+dt {
+  font-weight: 500;
+}
+
+#standard-band {
+  color: #0ac442;
+  background: none;
+}
+
+#standard {
+  border-bottom: solid 3px #0ac442;
+}
+
+#governance {
+  border-bottom: solid 3px #750697;
+}
+
+#governance-band {
+  background-color: #750697;
+}
+
+#guide {
+  border-bottom: solid 3px #48a0e7;
+}
+
+#guide-band {
+  background-color: #48a0e7;
+}
+
+.coverpage-maturity {
+  @include coverpageStageBlock();
+}
+
+#working-draft {
+  border-bottom: solid 3px #fda706;
+}
+
+#working-draft-band {
+  p {
+    color: #fda706;
+  }
+  background: none;
+}
+
+#committee-draft {
+  border-bottom: solid 3px #fd06fd;
+}
+
+#committee-draft-band {
+  background-color: #fd06fd;
+}
+
+#draft-standard {
+  border-bottom: solid 3px #fdf906;
+}
+
+#draft-standard-band {
+  background-color: #fdf906;
+}
+
+#standard {
+  border-bottom: solid 3px #0ac442;
+}
+
+#obsolete {
+  border-bottom: solid 3px #7e0d13;
+}
+
+#obsolete-band {
+  background-color: #7e0d13;
+}
+
+/*
+3. TYPOGRAPHY
+*/
+
+/*
+3.1 Titles
+*/
+
+h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
+  font-family: $headerfont;
+  line-height: 1.2em;
+  color: black;
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.3em;
+}
+
+h1,.h1 {
+  font-size: 1.8em;
+  text-transform: uppercase;
+/*  margin-top: 2em;*/
+}
+
+h1#content,.h1#content {
+  margin-top: 2em;
+}
+
+h2,.h2 {
+  font-size: 1.6em;
+}
+
+h3,.h3 {
+  font-size: 1.5em;
+}
+/*
+span[id^="toc"]::after {
+float: left;
+padding-right: 4px;
+margin-left: -20px;
+font-family: "Font Awesome 5 Free";
+font-weight: 900;
+font-size: 0.8em;
+color: #cfcfcf;
+content: "\f0c1";
+}
+*/
+.TermNum, .Terms, .AltTerms {
+  color: #00549f;
+  font-weight: 400;
+}
+
+p.TermNum {
+  font-size: 0.9em;
+  line-height: 1em;
+  margin: 0;
+  margin-top: 2em;
+}
+
+p.Terms {
+  font-size: 1.1em;
+  line-height: 1.7em;
+  margin: 0;
+}
+
+/*
+p.AltTerms {
+font-style: italic;
+margin: 0;
+}
+*/
+
+span.obligation {
+  font-weight: 400;
+}
+
+/*
+3.2 Links
+*/
+@include elementStyles(#4D7EA5, #4D7EA5, white);
+
+/*
+3.3 Lists
+*/
+
+ul, ol {
+  margin-left: 1em;
+  list-style-position: inside;
+}
+
+#toc ul {
+  margin-bottom: 0.25em;
+}
+
+#toc li {
+  list-style-type: none;
+}
+
+/*
+3.4 Rules
+*/
+
+.rule {
+  @include rule(1px, #00427e)
+}
+/*
+h2 p,.h2 p {
+display: inline;
+}
+*/
+
+/*
+3.5 Bibliograhy
+*/
+
+p.Biblio, p.NormRef {
+  margin-top: 1em;
+  margin-left: 2em;
+  text-indent: -2em;
+}
+
+/*
+3.6 Source Code + figures
+*/
+
+pre {
+  @include monospaceBlockStyle()
+}
+
+.figure,
+pre,
+.pseudocode {
+  @include pseudocodeBlock(#F5F6F6, rgb(91, 94, 95));
+  font-size: $monospacefontsize;
+  border-left: solid 5px #B1B6B8;
+  padding: 1.2em 1.2em 1.2em 2.2em;
+  margin: 2em 0 2em -1em;
+}
+
+table div.figure {
+  padding: 0;
+  margin: 0;
+}
+
+
+@include admonitionBlock();
+@include recommendationBlock();
+@include listBlock();
+
+.FigureTitle,
+.SourceTitle {
+  @include blockTitle()
+}
+
+/*
+3.7 Notes
+*/
+
+.Note {
+  background-color: #F5F6F6;
+  border-left: solid 5px #B1B6B8;
+  color: rgb(91, 94, 95);
+  padding: 0.5em 1em;
+}
+
+.Admonition {
+  background-color: #ffcccc;
+  border-left: solid 5px #B1B6B8;
+  color: rgb(91, 94, 95);
+  padding: 0.5em 1em;
+}
+
+.note_label {
+  font-weight: 700;
+}
+
+/*
+3.8 Examples
+*/
+
+td.example,
+td.example_label {
+  background-color: #F5F6F6;
+  color: rgb(91, 94, 95);
+  padding: 0;
+}
+
+td>p.example {
+  margin: 0;
+  border-left: solid 5px #B1B6B8;
+  padding: 1em;
+}
+
+td.example_label {
+  font-weight: 700;
+  font-size: $normalfontsize;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 0;
+}
+
+.example {
+  @include exampleBlock(#F5F6F6, rgb(91, 94, 95));
+  color: rgb(91, 94, 95);
+
+  .example-title {
+    margin-top: 0;
+    font-size: $normalfontsize;
+  }
+
+  pre,
+  .pseudocode {
+    background: none;
+  }
+}
+
+/*
+3.9 Tables
+*/
+
+table {
+  @include table(1px solid black);
+}
+
+table,
+th,
+td {
+  border: none !important;
+  font-size: 1em;
+}
+
+tr:nth-child(even) {
+  background-color: #FBF9F8;
+}
+
+thead {
+  background-color: #4D7EA5;
+  color: white;
+  border: none;
+}
+
+/*
+3.10 Footnotes
+*/
+
+a.footnote-number {
+  vertical-align: super;
+  font-size: 0.8em;
+}
+
+.footnote {
+  font-size: $footnotefontsize;
+}
+
+
+/*
+3.11 Blockquotes
+*/
+
+.Quote {
+  @include blockquoteBlock(#F5F6F6, true);
+  padding: 1.2em 1.2em 1.2em 2.2em;
+  margin: 2em 0 2em -1em;
+  border-left: solid 5px #B1B6B8;
+}
+
+/*
+3.12 Formulas
+*/
+
+.formula, .Formula {
+  background-color: #F5F6F6;
+  border-left: solid 5px #B1B6B8;
+  color: rgb(91, 94, 95);
+  padding: 1.2em 1.2em 1.2em 2.2em;
+  margin: 2em 0 2em -1em;;
+  text-align: center;
+}
+
+/*
+3.13 Contact Info
+*/
+
+.contact-info {
+  background-color: #f7f7f7;
+  padding: 2em;
+  margin-top: 5em;
+  width: auto;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+
+.contact-info p,
+.contact-info a {
+  @include monospaceBlockStyle();
+  font-weight: 400;
+}
+
+.contact-info .name {
+  font-weight: 700;
+  font-size: 1.2em;
+  margin-bottom: 0;
+}
+
+.contact-info .address {
+  font-size: 1em;
+  line-height: 1.3em;
+  margin-top: 0;
+}
+
+/*
+Keywords
+*/
+
+span.keyword {
+  font-weight: 400;
+}
+
+p {
+  font-size: $normalfontsize;
+  line-height: 1.5;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+/*
+Paragraphs
+*/
+
+p {
+  font-size: $normalfontsize;
+  line-height: 1.5;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+/* Admonitions */
+
+.Admonition, .admonition {
+  background-color: #ffb3b3;
+  /* color: #47430c;*/
+  padding: 0.5em;
+  margin: 1.5em 0 1.5em 0;
+  text-align: left;
+}
+
+.Admonition p, .admonition p {
+  margin: 0;
+}
+
+
+/*
+4.0 Page header
+*/
+
+/*
+4.1 Top Logo
+*/
+
+/*
+.wrapper-top {
+background-color: #0e1a85;
+background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAACXBIWXMAABYlAAAWJQFJUiTwAAADwUlEQVR4nO3YgQ2AMAwDwcAiWZ1NizrH30lIeIEq9nPOGSDqPgC7+93v/suy3Mmvhx+6VAAIcwFAmc4nyzYAIMgGAGEuACirdyBZtgEASTYACHMBQFm9A8myDQBIsgFAmAsAyuodSJZtAECSDQDCXABQVu9AsmwDAJJsABDmAoCyegeSZRsAkGQDgDAXAJTVO5As2wCAJBsAhLkAoKzegWTZBgAk2QAgzAUAZfUOJMs2ACDJBgBhLgAoq3cgWbYBAEk2AAhzAUBZvQPJsg0ASLIBQJgLAMrqHUiWbQBAkg0AwlwAUFbvQLJsAwCSbAAQ5gKAsnoHkmUbAJBkA4AwFwCU1TuQLNsAgCQbAIS5AKCs3oFk2QYAJNkAIMwFAGX1DiTLNgAgyQYAYS4AKKt3IFm2AQBJNgAIcwFAWb0DybINAEiyAUCYCwDK6h1Ilm0AQJINAMJcAFBW70CybAMAkmwAEOYCgLJ6B5JlGwCQZAOAMBcAlNU7kCzbAIAkGwCEuQCgrN6BZNkGACTZACDMBQBl9Q4kyzYAIMkGAGEuACirdyBZtgEASTYACHMBQFm9A8myDQBIsgFAmAsAyuodSJZtAECSDQDCXABQVu9AsmwDAJJsABDmAoCyegeSZRsAkGQDgDAXAJTVO5As2wCAJBsAhLkAoKzegWTZBgAk2QAgzAUAZfUOJMs2ACDJBgBhLgAoq3cgWbYBAEk2AAhzAUBZvQPJsg0ASLIBQJgLAMrqHUiWbQBAkg0AwlwAUFbvQLJsAwCSbAAQ5gKAsnoHkmUbAJBkA4AwFwCU1TuQLNsAgCQbAIS5AKCs3oFk2QYAJNkAIMwFAGX1DiTLNgAgyQYAYS4AKKt3IFm2AQBJNgAIcwFAWb0DybINAEiyAUCYCwDK6h1Ilm0AQJINAMJcAFBW70CybAMAkmwAEOYCgLJ6B5JlGwCQZAOAMBcAlNU7kCzbAIAkGwCEuQCgrN6BZNkGACTZACDMBQBl9Q4kyzYAIMkGAGEuACirdyBZtgEASTYACHMBQFm9A8myDQBIsgFAmAsAyuodSJZtAECSDQDCXABQVu9AsmwDAJJsABDmAoCyegeSZRsAkGQDgDAXAJTVO5As2wCAJBsAhLkAoKzegWTZBgAk2QAgzAUAZfUOJMs2ACDJBgBhLgAoq3cgWbYBAEk2AAhzAUBZvQPJsg0ASLIBQJgLAMrqHUiWbQBAkg0AwlwAUFbvQLJsAwCSbAAQ5gKAsnoHkmUbAJBkA4AwFwCU1TuQLNsAgCQbAFTNzA9ggAr9aahO8QAAAABJRU5ErkJggg==');
+color: #ffffff;
+padding: 2em 0;
+}
+*/
+
+.coverpage {
+  background: radial-gradient(#2D5D8E, #0D1E2B);
+  /*background-image: url("img/dots@2x.png");*/
+  color: #ffffff;
+  padding: 2em;
+  margin-left: 2em;
+}
+
+.doc-number {
+  font-size: 1em;
+  font-family: $bodyfont;
+}
+
+.coverpage-title {
+  padding-bottom: 0.5em;
+  font-family: $headerfont;
+  font-size: 1.5em;
+  font-weight: 900;
+}
+
+.title-section1 {
+  padding: 0 2em 0 3em;
+}
+
+.prefatory-section {
+  padding: 0 3em 0 3em;
+}
+
+
+.zzSTDTitle1, .MsoCommentText {
+  display: none;
+}
+
+
+.coverpage {
+  text-align: center;
+}
+
+.coverpage-logo {
+  margin-bottom: 1em;
+}
+
+.coverpage-logo span, .coverpage-tc-name span {
+  font-family: $bodyfont;
+  text-transform: uppercase;
+  font-weight: 300;
+  display: block;
+}
+
+.coverpage-tc-name {
+  font-size: 1.2em;
+  line-height: 1.2em;
+  margin: 0.25em 0;
+}
+
+.document-info {
+  padding: 2em;
+  text-align: center;
+  margin-left: 1em;
+}
+
+
+/*
+4.2 Document Identity
+*/
+
+.coverpage-doc-identity {
+  width: 100%;
+  height: 50px;
+  margin: 2em 0;
+}
+
+
+.title-first {
+  font-size: 3em;
+  line-height: 1.5em;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-decoration: underline solid #EE9C4F;
+  padding: 1em 0.5em;
+}
+
+.title-second {
+  font-size: 2em;
+  line-height: 2em;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+img.csa-logo {
+  height: 50px;
+  width: auto;
+  float: right;
+  margin-right: 2em;
+}
+
+.coverpage-title .title-second {
+  display: none;
+}
+
+.coverpage-stage-block {
+  font-family: $bodyfont;
+  font-weight: 700;
+  font-size: 1em;
+  margin: 1em 0em 1em 0em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  background: linear-gradient(#A5A8AB, #B1B6B8);
+  padding: 4em 2em 3em 5.5em;
+  margin: 4em -3em 3em -5em;
+  border-bottom: 8px solid #EE9C4F;
+}
+
+.section-title .super-title {
+  font-size: 2em;
+  font-weight: 100;
+  line-height: 1em;
+  margin: 0;
+  color: white;
+  text-transform: uppercase;
+}
+
+.section-title h1, .section-title .h1 {
+  font-size: 2em;
+  font-weight: 800;
+  line-height: 1em;
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  color: white;
+  text-transform: none;
+}
+
+h2,.h2 {
+  border-bottom: solid 1px #4D7EA5;
+  color: #4D7EA5;
+}
+
+h3, h4, h5, h6, .h3, .h4, .h5, .h6 {
+  color: #EE9C4F;
+}
+
+/*
+4.3 Draft Warning
+*/
+
+
+.coverpage-warning {
+  border-top: solid 1px #f36f36;
+  border-bottom: solid 1px #f36f36;
+  margin: 1em 2em;
+  color: #00549f;
+  padding: 1em;
+}
+
+.coverpage-warning .title {
+  color: #f36f36;
+  font-family: $headerfont;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 1.2em;
+}
+
+
+
+/*
+4.4 Copyright
+*/
+
+.copyright {
+  padding: 1em;
+  font-size: 0.8em;
+  text-align: left;
+}
+
+
+.copyright .name, .copyright .address {
+  color: #00549f;
+}
+
+
+
+/*
+5.0 Other styles
+*/
+
+
+
+/*
+To top button
+*/
+
+#myBtn {
+  @include toTopBtn(white, #1f8ca0);
+  text-transform: uppercase;
+
+  a.anchorjs-link {
+    @include anchorLink(#4D7EA5)
+  }
+}
+
+nav h1:hover a::after {
+  display: none;
+}
+
+.document-stage-band p {
+  color: #EE9C4F!important;
+}
+
+.document-type-band p {
+  color: #4D7EA5!important;
+}
+
+.document-stage-band {
+  box-shadow: none;
+}
+
+@page {
+  margin: 1cm;
+}
+
+@media print {
+
+  .section-title, .document-info,  nav {
+    page-break-before: always;
+  }
+
+  .coverpage {
+    height: 23cm;
+  }
+
+  .coverpage-doc-identity {
+    position: absolute;
+    bottom: 1cm;
+  }
+
+  #toggle, .document-stage-band,
+  .document-type-band {
+    display: none;
+  }
+
+  .container {
+    padding-left: 0;
+  }
+
+  #toc .toc-active a {
+    color: #4D7EA5;
+  }
+
+  #toc .toc-active, #toc li:hover {
+    background: white;
+    box-shadow: none !important;
+  }
+
+  #toc li:hover a {
+    color: black;
+  }
+
+
+  h1.toc-contents {
+    margin-top: 2em;
+  }
+
+}

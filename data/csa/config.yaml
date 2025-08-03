@@ -1,0 +1,39 @@
+---
+flavor: csa
+owner: Cloud Security Allowance
+base-flavor: cc
+copyright-notice: boilerplate.adoc
+i18n-dictionary: i18n.yaml
+publisher-logo: csa.png
+htmlcoverpage: html_csa_titlepage.html
+htmlstylesheet: htmlstyle.scss
+htmlintropage: html_csa_intro.html
+wordcoverpage: word_csa_titlepage.html
+standardstylesheet: csa.scss
+wordstylesheet: wordstyle.scss
+wordintropage: word_csa_intro.html
+header: header.html
+pdfstylesheet: csa.standard.xsl
+base-override:
+  publisher: Cloud Security Allowance
+  publisher_abbr: CSA
+  body-font: Lato,"Source Sans Pro",sans-serif
+  header-font: Lato,"Source Sans Pro",sans-serif
+  monospace-font: "Source Code Pro",monospace
+doctypes:
+- taste: specification 
+  base: international-standard
+  override-attributes:
+  - presentation-metadata-color-secondary: '#376795'
+- taste: ics # Interoperability Conformance Specification
+  base: international-standard
+  override-attributes:
+  - presentation-metadata-color-secondary: '#376795'
+- taste: white-paper # White Paper
+  base: international-standard
+- taste: proposal # Proposal
+  base: international-standard
+- taste: votable-proposal # Votable Proposal
+  base: international-standard
+- taste: technical-note # Technical Note
+  base: international-standard
