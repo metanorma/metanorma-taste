@@ -19,21 +19,23 @@ base-override:
   publisher_abbr: CSA
   body-font: Lato,"Source Sans Pro",sans-serif
   header-font: Lato,"Source Sans Pro",sans-serif
-  monospace-font: "Source Code Pro",monospace
+  monospace-font: '"Source Code Pro",monospace'
 doctypes:
-- taste: specification 
-  base: international-standard
-  override-attributes:
-  - presentation-metadata-color-secondary: '#376795'
-- taste: ics # Interoperability Conformance Specification
-  base: international-standard
-  override-attributes:
-  - presentation-metadata-color-secondary: '#376795'
-- taste: white-paper # White Paper
-  base: international-standard
-- taste: proposal # Proposal
-  base: international-standard
-- taste: votable-proposal # Votable Proposal
-  base: international-standard
-- taste: technical-note # Technical Note
-  base: international-standard
+- taste: standard
+  base: standard
+- taste: guidance
+  base: guide
+- taste: proposal
+  base: standard
+- taste: report
+  base: report
+- taste: whitepaper
+  base: specification
+- taste: charter
+  base: directive
+- taste: policy
+  base: admministrative
+- taste: glossary
+  base: specification
+- taste: case-study
+  base: report
