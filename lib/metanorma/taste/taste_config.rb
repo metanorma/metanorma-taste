@@ -3,6 +3,7 @@
 require "lutaml/model"
 require_relative "base_override"
 require_relative "doctype_config"
+require_relative "stage_config"
 
 module Metanorma
   module Taste
@@ -29,6 +30,7 @@ module Metanorma
       attribute :pdfstylesheet_override, :string
       attribute :base_override, BaseOverride
       attribute :doctypes, DoctypeConfig, collection: true
+      attribute :stages, StageConfig, collection: true
       attribute :directory, :string
 
       key_value do

@@ -40,3 +40,17 @@ doctypes:
   base: specification
 - taste: case-study
   base: report
+stages:
+  proposal:
+  working-draft:
+    abbreviation: wd
+  committee-draft:
+    abbreviation: cd
+  draft-standard:
+    abbreviation: d
+  final-draft:
+  published:
+    default: true
+    published: true
+  withdrawn:
+    published: true    
