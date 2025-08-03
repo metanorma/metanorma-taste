@@ -46,6 +46,7 @@ module Metanorma
         body_font: "body-font",
         header_font: "header-font",
         monospace_font: "monospace-font",
+        fonts_manifest: "fonts-manifest",
       }.freeze
 
       # Initialize a new Base processor
