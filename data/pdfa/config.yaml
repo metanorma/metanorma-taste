@@ -35,7 +35,7 @@ doctypes:
   base: technical-specification
   override-attributes:
   - presentation-metadata-color-secondary: '#ca9831'
-- taste: best-practice # Best Practice
+- taste: best-practice-guide # Best Practice Guide
   base: technical-specification
   override-attributes:
   - presentation-metadata-color-secondary: '#4891af'
