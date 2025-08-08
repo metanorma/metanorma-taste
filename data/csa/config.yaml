@@ -4,7 +4,7 @@ owner: Cloud Security Allowance
 base-flavor: cc
 copyright-notice: boilerplate.adoc
 i18n-dictionary: i18n.yaml
-publisher-logo: csa.png
+publisher-logo: logo.svg
 htmlcoverpage: html_csa_titlepage.html
 htmlstylesheet: htmlstyle.scss
 htmlintropage: html_csa_intro.html
