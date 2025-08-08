@@ -1,6 +1,6 @@
 ---
 flavor: csa
-owner: Cloud Security Allowance
+owner: Cloud Security Alliance
 base-flavor: cc
 copyright-notice: boilerplate.adoc
 i18n-dictionary: i18n.yaml
@@ -15,7 +15,7 @@ wordintropage: word_csa_intro.html
 header: header.html
 pdf-stylesheet: csa.standard.xsl
 base-override:
-  publisher: Cloud Security Allowance
+  publisher: Cloud Security Alliance
   publisher_abbr: CSA
   body-font: Lato,"Source Sans Pro",sans-serif
   header-font: Lato,"Source Sans Pro",sans-serif
@@ -53,4 +53,4 @@ stages:
     default: true
     published: true
   withdrawn:
-    published: true    
+    published: true
