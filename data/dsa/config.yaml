@@ -1,0 +1,19 @@
+---
+flavor: dsa
+owner: SAE ITC
+base-flavor: iso
+copyright-notice: copyright.adoc
+i18n-dictionary: i18n.yaml
+publisher-logo: logo.svg
+base-override:
+  publisher: Digital Standards Alliance
+  publisher_abbr: DSA
+  presentation-metadata-color-secondary: '#005893'
+  presentation-metadata-backcover-text: https://www.sae-itc.com/programs/dsa
+  body-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
+  header-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
+doctypes:
+- taste: whitepaper
+  base: international-standard
+  override-attributes:
+  - presentation-metadata-color-secondary: '#005893'
