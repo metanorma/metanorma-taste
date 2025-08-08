@@ -46,6 +46,7 @@ module Metanorma
         body_font: "body-font",
         header_font: "header-font",
         monospace_font: "monospace-font",
+        fonts_manifest: "fonts-manifest",
       }.freeze
 
       # Initialize a new Base processor
@@ -156,8 +157,11 @@ module Metanorma
           wordintropage: "wordintropage",
           wordstylesheet: "wordstylesheet",
           wordstylesheet_override: "wordstylesheet-override",
-          pdfstylesheet: "pdfstylesheet",
-          pdfstylesheet_override: "pdfstylesheet-override",
+          header: "header",
+          standardstylesheet: "standardstylesheet",
+          standardstylesheet_override: "standardstylesheet-override",
+          pdfstylesheet: "pdf-stylesheet",
+          pdfstylesheet_override: "pdf-stylesheet-override",
         }
       end
 
