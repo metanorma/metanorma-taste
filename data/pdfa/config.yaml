@@ -10,7 +10,7 @@ htmlstylesheet-override: htmlstylesheet-override.scss
 pdf-stylesheet-override: pdfa.xsl
 base-override:
   publisher: PDF Association
-  publisher_abbr: PDFA
+  publisher_abbr: PDFa
   presentation-metadata-color-secondary: '#d03f4e'
   presentation-metadata-backcover-text: pdfa.org
   body-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
