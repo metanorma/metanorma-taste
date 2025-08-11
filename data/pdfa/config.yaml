@@ -17,26 +17,18 @@ base-override:
   header-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
 doctypes:
 - taste: specification # Specification # The name goes into i18n.yaml
-  base: international-standard
+  base: standard
   override-attributes:
   - presentation-metadata-color-secondary: '#d03f4e'
-- taste: international-standard # International Standard
-  base: international-standard
-  override-attributes:
-  - presentation-metadata-color-secondary: '#8b985b'
-- taste: international-technical-specification # International Technical Specification
-  base: technical-specification
-  override-attributes:
-  - presentation-metadata-color-secondary: '#8b985b'
 - taste: application-note # Application Note
-  base: technical-specification
+  base: report
   override-attributes:
   - presentation-metadata-color-secondary: '#ca9831'
 - taste: technical-note # Technical Note
-  base: technical-specification
+  base: report
   override-attributes:
   - presentation-metadata-color-secondary: '#ca9831'
 - taste: best-practice-guide # Best Practice Guide
-  base: technical-specification
+  base: report
   override-attributes:
   - presentation-metadata-color-secondary: '#4891af'
