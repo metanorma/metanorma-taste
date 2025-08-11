@@ -1,7 +1,7 @@
 ---
 flavor: pdfa
 owner: PDF Association Inc.
-base-flavor: iso
+base-flavor: ribose
 copyright-notice: copyright.adoc
 i18n-dictionary: i18n.yaml
 publisher-logo: pdfa-logo.svg
