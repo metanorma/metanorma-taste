@@ -1,0 +1,10 @@
+annex: Appendix
+stage_dict:
+  proposal: Proposal
+  working-draft: Working Draft
+  committee-draft: Committee Draft
+  draft-standard: Draft Standard
+  final-draft: Final Draft
+  published: Published
+  withdrawn: Withdrawn
+
