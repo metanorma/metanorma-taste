@@ -1,0 +1,56 @@
+---
+flavor: csa
+owner: Cloud Security Alliance
+base-flavor: cc
+copyright-notice: boilerplate.adoc
+i18n-dictionary: i18n.yaml
+publisher-logo: logo.svg
+htmlcoverpage: html_csa_titlepage.html
+htmlstylesheet: htmlstyle.scss
+htmlintropage: html_csa_intro.html
+wordcoverpage: word_csa_titlepage.html
+standardstylesheet: csa.scss
+wordstylesheet: wordstyle.scss
+wordintropage: word_csa_intro.html
+header: header.html
+pdf-stylesheet: csa.standard.xsl
+base-override:
+  publisher: Cloud Security Alliance
+  publisher_abbr: CSA
+  body-font: Lato,"Source Sans Pro",sans-serif
+  header-font: Lato,"Source Sans Pro",sans-serif
+  monospace-font: '"Source Code Pro",monospace'
+  fonts-manifest: Lato,STIX Two Math,Source Code Pro
+doctypes:
+- taste: standard
+  base: standard
+- taste: guidance
+  base: guide
+- taste: proposal
+  base: standard
+- taste: report
+  base: report
+- taste: whitepaper
+  base: specification
+- taste: charter
+  base: directive
+- taste: policy
+  base: admministrative
+- taste: glossary
+  base: specification
+- taste: case-study
+  base: report
+stages:
+  proposal:
+  working-draft:
+    abbreviation: wd
+  committee-draft:
+    abbreviation: cd
+  draft-standard:
+    abbreviation: d
+  final-draft:
+  published:
+    default: true
+    published: true
+  withdrawn:
+    published: true
