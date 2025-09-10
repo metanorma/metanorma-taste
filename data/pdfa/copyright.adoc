@@ -32,6 +32,11 @@ any of the mentioned information, services, products, or providers.
 
 === {blank}
 
+== legal-statement
+
+=== {blank}
+
+
 // [align=center]
 // **PDF Association**:
 
