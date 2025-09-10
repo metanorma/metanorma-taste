@@ -198,6 +198,10 @@
 		<xsl:attribute name="text-decoration">underline</xsl:attribute>
 	</xsl:attribute-set>
 
+	<xsl:template name="insertHeaderFooter">
+		<xsl:call-template name="insertFooter"/>
+	</xsl:template>
+
 	<xsl:template name="insertFooter">
 		<!-- <xsl:param name="invert"/> -->
 		<xsl:variable name="footerText"> 
