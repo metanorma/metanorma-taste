@@ -34,7 +34,7 @@
 	
 	<xsl:template name="cover-page">
 		<fo:page-sequence master-reference="cover-page" force-page-count="no-force">
-			<fo:flow flow-name="xsl-region-body" font-family="Source Sans Pro">
+			<fo:flow flow-name="xsl-region-body" font-family="Source Sans 3">
 				
 				<fo:block margin-top="-3mm" role="SKIP"> <!-- -3mm because there is a space before image in the source SVG -->
 					<fo:inline-container width="47mm" role="SKIP">
