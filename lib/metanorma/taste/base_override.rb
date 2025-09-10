@@ -14,6 +14,8 @@ module Metanorma
       attribute :fonts_manifest, :string
       attribute :presentation_metadata_color_secondary, :string
       attribute :presentation_metadata_backcover_text, :string
+      attribute :fonts, :string
+      attribute :pdf_stylesheet_override, :string
 
       key_value do
         map "publisher", to: :publisher
@@ -26,6 +28,8 @@ module Metanorma
             to: :presentation_metadata_color_secondary
         map "presentation-metadata-backcover-text",
             to: :presentation_metadata_backcover_text
+        map "fonts", to: :fonts
+        map "pdf-stylesheet-override", to: :pdf_stylesheet_override
       end
     end
   end
