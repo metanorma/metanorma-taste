@@ -32,11 +32,11 @@
 				<fo:block-container width="112mm" line-height="1.2" margin-top="4mm">
 					<!-- Main title of doc -->
 					<fo:block font-size="32pt" font-weight="bold">
-						<fo:block><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-intro']/node()"/></fo:block>
+						<fo:block><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@language = 'intro-en']/node()"/></fo:block>
 					</fo:block>
 					<!-- Subtitle of doc -->
 					<fo:block font-size="30pt">
-						<fo:block><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-main']/node()"/></fo:block>
+						<fo:block><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@language = 'main-en']/node()"/></fo:block>
 					</fo:block>
 				</fo:block-container>
 
@@ -97,7 +97,7 @@
 								<fo:table-cell display-align="after" padding-left="0.5mm" padding-right="0.5mm" padding-top="-0.5mm" padding-bottom="-0.5mm">
 									<fo:block-container width="100%" height="{$block_height}" border="{$border_width} solid rgb(208,63,78)">
 										<!-- the group that authored the doc -->
-										<fo:block>TEMP FIXED TEXT</fo:block>
+										<!-- <fo:block>TEMP FIXED TEXT</fo:block> -->
 										<fo:block margin-left="5mm" margin-right="5mm" margin-bottom="3mm">EA-PDF LWG</fo:block>
 									</fo:block-container>
 								</fo:table-cell>
