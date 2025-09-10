@@ -22,7 +22,7 @@ base-override:
   header-font: Lato,"Source Sans Pro",sans-serif
   monospace-font: '"Source Code Pro",monospace'
   fonts-manifest: Lato,STIX Two Math,Source Code Pro
-  presentation-metadata-ul-label-list: "&#x2022;", &#x2d;, &#x6f;
+  presentation-metadata-ul-label-list: "&#x2022;, &#x2d;, &#x6f;"
 doctypes:
 - taste: standard
   base: standard
