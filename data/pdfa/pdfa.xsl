@@ -198,4 +198,30 @@
 		<xsl:attribute name="text-decoration">underline</xsl:attribute>
 	</xsl:attribute-set>
 
+	<xsl:template name="insertFooter">
+		<!-- <xsl:param name="invert"/> -->
+		<xsl:variable name="footerText"> 
+			<xsl:text>PDFa</xsl:text>
+			<xsl:text>&#xA0;</xsl:text>
+			<xsl:call-template name="capitalizeWords">
+				<xsl:with-param name="str">
+					<xsl:choose>
+						<xsl:when test="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:doctype-alias">
+							<xsl:value-of select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:doctype-alias"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:call-template name="insertFooterOdd">
+			<xsl:with-param name="footerText" select="$footerText"/>
+		</xsl:call-template>
+		<xsl:call-template name="insertFooterEven">
+			<xsl:with-param name="footerText" select="$footerText"/>
+		</xsl:call-template>
+	</xsl:template>
+
 </xsl:stylesheet>
