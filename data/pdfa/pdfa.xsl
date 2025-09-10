@@ -159,7 +159,9 @@
 	</xsl:template> <!-- END cover-page -->
 
 	<!-- empty back-page to omit back cover -->
-	<xsl:template name="back-page"/>
+	<xsl:template name="back-page">
+		<!-- put the back page layout -->
+	</xsl:template>
 
 	<xsl:template match="mn:copyright-statement" priority="2">
 		<xsl:apply-templates />
