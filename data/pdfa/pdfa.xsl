@@ -14,7 +14,7 @@
 
 	<xsl:template name="cover-page">
 		<fo:page-sequence master-reference="cover-page" force-page-count="no-force">
-			<fo:flow flow-name="xsl-region-body" font-family="Source Sans 3">
+			<fo:flow flow-name="xsl-region-body" font-family="Source Sans Pro">
 				<fo:block-container width="47mm" role="SKIP" margin-top="-3mm"> <!-- -3mm because there space before image in the source SVG -->
 					<fo:block>
 						<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:copyright/mn:owner/mn:organization">
