@@ -162,6 +162,7 @@ module Metanorma
           standardstylesheet_override: "standardstylesheet-override",
           pdfstylesheet: "pdf-stylesheet",
           pdfstylesheet_override: "pdf-stylesheet-override",
+          customize: "customize",
         }
       end
 
