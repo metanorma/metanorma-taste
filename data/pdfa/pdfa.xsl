@@ -128,7 +128,7 @@
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box4}">
 										<fo:block margin-left="2mm">
 											<!-- Example: © 2025 PDF Association – pdfa.org -->
-											<fo:block font-size="9.9pt" margin-bottom="1mm">
+											<fo:block font-size="9.9pt">
 												<xsl:text>© </xsl:text>
 												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:copyright/mn:from"/>
 												<xsl:text> </xsl:text>
@@ -138,14 +138,26 @@
 													<fo:basic-link fox:alt-text="PDF association" external-destination="https://pdfa.org/">pdfa.org</fo:basic-link>
 												</fo:inline>
 											</fo:block>
-											<fo:block font-size="8pt" margin-bottom="3mm">
+											<fo:block font-size="8pt" margin-bottom="2mm">
 												<xsl:text>This work is licensed under CC-BY-4.0 </xsl:text>
 												<!-- Note: the error occurs [Fatal Error] :1621:113: Character reference "&#55356" is an invalid XML character. -->
 												<!-- Circled CC -->
-												<fo:inline font-size="10pt"><xsl:call-template name="getCharByCodePoint"><xsl:with-param name="codepoint">1f16d</xsl:with-param></xsl:call-template></fo:inline>
-												<xsl:text> </xsl:text>
+												<!-- <fo:inline font-size="10pt"><xsl:call-template name="getCharByCodePoint"><xsl:with-param name="codepoint">1f16d</xsl:with-param></xsl:call-template></fo:inline>
+												<xsl:text> </xsl:text> -->
 												<!-- Circled Human Figure -->
-												<fo:inline font-size="10pt"><xsl:call-template name="getCharByCodePoint"><xsl:with-param name="codepoint">1f16f</xsl:with-param></xsl:call-template></fo:inline>
+												<!-- <fo:inline font-size="10pt"><xsl:call-template name="getCharByCodePoint"><xsl:with-param name="codepoint">1f16f</xsl:with-param></xsl:call-template></fo:inline> -->
+												<!-- Characters replaced to SVG To prevent warning:
+																										PDF isn't valid PDF/UA-1:
+														ValidationResult [flavour=ua1, totalAssertions=112627, assertions=[
+														TestAssertion [ruleId=RuleId [specification=ISO 14289-1:2014, clause=7.21.7, testNumber=1], status=failed,
+														message=The Font dictionary of all fonts shall define the map of all used character codes to Unicode values, either via a ToUnicode entry, or other mechanisms as defined in ISO 14289-1, 7.21.7,
+														location=Location [level=CosDocument, context=root/document[0]/pages[0](919 0 obj PDPage)/contentStream[0](947 0 obj PDSemanticContentStream)/operators[1391]/usedGlyphs[0](EAAAAB+SourceSans3-Regular EAAAAB+SourceSans3-Regular 43 0 2124645278 0 true)], locationContext=null, errorMessage=null]], isCompliant=false]
+												-->
+												<fo:inline baseline-shift="-50%" padding-left="0.5mm">
+												<fo:instream-foreign-object content-width="5.6mm" fox:alt-text="Circled Chars">
+													<xsl:copy-of select="$circledChars"/>
+												</fo:instream-foreign-object>
+												</fo:inline>
 											</fo:block>
 										</fo:block>
 									</fo:block-container>
@@ -157,6 +169,25 @@
 			</fo:flow>
 		</fo:page-sequence>
 	</xsl:template> <!-- END cover-page -->
+
+	<xsl:variable name="circledChars">
+		<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+			 viewBox="0 0 16 6.6" style="enable-background:new 0 0 16 6.6;" xml:space="preserve">
+			<style type="text/css">
+				.st0{fill:#010101;}
+			</style>
+			<path class="st0" d="M0,3.3C0,1.3,1.5,0,3.2,0C5,0,6.5,1.3,6.5,3.3c0,2-1.5,3.3-3.2,3.3C1.5,6.6,0,5.3,0,3.3z M6,3.3
+				c0-1.7-1.2-2.8-2.7-2.8c-1.5,0-2.7,1.1-2.7,2.8c0,1.7,1.2,2.9,2.7,2.9C4.7,6.2,6,5,6,3.3z M1,3.3c0-1.2,0.6-1.8,1.3-1.8
+				c0.4,0,0.6,0.2,0.8,0.4L2.7,2.3C2.6,2.2,2.5,2.1,2.4,2.1C2,2.1,1.7,2.6,1.7,3.3c0,0.8,0.2,1.2,0.6,1.2c0.2,0,0.3-0.1,0.5-0.2
+				l0.3,0.4C2.9,4.9,2.7,5.1,2.3,5.1C1.6,5.1,1,4.5,1,3.3z M3.1,3.3c0-1.2,0.6-1.8,1.3-1.8c0.4,0,0.6,0.2,0.8,0.4L4.8,2.3
+				C4.7,2.2,4.7,2.1,4.5,2.1c-0.3,0-0.6,0.5-0.6,1.2c0,0.8,0.2,1.2,0.6,1.2c0.2,0,0.3-0.1,0.5-0.2l0.3,0.4C5.1,4.9,4.8,5.1,4.4,5.1
+				C3.7,5.1,3.1,4.5,3.1,3.3z M9.5,3.3c0-2,1.5-3.3,3.2-3.3S16,1.3,16,3.3c0,2-1.5,3.3-3.2,3.3S9.5,5.3,9.5,3.3z M15.4,3.3
+				c0-1.7-1.2-2.8-2.7-2.8c-1.5,0-2.7,1.1-2.7,2.8c0,1.7,1.2,2.9,2.7,2.9C14.2,6.2,15.4,5,15.4,3.3z M12.1,5.7c0-0.5-0.1-0.9-0.1-1.4v0
+				c-0.3,0-0.5-0.2-0.5-0.5c0-0.3,0-0.7,0.1-1c0.1-0.3,0.2-0.4,0.4-0.5c0.1,0,0.3,0,0.6,0c0.3,0,0.5,0,0.6,0c0.2,0.1,0.4,0.2,0.4,0.5
+				c0.1,0.3,0.1,0.7,0.1,1c0,0.3-0.2,0.5-0.5,0.5v0c0,0.6,0,1-0.1,1.4H12.1z M12.1,1.4c0-0.3,0.3-0.6,0.6-0.6s0.6,0.2,0.6,0.6
+				C13.3,1.7,13,2,12.7,2C12.4,2,12.1,1.7,12.1,1.4z"/>
+		</svg>
+	</xsl:variable>
 
 	<!-- empty back-page to omit back cover -->
 	<xsl:template name="back-page">
