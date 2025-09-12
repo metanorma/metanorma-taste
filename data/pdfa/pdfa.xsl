@@ -55,11 +55,11 @@
 				<fo:block-container width="112mm" line-height="1.2" margin-top="4mm">
 					<!-- Main title of doc -->
 					<fo:block font-size="32pt" font-weight="bold">
-						<fo:block><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@language = 'intro-en']/node()"/></fo:block>
+						<fo:block><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'intro']/node()"/></fo:block>
 					</fo:block>
 					<!-- Subtitle of doc -->
 					<fo:block font-size="30pt">
-						<fo:block><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@language = 'main-en']/node()"/></fo:block>
+						<fo:block><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'main'][last()]/node()"/></fo:block>
 					</fo:block>
 				</fo:block-container>
 				
