@@ -234,4 +234,10 @@
 		</xsl:call-template>
 	</xsl:template>
 
+	<xsl:template name="refine_strong_style">
+		<xsl:if test="ancestor::*['preferred']">
+			<xsl:attribute name="role">SKIP</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	
 </xsl:stylesheet>
