@@ -6,14 +6,13 @@ xml_root_tag: csa-standard
 html_bodyfont: 'Lato,"Source Sans Pro",sans-serif'
 html_headerfont: 'Lato,"Source Sans Pro",sans-serif'
 html_monospacefont: '"Source Code Pro",monospace'
-validate_rng_file: lib/metanorma/csa/csa.rng
-htmlcoverpage: lib/isodoc/csa/html/html_csa_titlepage.html
-htmlintropage: lib/isodoc/csa/html/html_csa_intro.html
-htmlstylesheet: lib/isodoc/csa/html/htmlstyle.scss
+htmlcoverpage: html_csa_titlepage.html
+htmlintropage: html_csa_intro.html
+htmlstylesheet: htmlstyle.scss
 html_normalfontsize: "1.2em"
 html_monospacefontsize: "1.0em"
 html_footnotefontsize: "0.9em"
-i18nyaml: lib/isodoc/csa/i18n-en.yaml
+i18nyaml: i18n-en.yaml
 word_bodyfont: 'Lato,Arial,sans-serif'
 word_headerfont: 'Lato,Arial,sans-serif'
 word_monospacefont: '"Source Code Pro","Courier New",monospace'
@@ -21,13 +20,13 @@ word_normalfontsize: "10.5pt"
 word_smallerfontsize: "10.0pt"
 word_monospacefontsize: "10.0pt"
 word_footnotefontsize: "10.0pt"
-standardstylesheet: lib/isodoc/csa/html/csa.scss
-header: lib/isodoc/csa/html/header.html
-wordcoverpage: lib/isodoc/csa/html/word_csa_titlepage.html
-wordintropage: lib/isodoc/csa/html/word_csa_intro.html
-wordstylesheet: lib/isodoc/csa/html/wordstyle.scss
-pdf_stylesheet: lib/isodoc/csa/csa.standard.xsl
-boilerplate: lib/metanorma/csa/boilerplate.adoc
+standardstylesheet: csa.scss
+header: header.html
+wordcoverpage: word_csa_titlepage.html
+wordintropage: word_csa_intro.html
+wordstylesheet: wordstyle.scss
+pdf_stylesheet: csa.standard.xsl
+boilerplate: boilerplate.adoc
 webfont:
   - "https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i|Space+Mono:400,700"
   - "https://fonts.googleapis.com/css?family=Lato:400,400i,700,900"
