@@ -1,0 +1,29 @@
+== copyright-statement
+=== {blank}
+(c) {{ docyear }} The Spatial Web Foundation, Inc.
+
+SPATIAL WEB™ standard is a Hyperspatial Transaction Protocol, Hyperspatial
+Modeling Language, and Hyperspatial Architecture for Hyperspatial Transactions
+that enables users to implement it in accordance with a standard being created
+with the IEEE. SPATIAL WEB™ is a trademark of the Spatial Web Foundation.
+
+All rights reserved. Unless otherwise specified, or required in the context of
+its implementation, no part of this publication may be reproduced or utilized
+otherwise in any form or by any means, electronic or mechanical, including
+photocopying, or posting on the internet or an intranet, without prior written
+permission. Permission can be requested from the Spatial Web Foundation.
+
+Spatial Web Foundation +
+5877 Obama Blvd +
+Los Angeles, CA 90016 +
+USA
+
+E-mail: link:mailto:info@spatialwebfoundation.org[info@spatialwebfoundation.org]
+
+
+== feedback-statement
+
+=== {blank}
+
+// [align=center]
+// [css color:#007724]#**Connecting the physical and digital worlds**#
