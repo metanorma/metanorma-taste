@@ -1,0 +1,66 @@
+metanorma_name: csa
+organization_name_short: CSA
+organization_name_long: Cloud Security Alliance
+document_namespace: https://www.metanorma.org/ns/csa
+xml_root_tag: csa-standard
+html_bodyfont: 'Lato,"Source Sans Pro",sans-serif'
+html_headerfont: 'Lato,"Source Sans Pro",sans-serif'
+html_monospacefont: '"Source Code Pro",monospace'
+htmlcoverpage: html_csa_titlepage.html
+htmlintropage: html_csa_intro.html
+htmlstylesheet: htmlstyle.scss
+html_normalfontsize: "1.2em"
+html_monospacefontsize: "1.0em"
+html_footnotefontsize: "0.9em"
+i18nyaml: i18n-en.yaml
+word_bodyfont: 'Lato,Arial,sans-serif'
+word_headerfont: 'Lato,Arial,sans-serif'
+word_monospacefont: '"Source Code Pro","Courier New",monospace'
+word_normalfontsize: "10.5pt"
+word_smallerfontsize: "10.0pt"
+word_monospacefontsize: "10.0pt"
+word_footnotefontsize: "10.0pt"
+standardstylesheet: csa.scss
+header: header.html
+wordcoverpage: word_csa_titlepage.html
+wordintropage: word_csa_intro.html
+wordstylesheet: wordstyle.scss
+pdf_stylesheet: csa.standard.xsl
+boilerplate: boilerplate.adoc
+webfont:
+  - "https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i|Space+Mono:400,700"
+  - "https://fonts.googleapis.com/css?family=Lato:400,400i,700,900"
+  - "https://fonts.googleapis.com/css?family=Rubik:300,300i,500"
+  - "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,400,700,900"
+  - "https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,300;0,600;1,300;1,600&display=swap"
+docid_template: "{{ docnumeric }}{% if stageabbr %}({{ stageabbr }}){%endif%}{% if docyear %}:{{docyear}}{%endif%}"
+doctypes:
+  standard:
+  guidance:
+  proposal:
+  report:
+  whitepaper:
+  charter:
+  policy:
+  glossary:
+  case-study:
+default_doctype: standard
+published_stages:
+  - published
+  - withdrawn
+default_stage: published
+committee_types:
+  - technical-committee
+stage_abbreviations:
+  proposal:
+  working-draft: wd
+  committee-draft: cd
+  draft-standard: d
+  final-draft: 
+  published:
+  withdrawn:
+logo_path: ""
+fonts_manifest:
+  Lato:
+  STIX Two Math:
+  Source Code Pro:

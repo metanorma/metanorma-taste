@@ -43,11 +43,20 @@ module Metanorma
         publisher_abbr: "publisher_abbr",
         presentation_metadata_color_secondary: "presentation-metadata-color-secondary",
         presentation_metadata_backcover_text: "presentation-metadata-backcover-text",
+        presentation_metadata_ul_label_list: "presentation-metadata-ul-label-list",
+        presentation_metadata_annex_delim: "presentation-metadata-annex-delim",
+        presentation_metadata_middle_title: "presentation-metadata-middle-title",
+        presentation_metadata_ol_label_template_alphabet: "presentation-metadata-ol-label-template-alphabet",
+        presentation_metadata_ol_label_template_alphabet_upper: "presentation-metadata-ol-label-template-alphabet_upper",
+        presentation_metadata_ol_label_template_roman: "presentation-metadata-ol-label-template-roman",
+        presentation_metadata_ol_label_template_roman_upper: "presentation-metadata-ol-label-template-roman_upper",
+        presentation_metadata_ol_label_template_arabic: "presentation-metadata-ol-label-template-arabic",
         body_font: "body-font",
         header_font: "header-font",
         monospace_font: "monospace-font",
         fonts_manifest: "fonts-manifest",
       }.freeze
+
 
       # Initialize a new Base processor
       #
@@ -162,6 +171,7 @@ module Metanorma
           standardstylesheet_override: "standardstylesheet-override",
           pdfstylesheet: "pdf-stylesheet",
           pdfstylesheet_override: "pdf-stylesheet-override",
+          customize: "customize",
         }
       end
 

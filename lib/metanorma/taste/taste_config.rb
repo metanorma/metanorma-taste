@@ -28,6 +28,7 @@ module Metanorma
       attribute :standardstylesheet_override, :string
       attribute :pdfstylesheet, :string
       attribute :pdfstylesheet_override, :string
+      attribute :customize, :string
       attribute :base_override, BaseOverride
       attribute :doctypes, DoctypeConfig, collection: true
       attribute :stages, StageConfig, collection: true
@@ -55,6 +56,7 @@ module Metanorma
         map "pdf-stylesheet-override", to: :pdfstylesheet_override
         map "base-override", to: :base_override
         map "doctypes", to: :doctypes
+        map "customize", to: :customize
       end
     end
   end
