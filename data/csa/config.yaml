@@ -20,7 +20,7 @@ base-override:
   body-font: Lato,"Source Sans Pro",sans-serif
   header-font: Lato,"Source Sans Pro",sans-serif
   monospace-font: '"Source Code Pro",monospace'
-  fonts-manifest: Lato,STIX Two Math,Source Code Pro
+  fonts: Lato,STIX Two Math,Source Code Pro
 doctypes:
 - taste: standard
   base: standard

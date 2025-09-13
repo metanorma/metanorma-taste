@@ -15,6 +15,7 @@ base-override:
   presentation-metadata-backcover-text: pdfa.org
   body-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
   header-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
+  fonts: Source Sans 3;Source Sans Pro
 doctypes:
 - taste: specification # Specification # The name goes into i18n.yaml
   base: standard

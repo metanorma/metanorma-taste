@@ -11,7 +11,7 @@ module Metanorma
       attribute :body_font, :string
       attribute :header_font, :string
       attribute :monospace_font, :string
-      attribute :fonts_manifest, :string
+      attribute :fonts, :string
       attribute :presentation_metadata_color_secondary, :string
       attribute :presentation_metadata_backcover_text, :string
 
@@ -21,7 +21,7 @@ module Metanorma
         map "body-font", to: :body_font
         map "header-font", to: :header_font
         map "monospace-font", to: :monospace_font
-        map "fonts-manifest", to: :fonts_manifest
+        map "fonts", to: :fonts
         map "presentation-metadata-color-secondary",
             to: :presentation_metadata_color_secondary
         map "presentation-metadata-backcover-text",
