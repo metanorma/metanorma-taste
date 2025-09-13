@@ -14,6 +14,14 @@ module Metanorma
       attribute :fonts_manifest, :string
       attribute :presentation_metadata_color_secondary, :string
       attribute :presentation_metadata_backcover_text, :string
+      attribute :presentation_metadata_ul_label_list, :string
+      attribute :presentation_metadata_annex_delim, :string
+      attribute :presentation_metadata_middle_title, :string
+      attribute :presentation_metadata_ol_label_template_alphabet, :string
+      attribute :presentation_metadata_ol_label_template_alphabet_upper, :string
+      attribute :presentation_metadata_ol_label_template_roman, :string
+      attribute :presentation_metadata_ol_label_template_roman_upper, :string
+      attribute :presentation_metadata_middle_arabic, :string
 
       key_value do
         map "publisher", to: :publisher
@@ -26,6 +34,22 @@ module Metanorma
             to: :presentation_metadata_color_secondary
         map "presentation-metadata-backcover-text",
             to: :presentation_metadata_backcover_text
+        map "presentation-metadata-ul-label-list",
+            to: :presentation_metadata_ul_label_list
+        map "presentation-metadata-annex-delim",
+            to: :presentation_metadata_annex_delim
+        map "presentation-metadata-middle-title",
+            to: :presentation_metadata_middle_title
+        map "presentation-metadata-ol-label-template-alphabet",
+            to: :presentation_metadata_ol_label_template_alphabet
+        map "presentation-metadata-ol-label-template-alphabet_upper",
+            to: :presentation_metadata_ol_label_template_alphabet_upper
+        map "presentation-metadata-ol-label-template-roman",
+            to: :presentation_metadata_ol_label_template_roman
+        map "presentation-metadata-ol-label-template-roman_upper",
+            to: :presentation_metadata_ol_label_template_roman_upper
+        map "presentation-metadata-ol-label-template-arabic",
+            to: :presentation_metadata_ol_label_template_arabic
       end
     end
   end
