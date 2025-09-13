@@ -22,6 +22,8 @@ module Metanorma
       attribute :presentation_metadata_ol_label_template_roman, :string
       attribute :presentation_metadata_ol_label_template_roman_upper, :string
       attribute :presentation_metadata_middle_arabic, :string
+      attribute :fonts, :string
+      attribute :pdf_stylesheet_override, :string
 
       key_value do
         map "publisher", to: :publisher
@@ -50,6 +52,8 @@ module Metanorma
             to: :presentation_metadata_ol_label_template_roman_upper
         map "presentation-metadata-ol-label-template-arabic",
             to: :presentation_metadata_ol_label_template_arabic
+        map "fonts", to: :fonts
+        map "pdf-stylesheet-override", to: :pdf_stylesheet_override
       end
     end
   end

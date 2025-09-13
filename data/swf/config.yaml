@@ -1,0 +1,17 @@
+---
+flavor: swf
+owner: Spatial Web Foundation
+base-flavor: ribose
+copyright-notice: copyright.adoc
+i18n-dictionary: i18n.yaml
+publisher-logo: swf-full.svg
+base-override:
+  publisher: Spatial Web Foundation
+  publisher_abbr: SWF
+  presentation-metadata-color-secondary: '#007724'
+  presentation-metadata-backcover-text: spatialwebfoundation.org
+doctypes:
+- taste: standard
+  base: standard
+- taste: guide
+  base: report

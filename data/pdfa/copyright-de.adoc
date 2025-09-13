@@ -1,0 +1,39 @@
+== copyright-statement
+
+=== Copyright notice
+
+Copyright (c) {{ docyear }} PDF Association or its licensors.
+
+This work is licensed under the Creative Commons Attribution 4.0 International
+License.
+
+To view a copy of this license, visit
+http://creativecommons.org/licenses/by/4.0/
+
+or send a letter to +
+Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+PDF Association +
+Friedenstr. 2A · 16321 Bernau bei Berlin · Germany
+
+E-mail: copyright@pdfa.org +
+Web: www.pdfa.org
+
+Published in Germany and the United States of America
+
+Vendors own their respective copyrights wherever they are mentioned. The
+information contained in this document is provided only as general information,
+which may be incomplete or outdated. Users of this document are responsible for
+independently verifying any and all information. Any mention of companies or
+products does not imply endorsement or support of any of the mentioned
+information, services, products, or providers.
+
+== feedback-statement
+
+=== {blank}
+
+// [align=center]
+// **International Color Consortium**:
+// Standardizing [css color:blue]#color# fidelity since 1993.
+
+// (c) ICC {{ docyear }} - All rights reserved
