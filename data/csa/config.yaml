@@ -25,7 +25,7 @@ base-override:
   presentation-metadata-ul-label-list: "&#x2022;, &#x2d;, &#x6f;"
   presentation_metadata_annex_delim: "<br/>"
   presentation_metadata_middle_title: ""
-  presentation_metadata_ol_label_template_alphabet_upper: "%<span class="fmt-label-delim">)</span>"
+  presentation_metadata_ol_label_template_alphabet_upper: "%<span class='fmt-label-delim'>)</span>"
 doctypes:
 - taste: standard
   base: standard

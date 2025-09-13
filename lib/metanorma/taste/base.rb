@@ -50,7 +50,7 @@ module Metanorma
         presentation_metadata_ol_label_template_alphabet_upper: "presentation-metadata-ol-label-template-alphabet_upper",
         presentation_metadata_ol_label_template_roman: "presentation-metadata-ol-label-template-roman",
         presentation_metadata_ol_label_template_roman_upper: "presentation-metadata-ol-label-template-roman_upper",
-        presentation_metadata_middle_arabic: "presentation-metadata-ol-label-template-arabic",
+        presentation_metadata_ol_label_template_arabic: "presentation-metadata-ol-label-template-arabic",
         body_font: "body-font",
         header_font: "header-font",
         monospace_font: "monospace-font",

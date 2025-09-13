@@ -21,7 +21,7 @@ module Metanorma
       attribute :presentation_metadata_ol_label_template_alphabet_upper, :string
       attribute :presentation_metadata_ol_label_template_roman, :string
       attribute :presentation_metadata_ol_label_template_roman_upper, :string
-      attribute :presentation_metadata_middle_arabic, :string
+      attribute :presentation_metadata_ol_label_template_arabic, :string
       attribute :fonts, :string
       attribute :pdf_stylesheet_override, :string
 
