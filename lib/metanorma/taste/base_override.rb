@@ -11,7 +11,6 @@ module Metanorma
       attribute :body_font, :string
       attribute :header_font, :string
       attribute :monospace_font, :string
-      attribute :fonts, :string
       attribute :presentation_metadata_color_secondary, :string
       attribute :presentation_metadata_backcover_text, :string
       attribute :presentation_metadata_ul_label_list, :string
@@ -24,6 +23,7 @@ module Metanorma
       attribute :presentation_metadata_ol_label_template_arabic, :string
       attribute :fonts, :string
       attribute :pdf_stylesheet_override, :string
+      attribute :mn_output_extensions, :string
 
       key_value do
         map "publisher", to: :publisher
@@ -54,6 +54,7 @@ module Metanorma
             to: :presentation_metadata_ol_label_template_arabic
         map "fonts", to: :fonts
         map "pdf-stylesheet-override", to: :pdf_stylesheet_override
+        map "mn-output-extensions", to: :mn_output_extensions
       end
     end
   end

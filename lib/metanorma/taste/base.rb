@@ -55,6 +55,7 @@ module Metanorma
         header_font: "header-font",
         monospace_font: "monospace-font",
         fonts: "fonts",
+        mn_output_extensions: "mn-output-extensions",
       }.freeze
 
 
