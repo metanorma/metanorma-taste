@@ -80,7 +80,7 @@
 														e.g. "Draft Release Candidate 1.2", or just a version -->
 												<xsl:variable name="status" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:status"/>
 												<xsl:choose>
-													<xsl:when test="normalize-space($status != '')">
+													<xsl:when test="normalize-space($status) != ''">
 														<xsl:value-of select="$status"/>
 													</xsl:when>
 													<xsl:otherwise> <!-- just a version -->
