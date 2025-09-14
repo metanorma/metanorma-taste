@@ -77,15 +77,23 @@
 										<fo:block margin-left="5mm" margin-right="5mm">
 											<fo:block>
 												<!-- Status / Version.
-												e.g. "Draft Release Candidate 1.2", or just a version -->
-												<xsl:variable name="i18n_version"><xsl:call-template name="getLocalizedString"><xsl:with-param name="key">version</xsl:with-param></xsl:call-template></xsl:variable>
-												<xsl:call-template name="capitalize">
-													<xsl:with-param name="str" select="$i18n_version"/>
-												</xsl:call-template>
-												<xsl:text> </xsl:text>
-												<xsl:variable name="edition" select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) = '']"/>
-												<xsl:value-of select="$edition"/>
-												<xsl:if test="not(contains($edition, '.'))">.0</xsl:if>
+														e.g. "Draft Release Candidate 1.2", or just a version -->
+												<xsl:variable name="status" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:status"/>
+												<xsl:choose>
+													<xsl:when test="normalize-space($status != '')">
+														<xsl:value-of select="$status"/>
+													</xsl:when>
+													<xsl:otherwise> <!-- just a version -->
+														<xsl:variable name="i18n_version"><xsl:call-template name="getLocalizedString"><xsl:with-param name="key">version</xsl:with-param></xsl:call-template></xsl:variable>
+														<xsl:call-template name="capitalize">
+															<xsl:with-param name="str" select="$i18n_version"/>
+														</xsl:call-template>
+														<xsl:text> </xsl:text>
+														<xsl:variable name="edition" select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) = '']"/>
+														<xsl:value-of select="$edition"/>
+														<xsl:if test="not(contains($edition, '.'))">.0</xsl:if>
+													</xsl:otherwise>
+												</xsl:choose>
 											</fo:block>
 											<fo:block margin-bottom="2mm">
 												<xsl:value-of select="substring(/mn:metanorma/mn:bibdata/mn:version/mn:revision-date, 1, 7)"/>
