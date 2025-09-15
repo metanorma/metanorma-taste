@@ -44,12 +44,12 @@ RSpec.describe "Metanorma Taste Compilation" do
             
             # Use output_format_mapping to determine expected files
             format_mapping = compile.output_format_mapping
-            puts "Expected formats for #{taste}: \#{format_mapping.inspect}"
+            # puts "Expected formats for #{taste}: \#{format_mapping.inspect}"
             
             # Check that all expected output files were generated
             missing_files = []
             generated_files = Dir.glob('spec/assets/test.*')
-            puts "Files after compilation: \#{generated_files.join(', ')}"
+            # puts "Files after compilation: \#{generated_files.join(', ')}"
             
             format_mapping.each do |format, suffix|
               expected_file = "spec/assets/test.\#{suffix}"
