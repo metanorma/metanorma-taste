@@ -244,7 +244,7 @@ base-override:             # Hash of document attributes to override from base f
   header_font: string      # Header font to use in HTML and Word stylesheets
   monospace_font: string   # Monospace font to use in HTML and Word stylesheets
   fonts: string            # Comma-delimited listing of fonts to retrieve for the taste from Fontist
-  mn-output-extensions: string      # Comma-delimited listing of output formats to support (subset of base flavor's)
+  output-extensions: string         # Comma-delimited listing of output formats to support (subset of base flavor's)
   presentation-metadata-*: # Template style attributes for presentation
 doctypes:                  # Array of doctypes built over base flavour doctypes
   - taste:                 # taste-specific machine-readable doctype name

@@ -1,0 +1,7 @@
+= Document title
+Author
+:docfile: test.adoc
+
+== Scope
+This is a blank document
+

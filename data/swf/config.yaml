@@ -10,6 +10,7 @@ base-override:
   publisher_abbr: SWF
   presentation-metadata-color-secondary: '#007724'
   presentation-metadata-backcover-text: spatialwebfoundation.org
+  output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: standard
   base: standard

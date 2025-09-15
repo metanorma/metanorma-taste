@@ -10,6 +10,7 @@ base-override:
   publisher_abbr: EFS
   presentation-metadata-color-secondary: '#007724'
   presentation-metadata-backcover-text: enosema.org
+  output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: standard
   base: international-standard

@@ -186,6 +186,24 @@ module Metanorma
       unless config.flavor || directory_name
         raise InvalidTasteConfigError, "Taste must have a flavor name"
       end
+
+      # Validate that base-override.output-extensions is present and not empty
+      unless config.base_override&.output_extensions&.strip&.length&.positive?
+        raise InvalidTasteConfigError, "Taste must have base-override.output-extensions defined"
+      end
+
+      # Auto-enhance output-extensions: if it contains xml and any of html/doc/pdf,
+      # and doesn't already contain "presentation", then add "presentation"
+      if config.base_override&.output_extensions
+        extensions = config.base_override.output_extensions.split(',').map(&:strip)
+        
+        if extensions.include?('xml') && 
+           (extensions.include?('html') || extensions.include?('doc') || extensions.include?('pdf')) &&
+           !extensions.include?('presentation')
+          extensions << 'presentation'
+          config.base_override.output_extensions = extensions.join(',')
+        end
+      end
     end
 
     # Register a taste configuration in the registry

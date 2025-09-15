@@ -14,6 +14,7 @@ base-override:
   presentation-metadata-backcover-text: color.org
   body-font: Arial, 'Helvetica Neue', Helvetica, sans-serif
   header-font: Arial, 'Helvetica Neue', Helvetica, sans-serif
+  output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: specification # Specification # The name goes into i18n.yaml
   base: international-standard

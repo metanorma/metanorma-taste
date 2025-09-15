@@ -27,6 +27,10 @@ wordintropage: word_csa_intro.html
 wordstylesheet: wordstyle.scss
 pdf_stylesheet: csa.standard.xsl
 boilerplate: boilerplate.adoc
+formats:
+  - html
+  - pdf
+  - doc
 webfont:
   - "https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i|Space+Mono:400,700"
   - "https://fonts.googleapis.com/css?family=Lato:400,400i,700,900"

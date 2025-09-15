@@ -10,6 +10,7 @@ base-override:
   publisher_abbr: ELF
   presentation-metadata-color-secondary: '#3f65a2'
   presentation-metadata-backcover-text: expresslang.org
+  output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: standard
   base: international-standard
