@@ -29,6 +29,8 @@ module Metanorma
       attribute :pdfstylesheet, :string
       attribute :pdfstylesheet_override, :string
       attribute :customize, :string
+      attribute :coverpage_image, :string
+      attribute :backpage_image, :string
       attribute :base_override, BaseOverride
       attribute :doctypes, DoctypeConfig, collection: true
       attribute :stages, StageConfig, collection: true
@@ -57,6 +59,8 @@ module Metanorma
         map "base-override", to: :base_override
         map "doctypes", to: :doctypes
         map "customize", to: :customize
+        map "coverpage-image", to: :coverpage_image
+        map "backpage-image", to: :backpage_image
       end
     end
   end

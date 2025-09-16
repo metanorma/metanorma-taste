@@ -6,11 +6,11 @@ copyright-notice: copyright.adoc
 i18n-dictionary: i18n.yaml
 publisher-logo: swf-logo.svg
 pdf-stylesheet-override: swf.xsl
+coverpage-image: swf-front-cover.pdf
+backpage-image: swf-back-cover.pdf
 base-override:
   publisher: Spatial Web Foundation
   publisher_abbr: SWF
-  coverpage-image: swf-front-cover.pdf
-  backpage-image: swf-back-cover.pdf
   presentation-metadata-color-secondary: '#007724'
   presentation-metadata-backcover-text: spatialwebfoundation.org
   fonts: Nacelle;Nacelle SemiBold;Nacelle Light
