@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?><xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:mn="https://www.metanorma.org/ns/standoc" xmlns:mnx="https://www.metanorma.org/ns/xslt" xmlns:mathml="http://www.w3.org/1998/Math/MathML" xmlns:xalan="http://xml.apache.org/xalan" xmlns:fox="http://xmlgraphics.apache.org/fop/extensions" xmlns:pdf="http://xmlgraphics.apache.org/fop/extensions/pdf" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:java="http://xml.apache.org/xalan/java" xmlns:barcode="http://barcode4j.krysalis.org/ns" xmlns:redirect="http://xml.apache.org/xalan/redirect" exclude-result-prefixes="java" extension-element-prefixes="redirect" version="1.0">
 
-
-	<xsl:variable name="pageWidth" select="210"/>
-	<xsl:variable name="pageHeight" select="297"/>
+	<xsl:variable name="pageWidth">210</xsl:variable>
+	<xsl:variable name="pageHeight">297</xsl:variable>
+	
+	<xsl:variable name="marginTop">25</xsl:variable>
+	<xsl:variable name="marginBottom">25</xsl:variable>
 
 	<xsl:variable name="color_black">rgb(30, 25, 29)</xsl:variable>
+	<xsl:variable name="color_header_background">rgb(240, 234, 219)</xsl:variable>
 	
 	<xsl:template name="layout-master-set">
 		<fo:layout-master-set>
@@ -13,6 +16,49 @@
 				<fo:region-before region-name="header" extent="10mm"/>
 				<fo:region-after region-name="footer" extent="20mm"/>
 			</fo:simple-page-master>
+			
+			<fo:simple-page-master master-name="even" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header-even" extent="20mm"/> 
+				<fo:region-after region-name="footer-even" extent="20mm"/>
+				<fo:region-start region-name="left-region" extent="13mm"/>
+				<fo:region-end region-name="right-region" extent="12mm"/>
+			</fo:simple-page-master>
+			<fo:simple-page-master master-name="odd" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header-odd" extent="20mm"/> 
+				<fo:region-after region-name="footer-odd" extent="20mm"/>
+				<fo:region-start region-name="left-region" extent="13mm"/>
+				<fo:region-end region-name="right-region" extent="12mm"/>
+			</fo:simple-page-master>
+			<fo:page-sequence-master master-name="document">
+				<fo:repeatable-page-master-alternatives>
+					<fo:conditional-page-master-reference odd-or-even="even" master-reference="even"/>
+					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="odd"/>
+				</fo:repeatable-page-master-alternatives>
+			</fo:page-sequence-master>
+			
+			
+			<fo:simple-page-master master-name="even-landscape" page-width="{$pageHeight}mm" page-height="{$pageWidth}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header-even" extent="20mm"/> 
+				<fo:region-after region-name="footer-even" extent="20mm"/>
+				<fo:region-start region-name="left-region" extent="13mm"/>
+				<fo:region-end region-name="right-region" extent="12mm"/>
+			</fo:simple-page-master>
+			<fo:simple-page-master master-name="odd-landscape" page-width="{$pageHeight}mm" page-height="{$pageWidth}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header-odd" extent="20mm"/> 
+				<fo:region-after region-name="footer-odd" extent="20mm"/>
+				<fo:region-start region-name="left-region" extent="13mm"/>
+				<fo:region-end region-name="right-region" extent="12mm"/>
+			</fo:simple-page-master>
+			<fo:page-sequence-master master-name="document-landscape">
+				<fo:repeatable-page-master-alternatives>
+					<fo:conditional-page-master-reference odd-or-even="even" master-reference="even-landscape"/>
+					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="odd-landscape"/>
+				</fo:repeatable-page-master-alternatives>
+			</fo:page-sequence-master>
 			
 		</fo:layout-master-set>
 	</xsl:template>
@@ -133,27 +179,94 @@
 
 
 	<xsl:template name="insertHeaderFooter">
+		<xsl:call-template name="insertHeader"/>
 		<xsl:call-template name="insertFooter"/>
 	</xsl:template>
 
+	<xsl:template name="insertHeader">
+		<xsl:variable name="docidentifier" select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
+		<xsl:call-template name="insertHeaderOdd">
+			<xsl:with-param name="text" select="$docidentifier"/>
+		</xsl:call-template>
+		<xsl:call-template name="insertHeaderEven">
+			<xsl:with-param name="text" select="$docidentifier"/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:attribute-set name="header-style">
+		<xsl:attribute name="absolute-position">fixed</xsl:attribute>
+		<xsl:attribute name="left">0mm</xsl:attribute>
+		<xsl:attribute name="top">0mm</xsl:attribute>
+		<xsl:attribute name="width"><xsl:value-of select="$pageWidth"/>mm</xsl:attribute>
+		<xsl:attribute name="font-family">Nacelle</xsl:attribute>
+		<xsl:attribute name="font-size">12pt</xsl:attribute>
+		<xsl:attribute name="font-weight">300</xsl:attribute>
+		<xsl:attribute name="height">20mm</xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_black"/></xsl:attribute>
+		<xsl:attribute name="background-color"><xsl:value-of select="$color_header_background"/></xsl:attribute>
+		<xsl:attribute name="display-align">center</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:template name="insertHeaderOdd">
+		<xsl:param name="text"/>
+		<fo:static-content flow-name="header-odd" role="artifact">
+			<fo:block-container xsl:use-attribute-sets="header-style" id="__internal_layout__headerodd_{generate-id()}_{.//*[@id][1]/@id}">
+				<fo:block text-align="right" margin-right="7mm">
+					<xsl:value-of select="$text"/>
+				</fo:block>
+			</fo:block-container>
+		</fo:static-content>
+	</xsl:template>
+	
+	<xsl:template name="insertHeaderEven">
+		<xsl:param name="text"/>
+		<fo:static-content flow-name="header-even" role="artifact">
+			<fo:block-container xsl:use-attribute-sets="header-style" id="__internal_layout__headereven_{generate-id()}_{.//*[@id][1]/@id}">
+				<fo:block margin-left="10mm">
+					<xsl:value-of select="$text"/>
+				</fo:block>
+			</fo:block-container>
+		</fo:static-content>
+	</xsl:template>
+	
+	<xsl:attribute-set name="footer-style">
+		<xsl:attribute name="absolute-position">fixed</xsl:attribute>
+		<xsl:attribute name="left">0mm</xsl:attribute>
+		<xsl:attribute name="top"><xsl:value-of select="$pageHeight - 20"/>mm</xsl:attribute>
+		<xsl:attribute name="width"><xsl:value-of select="$pageWidth"/>mm</xsl:attribute>
+		<xsl:attribute name="font-family">Nacelle</xsl:attribute>
+		<xsl:attribute name="font-size">10pt</xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+		<xsl:attribute name="height">20mm</xsl:attribute>
+		<xsl:attribute name="color">white</xsl:attribute>
+		<xsl:attribute name="background-color"><xsl:value-of select="$color_black"/></xsl:attribute>
+		<xsl:attribute name="display-align">center</xsl:attribute>
+	</xsl:attribute-set>
+	
 	<xsl:template name="insertFooter">
-		<xsl:variable name="titles">
+		<xsl:variable name="titles_">
 			<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and (@type = 'intro' or not(@type))]"/>
 			<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and @type = 'main'][last()]"/>
 			<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and @type = 'part']"/>
 		</xsl:variable>
+		<xsl:variable name="titles">
+			<xsl:for-each select="xalan:nodeset($titles_)/mn:title">
+				<xsl:apply-templates />
+				<xsl:if test="position() != last()"> -- </xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
 		<xsl:call-template name="insertFooterOdd">
-			<xsl:with-param name="titles" select="$titles"/>
+			<xsl:with-param name="text" select="$titles"/>
 		</xsl:call-template>
 		<xsl:call-template name="insertFooterEven">
-			<xsl:with-param name="titles" select="$titles"/>
+			<xsl:with-param name="text" select="$titles"/>
 		</xsl:call-template>
 	</xsl:template>
 
 	<xsl:template name="insertFooterOdd">
-		<xsl:param name="titles"/>
+		<xsl:param name="text"/>
 		<fo:static-content flow-name="footer-odd" role="artifact">
-			<fo:block-container absolute-position="fixed" left="0mm" top="{$pageHeight - 20}mm" width="{$pageWidth}mm" font-size="10pt" font-weight="normal" height="20mm" color="white" background-color="{$color_black}" id="__internal_layout__footerodd_{generate-id()}_{.//*[@id][1]/@id}" display-align="center">
+			<fo:block-container xsl:use-attribute-sets="footer-style" id="__internal_layout__footerodd_{generate-id()}_{.//*[@id][1]/@id}">
 				<fo:table table-layout="fixed" width="100%">
 					<fo:table-column column-width="proportional-column-width(9)"/>
 					<fo:table-column column-width="proportional-column-width(1)"/>
@@ -161,10 +274,7 @@
 						<fo:table-row>
 							<fo:table-cell padding-left="7mm">
 								<fo:block>
-									<xsl:for-each select="xalan:nodeset($titles)/mn:title">
-										<xsl:apply-templates />
-										<xsl:if test="position() != last()"> -- </xsl:if>
-									</xsl:for-each>
+									<xsl:copy-of select="$text"/>
 								</fo:block>
 							</fo:table-cell>
 							<fo:table-cell text-align="right" padding-right="7mm">
@@ -178,9 +288,9 @@
 	</xsl:template>
 	
 	<xsl:template name="insertFooterEven">
-		<xsl:param name="titles"/>
+		<xsl:param name="text"/>
 		<fo:static-content flow-name="footer-even" role="artifact">
-			<fo:block-container absolute-position="fixed" left="0mm" top="{$pageHeight - 20}mm" width="{$pageWidth}mm" font-size="10pt" font-weight="normal" height="20mm" color="white" background-color="{$color_black}" id="__internal_layout__footereven_{generate-id()}_{.//*[@id][1]/@id}" display-align="center">
+			<fo:block-container xsl:use-attribute-sets="footer-style" id="__internal_layout__footereven_{generate-id()}_{.//*[@id][1]/@id}">
 				<fo:table table-layout="fixed" width="100%">
 					<fo:table-column column-width="proportional-column-width(1)"/>
 					<fo:table-column column-width="proportional-column-width(9)"/>
@@ -191,10 +301,7 @@
 							</fo:table-cell>
 							<fo:table-cell text-align="right" padding-right="9mm">
 								<fo:block>
-									<xsl:for-each select="xalan:nodeset($titles)/mn:title">
-										<xsl:apply-templates />
-										<xsl:if test="position() != last()"> -- </xsl:if>
-									</xsl:for-each>
+									<xsl:copy-of select="$text"/>
 								</fo:block>
 							</fo:table-cell>
 						</fo:table-row>
