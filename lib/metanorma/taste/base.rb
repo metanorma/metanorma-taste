@@ -175,6 +175,8 @@ module Metanorma
           pdfstylesheet: "pdf-stylesheet",
           pdfstylesheet_override: "pdf-stylesheet-override",
           customize: "customize",
+          coverpage_image: "coverpage-image",
+          backpage_image: "backpage-image",
         }
       end
 
