@@ -12,7 +12,7 @@
 	<xsl:template name="layout-master-set">
 		<fo:layout-master-set>
 			<fo:simple-page-master master-name="cover-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
-				<fo:region-body margin-top="60mm" margin-bottom="30mm" margin-left="19mm" margin-right="50mm"/>
+				<fo:region-body margin-top="60mm" margin-bottom="30mm" margin-left="19mm" margin-right="20mm"/>
 				<fo:region-before region-name="header" extent="10mm"/>
 				<fo:region-after region-name="footer" extent="20mm"/>
 			</fo:simple-page-master>
@@ -97,41 +97,45 @@
 			
 			<fo:flow flow-name="xsl-region-body" color="{$color_black}">
 				
-				<fo:block font-size="20pt" font-weight="600" margin-left="1mm">
-					<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
-				</fo:block>
+				<fo:block-container margin-right="30mm">
+					<fo:block-container margin-right="0mm">
 				
-				<xsl:variable name="titles">
-					<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and (@type = 'intro' or not(@type))]"/>
-					<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and @type = 'main'][last()]"/>
-				</xsl:variable>
-				
-				<xsl:for-each select="xalan:nodeset($titles)/mn:title">
-					<fo:block font-size="21pt" font-weight="600" margin-top="6mm" role="H1">
-						<xsl:if test="position() = 1">
-							<xsl:attribute name="font-size">22pt</xsl:attribute>
-							<xsl:attribute name="margin-top">17mm</xsl:attribute>
-						</xsl:if>
-						<xsl:apply-templates />
-					</fo:block>
-				</xsl:for-each>
-				
-				<xsl:variable name="title_part">
-					<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and @type = 'part']"/>
-				</xsl:variable>
-				<xsl:for-each select="xalan:nodeset($title_part)/mn:title">
-					<fo:block font-size="21pt" font-weight="600" margin-top="9mm">
-						<xsl:apply-templates />
-					</fo:block>
-				</xsl:for-each>
-				
-				<fo:block font-size="14pt" font-weight="normal" margin-top="17mm">
-					<xsl:call-template name="convertDate">
-						<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:version/mn:revision-date"/>
-						<xsl:with-param name="format">full</xsl:with-param>
-					</xsl:call-template>
-				</fo:block>
-			
+						<fo:block font-size="20pt" font-weight="600" margin-left="1mm">
+							<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
+						</fo:block>
+						
+						<xsl:variable name="titles">
+							<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and (@type = 'intro' or not(@type))]"/>
+							<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and @type = 'main'][last()]"/>
+						</xsl:variable>
+						
+						<xsl:for-each select="xalan:nodeset($titles)/mn:title">
+							<fo:block font-size="21pt" font-weight="600" margin-top="6mm" role="H1">
+								<xsl:if test="position() = 1">
+									<xsl:attribute name="font-size">22pt</xsl:attribute>
+									<xsl:attribute name="margin-top">17mm</xsl:attribute>
+								</xsl:if>
+								<xsl:apply-templates />
+							</fo:block>
+						</xsl:for-each>
+						
+						<xsl:variable name="title_part">
+							<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and @type = 'part']"/>
+						</xsl:variable>
+						<xsl:for-each select="xalan:nodeset($title_part)/mn:title">
+							<fo:block font-size="21pt" font-weight="600" margin-top="9mm">
+								<xsl:apply-templates />
+							</fo:block>
+						</xsl:for-each>
+						
+						<fo:block font-size="14pt" font-weight="normal" margin-top="17mm">
+							<xsl:call-template name="convertDate">
+								<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:version/mn:revision-date"/>
+								<xsl:with-param name="format">full</xsl:with-param>
+							</xsl:call-template>
+						</fo:block>
+					</fo:block-container>
+				</fo:block-container>
 			</fo:flow>
 		</fo:page-sequence>
 	</xsl:template> <!-- END cover-page -->
@@ -155,15 +159,28 @@
 			</fo:static-content>
 			
 			<fo:flow flow-name="xsl-region-body" color="{$color_black}">
-				<fo:block-container margin-left="1mm">
+				<fo:block-container margin-left="1mm" margin-right="5mm">
 					<fo:block-container margin-left="0mm">
-						<fo:block font-size="14pt" font-weight="600">Document contributors</fo:block>
-						
-						<fo:block font-size="14pt" font-weight="300" margin-top="6mm">TBD</fo:block>
+					
+						<xsl:variable name="contributors_">
+							<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'author']/mn:person/mn:name/mn:completename">
+								<xsl:copy-of select="."/>
+							</xsl:for-each>
+						</xsl:variable>
+						<xsl:variable name="contributors" select="xalan:nodeset($contributors_)"/>
+					
+						<xsl:if test="$contributors/*">
+							<fo:block font-size="14pt" font-weight="600">Document contributors</fo:block>
+							<fo:block font-size="12pt" font-weight="300" margin-top="5.5mm">
+								<xsl:for-each select="$contributors/*">
+									<fo:inline keep-together.within-line="always"><xsl:value-of select="."/></fo:inline><xsl:if test="position() != last()">, </xsl:if>
+								</xsl:for-each>
+							</fo:block>
+						</xsl:if>
 						
 						<fo:block font-size="14pt" font-weight="600" margin-top="11mm">Spatial Web Foundation leadership</fo:block>
 						
-						<fo:block font-size="14pt" font-weight="300" margin-top="6mm">TBD</fo:block>
+						<fo:block font-size="12pt" font-weight="300" margin-top="5.5mm">TBD</fo:block>
 						
 						
 						<fo:block font-size="12pt" font-weight="300" margin-top="15mm">
