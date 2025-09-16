@@ -163,7 +163,7 @@
 					<fo:block-container margin-left="0mm">
 					
 						<xsl:variable name="contributors_">
-							<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'author']/mn:person/mn:name/mn:completename">
+							<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role[@type = 'author' and normalize-space(mn:description) != 'leadership']]/mn:person/mn:name/mn:completename">
 								<xsl:copy-of select="."/>
 							</xsl:for-each>
 						</xsl:variable>
@@ -178,9 +178,39 @@
 							</fo:block>
 						</xsl:if>
 						
-						<fo:block font-size="14pt" font-weight="600" margin-top="11mm">Spatial Web Foundation leadership</fo:block>
+						<xsl:variable name="leadership_">
+							<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role[@type = 'author' and mn:description = 'leadership']]/mn:person">
+								<xsl:copy-of select="."/>
+							</xsl:for-each>
+						</xsl:variable>
+						<xsl:variable name="leadership" select="xalan:nodeset($leadership_)"/>
 						
-						<fo:block font-size="12pt" font-weight="300" margin-top="5.5mm">TBD</fo:block>
+						<xsl:if test="$leadership/*">
+							<fo:block font-size="14pt" font-weight="600" margin-top="11mm">Spatial Web Foundation leadership</fo:block>
+							
+							<fo:block font-size="12pt" font-weight="300" margin-top="5.5mm">
+								<fo:table table-layout="fixed" width="100%">
+									<fo:table-column column-width="51mm"/>
+									<fo:table-column column-width="90mm"/>
+									<fo:table-body>
+										<xsl:for-each select="$leadership/*">
+											<fo:table-row>
+												<fo:table-cell>
+													<fo:block font-weight="600">
+														<xsl:value-of select="mn:name/mn:completename"/>
+													</fo:block>
+												</fo:table-cell>
+												<fo:table-cell>
+													<fo:block font-weight="300">
+														<xsl:value-of select="mn:affiliation"/>
+													</fo:block>
+												</fo:table-cell>
+											</fo:table-row>
+										</xsl:for-each>
+									</fo:table-body>
+								</fo:table>
+							</fo:block>
+						</xsl:if>
 						
 						
 						<fo:block font-size="12pt" font-weight="300" margin-top="15mm">
