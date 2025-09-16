@@ -13,6 +13,9 @@ otherwise in any form or by any means, electronic or mechanical, including
 photocopying, or posting on the internet or an intranet, without prior written
 permission. Permission can be requested from the Spatial Web Foundation.
 
+== feedback-statement
+
+=== {blank}
 Spatial Web Foundation +
 5877 Obama Blvd +
 Los Angeles, CA 90016 +
@@ -20,10 +23,6 @@ USA
 
 E-mail: link:mailto:info@spatialwebfoundation.org[info@spatialwebfoundation.org]
 
-
-== feedback-statement
-
-=== {blank}
 
 // [align=center]
 // [css color:#007724]#**Connecting the physical and digital worlds**#
