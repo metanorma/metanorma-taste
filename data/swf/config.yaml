@@ -8,8 +8,11 @@ publisher-logo: swf-full.svg
 base-override:
   publisher: Spatial Web Foundation
   publisher_abbr: SWF
+  coverpage-image: cover-page.pdf
+  backpage-image: back-page.pdf
   presentation-metadata-color-secondary: '#007724'
   presentation-metadata-backcover-text: spatialwebfoundation.org
+  fonts: Nacelle
   output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: standard

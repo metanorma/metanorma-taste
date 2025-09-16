@@ -55,6 +55,8 @@ module Metanorma
         header_font: "header-font",
         monospace_font: "monospace-font",
         fonts: "fonts",
+        coverpage_image: "coverpage-image",
+        backpage_image: "backpage-image",
         output_extensions: "output-extensions",
       }.freeze
 

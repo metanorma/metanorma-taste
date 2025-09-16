@@ -23,6 +23,8 @@ module Metanorma
       attribute :presentation_metadata_ol_label_template_arabic, :string
       attribute :fonts, :string
       attribute :pdf_stylesheet_override, :string
+      attribute :coverpage_image, :string
+      attribute :backpage_image, :string
       attribute :output_extensions, :string
 
       key_value do
@@ -54,6 +56,8 @@ module Metanorma
             to: :presentation_metadata_ol_label_template_arabic
         map "fonts", to: :fonts
         map "pdf-stylesheet-override", to: :pdf_stylesheet_override
+        map "coverpage-image", to: :coverpage_image
+        map "backpage-image", to: :backpage_image
         map "output-extensions", to: :output_extensions
       end
     end
