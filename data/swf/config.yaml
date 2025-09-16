@@ -4,7 +4,7 @@ owner: Spatial Web Foundation
 base-flavor: ribose
 copyright-notice: copyright.adoc
 i18n-dictionary: i18n.yaml
-publisher-logo: swf-full.svg
+publisher-logo: swf-logo.svg
 base-override:
   publisher: Spatial Web Foundation
   publisher_abbr: SWF
