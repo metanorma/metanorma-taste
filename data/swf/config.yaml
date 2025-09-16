@@ -12,7 +12,7 @@ base-override:
   backpage-image: back-page.pdf
   presentation-metadata-color-secondary: '#007724'
   presentation-metadata-backcover-text: spatialwebfoundation.org
-  fonts: Nacelle
+  fonts: Nacelle;Nacelle SemiBold;Nacelle Light
   output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: standard
