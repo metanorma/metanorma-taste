@@ -17,6 +17,23 @@
 	</xsl:template>
 
 	
+	<xsl:variable name="copyright_year" select="/mn:metanorma/mn:bibdata/mn:copyright/mn:from"/>
+	<xsl:variable name="copyright_holder" select="normalize-space(/mn:metanorma/mn:bibdata/mn:copyright/mn:owner/mn:organization/mn:name)"/>
+	<xsl:variable name="copyrightText">
+		<xsl:text>© </xsl:text>
+		<xsl:value-of select="$copyright_year"/>
+		<xsl:text>. The </xsl:text>
+		<xsl:value-of select="$copyright_holder"/>
+		<xsl:text>, Inc. </xsl:text>
+		<xsl:variable name="all_rights_reserved">
+			<xsl:call-template name="getLocalizedString">
+				<xsl:with-param name="key">all_rights_reserved</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:value-of select="$all_rights_reserved"/>
+		<xsl:text>.</xsl:text>
+	</xsl:variable>
+	
 	<xsl:template name="cover-page">
 		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" font-family="Nacelle" >
 			<fo:static-content flow-name="header">
@@ -26,22 +43,6 @@
 			<fo:static-content flow-name="footer">
 				<fo:block-container height="20mm" display-align="center">
 					<fo:block font-size="12pt" font-weight="300" color="white" margin-left="11.3mm">
-						<xsl:variable name="copyright_year" select="/mn:metanorma/mn:bibdata/mn:copyright/mn:from"/>
-						<xsl:variable name="copyright_holder" select="normalize-space(/mn:metanorma/mn:bibdata/mn:copyright/mn:owner/mn:organization/mn:name)"/>
-						<xsl:variable name="copyrightText">
-							<xsl:text>© </xsl:text>
-							<xsl:value-of select="$copyright_year"/>
-							<xsl:text>. The </xsl:text>
-							<xsl:value-of select="$copyright_holder"/>
-							<xsl:text>, Inc. </xsl:text>
-							<xsl:variable name="all_rights_reserved">
-								<xsl:call-template name="getLocalizedString">
-									<xsl:with-param name="key">all_rights_reserved</xsl:with-param>
-								</xsl:call-template>
-							</xsl:variable>
-							<xsl:value-of select="$all_rights_reserved"/>
-							<xsl:text>.</xsl:text>
-						</xsl:variable>
 						<xsl:value-of select="$copyrightText"/>
 					</fo:block>
 				</fo:block-container>
@@ -89,10 +90,45 @@
 	</xsl:template> <!-- END cover-page -->
 
 	
-	<!-- empty back-page to omit back cover -->
-	<!-- <xsl:template name="back-page">
-		
-	</xsl:template> -->
+	<xsl:template name="back-page">
+		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" font-family="Nacelle" >
+			<fo:static-content flow-name="header">
+				<xsl:call-template name="insertBackgroundPageImage">
+					<xsl:with-param name="name">backpage-image</xsl:with-param>
+					<xsl:with-param name="suffix">back</xsl:with-param>
+				</xsl:call-template>
+			</fo:static-content>
+			
+			<fo:static-content flow-name="footer">
+				<fo:block-container height="20mm" display-align="center">
+					<fo:block font-size="12pt" font-weight="300" color="white" margin-left="11.3mm">
+						<xsl:value-of select="$copyrightText"/>
+					</fo:block>
+				</fo:block-container>
+			</fo:static-content>
+			
+			<fo:flow flow-name="xsl-region-body" color="rgb(30, 25, 29)">
+				<fo:block-container margin-left="1mm">
+					<fo:block-container margin-left="0mm">
+						<fo:block font-size="14pt" font-weight="600">Document contributors</fo:block>
+						
+						<fo:block font-size="14pt" font-weight="300" margin-top="6mm">TBD</fo:block>
+						
+						<fo:block font-size="14pt" font-weight="600" margin-top="11mm">Spatial Web Foundation leadership</fo:block>
+						
+						<fo:block font-size="14pt" font-weight="300" margin-top="6mm">TBD</fo:block>
+						
+						
+						<fo:block font-size="12pt" font-weight="300" margin-top="15mm">
+							<xsl:text>Comments about the Spatial Web and this document can be sent to</xsl:text>
+							<xsl:value-of select="$linebreak"/>
+							<xsl:text>the Spatial Web Foundation at info@spatialwebfoundation.org</xsl:text>
+						</fo:block>
+					</fo:block-container>
+				</fo:block-container>
+			</fo:flow>
+		</fo:page-sequence>
+	</xsl:template> <!-- Ena back-page -->
 
 
 	<xsl:template name="insertHeaderFooter">
