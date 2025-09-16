@@ -4,6 +4,7 @@
 	<xsl:variable name="pageWidth" select="210"/>
 	<xsl:variable name="pageHeight" select="297"/>
 
+	<xsl:variable name="color_black">rgb(30, 25, 29)</xsl:variable>
 	
 	<xsl:template name="layout-master-set">
 		<fo:layout-master-set>
@@ -48,7 +49,7 @@
 				</fo:block-container>
 			</fo:static-content>
 			
-			<fo:flow flow-name="xsl-region-body" color="rgb(30, 25, 29)">
+			<fo:flow flow-name="xsl-region-body" color="{$color_black}">
 				
 				<fo:block font-size="20pt" font-weight="600" margin-left="1mm">
 					<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
@@ -107,7 +108,7 @@
 				</fo:block-container>
 			</fo:static-content>
 			
-			<fo:flow flow-name="xsl-region-body" color="rgb(30, 25, 29)">
+			<fo:flow flow-name="xsl-region-body" color="{$color_black}">
 				<fo:block-container margin-left="1mm">
 					<fo:block-container margin-left="0mm">
 						<fo:block font-size="14pt" font-weight="600">Document contributors</fo:block>
@@ -136,29 +137,71 @@
 	</xsl:template>
 
 	<xsl:template name="insertFooter">
-		<!-- <xsl:param name="invert"/> -->
-		<xsl:variable name="footerText"> 
-			<xsl:text>&#xA0;</xsl:text>
-			<xsl:call-template name="capitalizeWords">
-				<xsl:with-param name="str">
-					<xsl:choose>
-						<xsl:when test="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:doctype-alias">
-							<xsl:value-of select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:doctype-alias"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype"/>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:with-param>
-			</xsl:call-template>
+		<xsl:variable name="titles">
+			<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and (@type = 'intro' or not(@type))]"/>
+			<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and @type = 'main'][last()]"/>
+			<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and @type = 'part']"/>
 		</xsl:variable>
 		<xsl:call-template name="insertFooterOdd">
-			<xsl:with-param name="footerText" select="$footerText"/>
+			<xsl:with-param name="titles" select="$titles"/>
 		</xsl:call-template>
 		<xsl:call-template name="insertFooterEven">
-			<xsl:with-param name="footerText" select="$footerText"/>
+			<xsl:with-param name="titles" select="$titles"/>
 		</xsl:call-template>
 	</xsl:template>
 
+	<xsl:template name="insertFooterOdd">
+		<xsl:param name="titles"/>
+		<fo:static-content flow-name="footer-odd" role="artifact">
+			<fo:block-container absolute-position="fixed" left="0mm" top="{$pageHeight - 20}mm" width="{$pageWidth}mm" font-size="10pt" font-weight="normal" height="20mm" color="white" background-color="{$color_black}" id="__internal_layout__footerodd_{generate-id()}_{.//*[@id][1]/@id}" display-align="center">
+				<fo:table table-layout="fixed" width="100%">
+					<fo:table-column column-width="proportional-column-width(9)"/>
+					<fo:table-column column-width="proportional-column-width(1)"/>
+					<fo:table-body>
+						<fo:table-row>
+							<fo:table-cell padding-left="7mm">
+								<fo:block>
+									<xsl:for-each select="xalan:nodeset($titles)/mn:title">
+										<xsl:apply-templates />
+										<xsl:if test="position() != last()"> -- </xsl:if>
+									</xsl:for-each>
+								</fo:block>
+							</fo:table-cell>
+							<fo:table-cell text-align="right" padding-right="7mm">
+								<fo:block><fo:page-number/></fo:block>
+							</fo:table-cell>
+						</fo:table-row>
+					</fo:table-body>
+				</fo:table>
+			</fo:block-container>
+		</fo:static-content>
+	</xsl:template>
+	
+	<xsl:template name="insertFooterEven">
+		<xsl:param name="titles"/>
+		<fo:static-content flow-name="footer-even" role="artifact">
+			<fo:block-container absolute-position="fixed" left="0mm" top="{$pageHeight - 20}mm" width="{$pageWidth}mm" font-size="10pt" font-weight="normal" height="20mm" color="white" background-color="{$color_black}" id="__internal_layout__footereven_{generate-id()}_{.//*[@id][1]/@id}" display-align="center">
+				<fo:table table-layout="fixed" width="100%">
+					<fo:table-column column-width="proportional-column-width(1)"/>
+					<fo:table-column column-width="proportional-column-width(9)"/>
+					<fo:table-body>
+						<fo:table-row>
+							<fo:table-cell padding-left="10mm">
+								<fo:block><fo:page-number/></fo:block>
+							</fo:table-cell>
+							<fo:table-cell text-align="right" padding-right="9mm">
+								<fo:block>
+									<xsl:for-each select="xalan:nodeset($titles)/mn:title">
+										<xsl:apply-templates />
+										<xsl:if test="position() != last()"> -- </xsl:if>
+									</xsl:for-each>
+								</fo:block>
+							</fo:table-cell>
+						</fo:table-row>
+					</fo:table-body>
+				</fo:table>
+			</fo:block-container>
+		</fo:static-content>
+	</xsl:template>
 	
 </xsl:stylesheet>
