@@ -9,8 +9,8 @@ pdf-stylesheet-override: swf.xsl
 base-override:
   publisher: Spatial Web Foundation
   publisher_abbr: SWF
-  coverpage-image: cover-page.pdf
-  backpage-image: back-page.pdf
+  coverpage-image: swf-front-cover.pdf
+  backpage-image: swf-back-cover.pdf
   presentation-metadata-color-secondary: '#007724'
   presentation-metadata-backcover-text: spatialwebfoundation.org
   fonts: Nacelle;Nacelle SemiBold;Nacelle Light

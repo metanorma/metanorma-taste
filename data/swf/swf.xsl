@@ -8,7 +8,7 @@
 	<xsl:template name="layout-master-set">
 		<fo:layout-master-set>
 			<fo:simple-page-master master-name="cover-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
-				<fo:region-body margin-top="28.5mm" margin-bottom="30mm" margin-left="19mm" margin-right="50mm"/>
+				<fo:region-body margin-top="60mm" margin-bottom="30mm" margin-left="19mm" margin-right="50mm"/>
 				<fo:region-before region-name="header" extent="10mm"/>
 				<fo:region-after region-name="footer" extent="20mm"/>
 			</fo:simple-page-master>
@@ -48,18 +48,8 @@
 			</fo:static-content>
 			
 			<fo:flow flow-name="xsl-region-body" color="rgb(30, 25, 29)">
-				<!-- Logo -->
-				<fo:block role="SKIP">
-					<fo:inline-container width="66mm" role="SKIP">
-						<fo:block font-size="0pt">
-							<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:copyright/mn:owner/mn:organization">
-								<xsl:apply-templates select="mn:logo/mn:image"/>
-							</xsl:for-each>
-						</fo:block>
-					</fo:inline-container>
-				</fo:block>
 				
-				<fo:block font-size="20pt" font-weight="600" margin-top="10.5mm" margin-left="1mm">
+				<fo:block font-size="20pt" font-weight="600" margin-left="1mm">
 					<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
 				</fo:block>
 				
