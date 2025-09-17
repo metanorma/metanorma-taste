@@ -299,7 +299,7 @@
 		<xsl:variable name="titles">
 			<xsl:for-each select="xalan:nodeset($titles_)/mn:title">
 				<xsl:apply-templates />
-				<xsl:if test="position() != last()"> -- </xsl:if>
+				<xsl:if test="position() != last()"> — </xsl:if>
 			</xsl:for-each>
 		</xsl:variable>
 		<xsl:call-template name="insertFooterOdd">
