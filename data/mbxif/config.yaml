@@ -4,7 +4,7 @@ owner: MBx Interoperability Forum
 base-flavor: ribose
 copyright-notice: copyright.adoc
 i18n-dictionary: i18n.yaml
-publisher-logo: mbxif-logo.svg
+publisher-logo: mbxif-logos_mbxif.svg
 pdf-stylesheet-override: mbxif.xsl
 coverpage-image: mbxif-front-cover.pdf
 backpage-image: mbxif-back-cover.pdf
