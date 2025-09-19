@@ -1,0 +1,36 @@
+== copyright-statement
+=== {blank}
+(c) {{ docyear }} MBx Interoperability Forum.
+
+All rights reserved. Unless otherwise specified, or required in the context of
+its implementation, no part of this publication may be reproduced or utilized
+otherwise in any form or by any means, electronic or mechanical, including
+photocopying, or posting on the internet or an intranet, without prior written
+permission. Permission can be requested from the MBx Interoperability Forum.
+
+== feedback-statement
+
+=== {blank}
+prostep ivip Association +
+Dolivostrasse 11 +
+D-64293 Darmstadt, Germany +
+Phone: +49-6151-9287-446 +
+Fax: +49-6151-9287-326 +
+Email: mailto:psev@prostep.com[] +
+Internet: https://www.prostep.org[www.prostep.org]
+
+AFNeT +
+30 Rue de Miromesnil +
+75008 Paris, France +
+Email: mailto:team@afnet.fr[] +
+Internet: http://www.afnet.fr/ +
+
+PDES, Inc. +
+125 King Charles Circle +
+Summerville, SC 29485, USA +
+Phone: +1-843-847-9807 +
+Contact: https://pdesinc.org/contact/[https://pdesinc.org/contact/] +
+Internet: https://pdesinc.org[pdesinc.org]
+
+// [align=center]
+// [css color:#007724]#**Connecting the physical and digital worlds**#
