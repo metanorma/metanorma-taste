@@ -256,7 +256,7 @@
 	<xsl:template name="insertFooter">
 		<!-- <xsl:param name="invert"/> -->
 		<xsl:variable name="footerText"> 
-			<xsl:text>PDFa</xsl:text>
+			<xsl:text>PDF Association</xsl:text>
 			<xsl:text>&#xA0;</xsl:text>
 			<xsl:call-template name="capitalizeWords">
 				<xsl:with-param name="str">
