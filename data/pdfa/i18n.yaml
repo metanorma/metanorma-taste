@@ -3,11 +3,9 @@ doctype_dict:
   application-note: Application Note
   best-practice-guide: Best Practice Guide
   technical-note: Technical Note
-  international-standard: International Standard
-  international-technical-specification: International Technical Specification
 term_def_boilerplate: |
   PDF Association maintains terminology databases for use in describing the
   Portable Document Format at the following addresses:
 
-  * Glossary of PDF terms: available at https://pdfa.org/glossary-of-pdf-terms/[]
-  * Glossary of accessibility terminology in PDF: available at https://pdfa.org/resource/glossary-of-accessibility-terminology-in-pdf/[]
+  * Glossary of general PDF terms: available at https://pdfa.org/glossary-of-pdf-terms/[]
+  * Glossary of PDF accessibility terminology: available at https://pdfa.org/resource/glossary-of-accessibility-terminology-in-pdf/[]
