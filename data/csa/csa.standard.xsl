@@ -203,6 +203,8 @@
 
 			<!-- End Document Pages -->
 
+			<xsl:call-template name="back-page"/>
+
 		</fo:root>
 	</xsl:template>
 
@@ -268,6 +270,9 @@
 				</fo:block-container>
 			</fo:flow>
 		</fo:page-sequence>
+	</xsl:template> <!-- inner-cover-page -->
+
+	<xsl:template name="back-page">
 	</xsl:template>
 
 	<xsl:template name="insertListOf_Title">
