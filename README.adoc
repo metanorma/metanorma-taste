@@ -393,7 +393,17 @@ These are Metanorma document attributes that contain values (not filenames):
 * `body-font`, `header-font`, `monospace-font`: Typography settings
 * `fonts`: Comma-delimited list of fonts to retrieve from Fontist
 * `output-extensions`: Comma-delimited list of supported output formats
-* `presentation-metadata-*`: Visual styling attributes for presentation
+* `presentation-metadata-*`: Visual styling attributes for presentation, including:
+  ** `presentation-metadata-color-secondary`: Secondary color for styling
+  ** `presentation-metadata-backcover-text`: Text for document back cover
+  ** `presentation-metadata-ul-label-list`: Unordered list label formatting
+  ** `presentation-metadata-annex-delim`: Annex delimiter formatting
+  ** `presentation-metadata-middle-title`: Middle title formatting
+  ** `presentation-metadata-ol-label-template-alphabet`: Ordered list alphabet template
+  ** `presentation-metadata-ol-label-template-alphabet_upper`: Ordered list uppercase alphabet template
+  ** `presentation-metadata-ol-label-template-roman`: Ordered list roman numeral template
+  ** `presentation-metadata-ol-label-template-roman_upper`: Ordered list uppercase roman numeral template
+  ** `presentation-metadata-ol-label-template-arabic`: Ordered list arabic numeral template
 * Custom organization-specific attributes
 
 The availability of these attributes depends on the base flavor's supported
