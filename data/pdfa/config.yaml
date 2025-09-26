@@ -2,21 +2,23 @@
 flavor: pdfa
 owner: PDF Association Inc.
 base-flavor: ribose
-copyright-notice: copyright.adoc
-i18n-dictionary: i18n.yaml
-publisher-logo: pdfa-logo.svg
-htmlcoverpage: htmlcoverpage.html
-htmlstylesheet-override: htmlstylesheet-override.scss
-pdf-stylesheet-override: pdfa.xsl
 base-override:
-  publisher: PDF Association
-  publisher_abbr: PDF Association
-  presentation-metadata-color-secondary: '#d03f4e'
-  presentation-metadata-backcover-text: pdfa.org
-  body-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
-  header-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
-  fonts: Source Sans 3;Source Sans Pro
-  output-extensions: xml,html,pdf
+  filename-attributes:
+    copyright-notice: copyright.adoc
+    i18n-dictionary: i18n.yaml
+    publisher-logo: pdfa-logo.svg
+    htmlcoverpage: htmlcoverpage.html
+    htmlstylesheet-override: htmlstylesheet-override.scss
+    pdfstylesheet-override: pdfa.xsl
+  value-attributes:
+    publisher: PDF Association
+    publisher_abbr: PDF Association
+    presentation-metadata-color-secondary: '#d03f4e'
+    presentation-metadata-backcover-text: pdfa.org
+    body-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
+    header-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
+    fonts: Source Sans 3;Source Sans Pro
+    output-extensions: xml,html,pdf
 doctypes:
 - taste: specification # Specification # The name goes into i18n.yaml
   base: standard

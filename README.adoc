@@ -152,12 +152,12 @@ currently available:
 |`icc`
 |International Color Consortium
 |`iso`
-|ICC specifications and standards with ICC branding and copyright
+|International Color Consortium specifications and standards with ICC branding and copyright
 
 |`elf`
 |Express Language Foundation
 |`iso`
-|ELF specifications and standards with ELF branding and copyright
+|Express Language Foundation specifications and standards with ELF branding and copyright
 
 |`enosema`
 |Enosema Foundation
@@ -166,8 +166,18 @@ currently available:
 
 |`csa`
 |Cloud Security Alliance
-|`cc`
+|`generic`
 |Cloud Security Alliance specifications and standards with CSA branding and copyright
+
+|`pdfa`
+|PDF Association
+|`ribose`
+|PDF Association specifications and standards with PDFA branding and copyright
+
+|`swf`
+|Spatial Web Foundation
+|`ribose`
+|Spatial Web Foundation specifications and standards with SWF branding and copyright
 |===
 
 
@@ -220,32 +230,36 @@ The main configuration file for each taste:
 flavor: string             # The name of the custom flavor (e.g., "icc")
 owner: string              # Organization name (e.g., "International Color Consortium")
 base-flavor: string        # Base Metanorma flavor to extend (e.g., "iso")
-copyright-notice: string   # Path to boilerplate file (e.g., "copyright.adoc"), which includes
-                           # copyright, license, legal, and feedback notices
-i18n-dictionary: string    # Path to internationalization dictionary (e.g., "i18n.yaml")
-publisher-logo: string     # Path to publisher logo (e.g., "icc.png")
-htmlcoverpage: string      # HTML output cover page
-htmlintropage: string      # HTML output introductory page
-htmlstylesheet: string     # HTML output CSS stylesheet
-htmlstylesheet-override: string     # HTML output CSS stylesheet, overriding base flavor stylesheet
-wordcoverpage: string      # Word output cover page
-wordintropage: string      # Word output introductory page
-wordstylesheet: string     # Word output CSS stylesheet
-wordstylesheet-override: string     # Word output CSS stylesheet, overriding base flavor stylesheet
-standardstylesheet: string # Word output secondary CSS stylesheet
-standardstylesheet-override: string # Word output secondary CSS stylesheet, overriding base flavor stylesheet
-header: string             # Word output header and footer content
-pdf-stylesheet: string     # PDF output XSLT stylesheet
-pdf-stylesheet-override: string     # PDF output XSLT stylesheet, overriding base flavor stylesheet
-base-override:             # Hash of document attributes to override from base flavor
-  publisher: string        # Publisher name override
-  publisher_abbr: string   # Publisher abbreviation
-  body_font: string        # Default font to use in HTML and Word stylesheets
-  header_font: string      # Header font to use in HTML and Word stylesheets
-  monospace_font: string   # Monospace font to use in HTML and Word stylesheets
-  fonts: string            # Comma-delimited listing of fonts to retrieve for the taste from Fontist
-  output-extensions: string         # Comma-delimited listing of output formats to support (subset of base flavor's)
-  presentation-metadata-*: # Template style attributes for presentation
+base-override:             # Document attributes to override from base flavor
+  filename-attributes:     # Metanorma document attributes that contain filenames
+    copyright-notice: string   # Path to boilerplate file (e.g., "copyright.adoc")
+    i18n-dictionary: string    # Path to internationalization dictionary (e.g., "i18n.yaml")
+    publisher-logo: string     # Path to publisher logo (e.g., "icc.png")
+    htmlcoverpage: string      # HTML output cover page
+    htmlintropage: string      # HTML output introductory page
+    htmlstylesheet: string     # HTML output CSS stylesheet
+    htmlstylesheet-override: string     # HTML output CSS stylesheet, overriding base flavor stylesheet
+    wordcoverpage: string      # Word output cover page
+    wordintropage: string      # Word output introductory page
+    wordstylesheet: string     # Word output CSS stylesheet
+    wordstylesheet-override: string     # Word output CSS stylesheet, overriding base flavor stylesheet
+    standardstylesheet: string # Word output secondary CSS stylesheet
+    standardstylesheet-override: string # Word output secondary CSS stylesheet, overriding base flavor stylesheet
+    header: string             # Word output header and footer content
+    pdf-stylesheet: string     # PDF output XSLT stylesheet
+    pdf-stylesheet-override: string     # PDF output XSLT stylesheet, overriding base flavor stylesheet
+    customize: string          # Path to custom metanorma configuration file
+    coverpage-image: string    # Path to coverpage image file
+    backpage-image: string     # Path to backpage image file
+  value-attributes:        # Metanorma document attributes that contain values
+    publisher: string        # Publisher name override
+    publisher_abbr: string   # Publisher abbreviation
+    body-font: string        # Default font to use in HTML and Word stylesheets
+    header-font: string      # Header font to use in HTML and Word stylesheets
+    monospace-font: string   # Monospace font to use in HTML and Word stylesheets
+    fonts: string            # Comma-delimited listing of fonts to retrieve for the taste from Fontist
+    output-extensions: string         # Comma-delimited listing of output formats to support (subset of base flavor's)
+    presentation-metadata-*: # Template style attributes for presentation
 doctypes:                  # Array of doctypes built over base flavour doctypes
   - taste:                 # taste-specific machine-readable doctype name
     base:                  # Base Metanorma flavor corresponding machine-readable doctype name
@@ -260,13 +274,21 @@ doctypes:                  # Array of doctypes built over base flavour doctypes
 flavor: icc
 owner: International Color Consortium
 base-flavor: iso
-copyright-notice: copyright.adoc
-i18n-dictionary: i18n.yaml
 base-override:
-  publisher: International Color Consortium
-  publisher_abbr: ICC
-  presentation-metadata-color-secondary: '#376795'
-  presentation-metadata-backcover-text: color.org
+  filename-attributes:
+    copyright-notice: copyright.adoc
+    i18n-dictionary: i18n.yaml
+    publisher-logo: icc-full.svg
+    htmlcoverpage: htmlcoverpage.html
+    htmlstylesheet-override: htmlstylesheet-override.scss
+  value-attributes:
+    publisher: International Color Consortium
+    publisher_abbr: ICC
+    presentation-metadata-color-secondary: '#376795'
+    presentation-metadata-backcover-text: color.org
+    body-font: Arial, 'Helvetica Neue', Helvetica, sans-serif
+    header-font: Arial, 'Helvetica Neue', Helvetica, sans-serif
+    output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: specification # Specification # The name goes into i18n.yaml
   base: international-standard
@@ -342,23 +364,37 @@ on the metaorma.org site.
 
 === Base-Override configuration
 
-The `base-override` section allows customization of any document attribute
-supported by the base flavor.
+The `base-override` section allows customization of document attributes
+supported by the base flavor through two nested categories:
 
-This includes:
+==== Filename Attributes (`filename-attributes`)
 
-Document attributes:
+These are Metanorma document attributes that contain filenames and file paths:
+
+* `copyright-notice`: Path to boilerplate file containing copyright, license, and legal notices
+* `i18n-dictionary`: Path to internationalization dictionary
+* `publisher-logo`: Path to organization logo file
+* `htmlcoverpage`, `htmlintropage`: HTML output page templates
+* `htmlstylesheet`, `htmlstylesheet-override`: HTML CSS stylesheets
+* `wordcoverpage`, `wordintropage`: Word output page templates  
+* `wordstylesheet`, `wordstylesheet-override`: Word CSS stylesheets
+* `standardstylesheet`, `standardstylesheet-override`: Secondary Word CSS stylesheets
+* `header`: Word output header and footer content
+* `pdf-stylesheet`, `pdf-stylesheet-override`: PDF XSLT stylesheets
+* `customize`: Path to custom metanorma configuration file
+* `coverpage-image`, `backpage-image`: Cover and back page image files
+
+==== Value Attributes (`value-attributes`)
+
+These are Metanorma document attributes that contain values (not filenames):
 
 * `publisher`: Organization name
 * `publisher_abbr`: Organization abbreviation
-* `doctype`: Document type mappings
+* `body-font`, `header-font`, `monospace-font`: Typography settings
+* `fonts`: Comma-delimited list of fonts to retrieve from Fontist
+* `output-extensions`: Comma-delimited list of supported output formats
+* `presentation-metadata-*`: Visual styling attributes for presentation
 * Custom organization-specific attributes
-
-Template style attributes:
-
-* `presentation-metadata-*`: Visual styling attributes
-* Color schemes, logos, layout preferences
-* Typography and formatting options
 
 The availability of these attributes depends on the base flavor's supported
 document attributes and template system.
@@ -368,6 +404,15 @@ For example, the ISO flavor supports specific presentation metadata attributes.
 Other flavors may have different customization options. Please check the base
 flavor documentation for available attributes.
 
+== Mappings of structures from taste to base flavours
+
+The taste configuration includes various document classifications which need to be
+mapped between values specific to the taste, and corresponding values in the base flavor.
+The document will actually be compiled with the base flavor settings, but it will be
+rendered using the taste's corresponding values. These includes
+
+* `doctype`: mapping of taste doctypes to native base flavor doctypes
+* `stage`: mapping of taste stages to native base flavor stages
 
 == Data model
 

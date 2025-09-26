@@ -2,15 +2,17 @@
 flavor: enosema
 owner: Enosema Foundation
 base-flavor: iso
-copyright-notice: copyright.adoc
-i18n-dictionary: i18n.yaml
-publisher-logo: logo.svg
 base-override:
-  publisher: Enosema Foundation
-  publisher_abbr: EFS
-  presentation-metadata-color-secondary: '#007724'
-  presentation-metadata-backcover-text: enosema.org
-  output-extensions: xml,html,pdf,doc
+  filename-attributes:
+    copyright-notice: copyright.adoc
+    i18n-dictionary: i18n.yaml
+    publisher-logo: logo.svg
+  value-attributes:
+    publisher: Enosema Foundation
+    publisher_abbr: EFS
+    presentation-metadata-color-secondary: '#007724'
+    presentation-metadata-backcover-text: enosema.org
+    output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: standard
   base: international-standard
