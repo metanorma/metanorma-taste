@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?><xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:mn="https://www.metanorma.org/ns/standoc" xmlns:mnx="https://www.metanorma.org/ns/xslt" xmlns:mathml="http://www.w3.org/1998/Math/MathML" xmlns:xalan="http://xml.apache.org/xalan" xmlns:fox="http://xmlgraphics.apache.org/fop/extensions" xmlns:pdf="http://xmlgraphics.apache.org/fop/extensions/pdf" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:java="http://xml.apache.org/xalan/java" xmlns:barcode="http://barcode4j.krysalis.org/ns" xmlns:redirect="http://xml.apache.org/xalan/redirect" exclude-result-prefixes="java" extension-element-prefixes="redirect" version="1.0">
 
+	<xsl:variable name="pageWidth">210</xsl:variable>
+	<xsl:variable name="pageHeight">297</xsl:variable>
+
 	<xsl:attribute-set name="root-style">
 		<xsl:attribute name="font-family">Source Sans 3, STIX Two Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
 		<xsl:attribute name="font-size">11pt</xsl:attribute>
@@ -52,15 +55,30 @@
 					<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) != '']"/>
 				</fo:block>
 				
-				<fo:block-container width="112mm" line-height="1.2" margin-top="4mm">
-					<!-- Main title of doc -->
-					<fo:block font-size="32pt" font-weight="bold">
-						<fo:block><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'intro']/node()"/></fo:block>
-					</fo:block>
-					<!-- Subtitle of doc -->
-					<fo:block font-size="30pt">
-						<fo:block><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'main'][last()]/node()"/></fo:block>
-					</fo:block>
+				<fo:block-container width="112mm" height="98mm" line-height="1.2" margin-top="4mm" fox:shrink-to-fit="true">
+				
+					<xsl:call-template name="insertCoverPageTitles"/>
+					
+					<!-- Example: title-intro fr -->
+					<!-- <xsl:variable name="lang_other">
+						<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:title[@language != $lang]">
+							<xsl:if test="not(preceding-sibling::mn:title[@language = current()/@language])">
+								<xsl:element name="lang" namespace="{$namespace_mn_xsl}"><xsl:value-of select="@language"/></xsl:element>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
+					
+					<xsl:for-each select="xalan:nodeset($lang_other)/mnx:lang">
+						<xsl:variable name="lang_other" select="."/>
+						<fo:block font-size="4pt" role="SKIP"><xsl:value-of select="$linebreak"/></fo:block>
+						<fo:block font-style="italic" role="SKIP">
+							<xsl:call-template name="insertCoverPageTitles">
+								<xsl:with-param name="curr_lang" select="$lang_other"/>
+								<xsl:with-param name="font_size">28</xsl:with-param>
+							</xsl:call-template>
+						</fo:block>
+					</xsl:for-each> -->
+					
 				</fo:block-container>
 				
 				<fo:block-container absolute-position="fixed" top="95mm" left="17.5mm" font-size="20pt">
@@ -178,6 +196,25 @@
 		</fo:page-sequence>
 	</xsl:template> <!-- END cover-page -->
 
+	<xsl:template name="insertCoverPageTitles">
+		<xsl:param name="curr_lang" select="$lang"/>
+		<xsl:param name="font_size">32</xsl:param>
+		<xsl:param name="font_style">normal</xsl:param>
+		<!-- Main title of doc -->
+		<fo:block font-size="{$font_size}pt" font-weight="bold" font-style="{$font_style}">
+			<fo:block role="H1"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'intro' and @language = $curr_lang]/node()"/></fo:block>
+		</fo:block>
+		<!-- Subtitle of doc -->
+		<fo:block font-size="{$font_size - 2}pt" font-style="{$font_style}">
+			<fo:block role="H1"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'main' and @language = $curr_lang][last()]/node()"/></fo:block>
+		</fo:block>
+		<!-- Part title -->
+		<fo:block font-size="{$font_size - 8}pt" font-style="{$font_style}">
+			<fo:block role="H1"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'part' and @language = $curr_lang]/node()"/></fo:block>
+		</fo:block>
+	</xsl:template>
+	
+
 	<xsl:variable name="circledChars">
 		<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 			 viewBox="0 0 16 6.6" style="enable-background:new 0 0 16 6.6;" xml:space="preserve">
@@ -219,7 +256,7 @@
 	<xsl:template name="insertFooter">
 		<!-- <xsl:param name="invert"/> -->
 		<xsl:variable name="footerText"> 
-			<xsl:text>PDFa</xsl:text>
+			<xsl:text>PDF Association</xsl:text>
 			<xsl:text>&#xA0;</xsl:text>
 			<xsl:call-template name="capitalizeWords">
 				<xsl:with-param name="str">

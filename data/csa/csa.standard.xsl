@@ -72,35 +72,20 @@
 
 			<xsl:call-template name="cover-page"/>
 
-			<!-- Copyright, Content, Foreword, etc. pages -->
-			<fo:page-sequence master-reference="document" initial-page-number="2" format="1" force-page-count="no-force">
+			<xsl:call-template name="inner-cover-page"/>
+
+			<xsl:if test="$debug = 'true'">
+				<redirect:write file="contents_.xml"> <!-- {java:getTime(java:java.util.Date.new())} -->
+					<xsl:copy-of select="$contents"/>
+				</redirect:write>
+			</xsl:if>
+
+			<!-- Content, Foreword, etc. pages -->
+			<fo:page-sequence master-reference="document" format="1" force-page-count="no-force">
 
 				<xsl:call-template name="insertFootnoteSeparatorCommon"/>
 				<xsl:call-template name="insertHeaderFooter"/>
 				<fo:flow flow-name="xsl-region-body">
-
-					<xsl:if test="$debug = 'true'">
-						<redirect:write file="contents_.xml"> <!-- {java:getTime(java:java.util.Date.new())} -->
-							<xsl:copy-of select="$contents"/>
-						</redirect:write>
-					</xsl:if>
-
-					<fo:block>
-						<fo:block>The permanent and official location for Cloud Security Alliance DevSecOps is</fo:block>
-						<fo:block color="rgb(33, 94, 159)" text-decoration="underline">https://cloudsecurityalliance.org/group/DevSecOps/</fo:block>
-					</fo:block>
-
-					<fo:block-container absolute-position="fixed" left="25mm" top="152mm" width="165mm" height="100mm" display-align="after" color="rgb(165, 169, 172)" line-height="145%">
-						<fo:block>© <xsl:value-of select="/mn:metanorma/mn:bibdata/mn:copyright/mn:from"/> Cloud Security Alliance – All Rights Reserved. You may download, store, display on your
-						computer, view, print, and link to the Cloud Security Alliance at <fo:inline text-decoration="underline">https://cloudsecurityalliance.org</fo:inline>
-						subject to the following: (a) the draft may be used solely for your personal, informational, noncommercial
-						use; (b) the draft may not be modified or altered in any way; (c) the draft may not be
-						redistributed; and (d) the trademark, copyright or other notices may not be removed. You may quote
-						portions of the draft as permitted by the Fair Use provisions of the United States Copyright Act,
-						provided that you attribute the portions to the Cloud Security Alliance.</fo:block>
-					</fo:block-container>
-
-					<fo:block break-after="page"/>
 
 					<fo:block font-size="26pt" margin-bottom="18pt" role="H1">
 						<xsl:call-template name="getLocalizedString">
@@ -218,6 +203,8 @@
 
 			<!-- End Document Pages -->
 
+			<xsl:call-template name="back-page"/>
+
 		</fo:root>
 	</xsl:template>
 
@@ -258,6 +245,35 @@
 			</fo:flow>
 		</fo:page-sequence>
 	</xsl:template> <!-- END: cover-page -->
+
+	<xsl:template name="inner-cover-page">
+		<!-- Copyright -->
+		<fo:page-sequence master-reference="document" initial-page-number="2" format="1" force-page-count="no-force">
+
+			<xsl:call-template name="insertFootnoteSeparatorCommon"/>
+			<xsl:call-template name="insertHeaderFooter"/>
+			<fo:flow flow-name="xsl-region-body">
+
+				<fo:block>
+					<fo:block>The permanent and official location for Cloud Security Alliance DevSecOps is</fo:block>
+					<fo:block color="rgb(33, 94, 159)" text-decoration="underline">https://cloudsecurityalliance.org/group/DevSecOps/</fo:block>
+				</fo:block>
+
+				<fo:block-container absolute-position="fixed" left="25mm" top="152mm" width="165mm" height="100mm" display-align="after" color="rgb(165, 169, 172)" line-height="145%">
+					<fo:block>© <xsl:value-of select="/mn:metanorma/mn:bibdata/mn:copyright/mn:from"/> Cloud Security Alliance – All Rights Reserved. You may download, store, display on your
+					computer, view, print, and link to the Cloud Security Alliance at <fo:inline text-decoration="underline">https://cloudsecurityalliance.org</fo:inline>
+					subject to the following: (a) the draft may be used solely for your personal, informational, noncommercial
+					use; (b) the draft may not be modified or altered in any way; (c) the draft may not be
+					redistributed; and (d) the trademark, copyright or other notices may not be removed. You may quote
+					portions of the draft as permitted by the Fair Use provisions of the United States Copyright Act,
+					provided that you attribute the portions to the Cloud Security Alliance.</fo:block>
+				</fo:block-container>
+			</fo:flow>
+		</fo:page-sequence>
+	</xsl:template> <!-- inner-cover-page -->
+
+	<xsl:template name="back-page">
+	</xsl:template>
 
 	<xsl:template name="insertListOf_Title">
 		<xsl:param name="title"/>
@@ -8041,15 +8057,22 @@
 	</xsl:attribute-set> <!-- quote-style -->
 
 	<xsl:template name="refine_quote-style">
-	</xsl:template>
+	</xsl:template> <!-- refine_quote-style -->
 
 	<xsl:attribute-set name="quote-source-style">
 		<xsl:attribute name="text-align">right</xsl:attribute>
 		<xsl:attribute name="margin-right">25mm</xsl:attribute>
-	</xsl:attribute-set>
+	</xsl:attribute-set> <!-- quote-source-style -->
 
 	<xsl:template name="refine_quote-source-style">
 	</xsl:template>
+
+	<xsl:attribute-set name="source-style">
+	</xsl:attribute-set> <!-- source-style -->
+
+	<xsl:template name="refine_source-style">
+
+	</xsl:template> <!-- refine_source-style -->
 
 	<!-- ====== -->
 	<!-- quote -->
@@ -8098,7 +8121,9 @@
 		</xsl:if>
 		<xsl:choose>
 			<xsl:when test="not(parent::quote)">
-				<fo:block>
+				<fo:block xsl:use-attribute-sets="source-style">
+					<xsl:call-template name="refine_source-style"/>
+
 					<xsl:call-template name="insert_basic_link">
 						<xsl:with-param name="element">
 							<fo:basic-link internal-destination="{@bibitemid}" fox:alt-text="{@citeas}">
@@ -10202,6 +10227,7 @@
 	</xsl:template>
 
 	<xsl:attribute-set name="fn-num-style">
+		<xsl:attribute name="role">Reference</xsl:attribute>
 		<xsl:attribute name="keep-with-previous.within-line">always</xsl:attribute>
 		<xsl:attribute name="font-size">65%</xsl:attribute>
 		<xsl:attribute name="vertical-align">super</xsl:attribute>
@@ -10278,26 +10304,9 @@
 		<xsl:variable name="ref_id" select="@target"/>
 
 		<xsl:variable name="footnote_inline">
-			<fo:inline role="Reference">
+			<fo:inline xsl:use-attribute-sets="fn-num-style">
 
-				<xsl:variable name="fn_styles">
-					<xsl:choose>
-						<xsl:when test="ancestor::mn:bibitem">
-							<fn_styles xsl:use-attribute-sets="bibitem-note-fn-style">
-								<xsl:call-template name="refine_bibitem-note-fn-style"/>
-							</fn_styles>
-						</xsl:when>
-						<xsl:otherwise>
-							<fn_styles xsl:use-attribute-sets="fn-num-style">
-								<xsl:call-template name="refine_fn-num-style"/>
-							</fn_styles>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-
-				<xsl:for-each select="xalan:nodeset($fn_styles)/fn_styles/@*">
-					<xsl:copy-of select="."/>
-				</xsl:for-each>
+				<xsl:call-template name="refine_fn-num-style"/>
 
 				<!-- https://github.com/metanorma/metanorma-ieee/issues/595 -->
 				<!-- <xsl:if test="following-sibling::node()[normalize-space() != ''][1][self::mn:fn]">
@@ -10606,32 +10615,6 @@
 
 	<xsl:template name="refine_bibitem-non-normative-list-body-style">
 	</xsl:template>
-
-	<!-- footnote reference number for bibitem, in the text  -->
-	<xsl:attribute-set name="bibitem-note-fn-style">
-		<xsl:attribute name="keep-with-previous.within-line">always</xsl:attribute>
-		<xsl:attribute name="font-size">65%</xsl:attribute>
-		<xsl:attribute name="vertical-align">super</xsl:attribute>
-	</xsl:attribute-set> <!-- bibitem-note-fn-style -->
-
-	<xsl:template name="refine_bibitem-note-fn-style">
-	</xsl:template>
-
-	<!-- footnote number on the page bottom -->
-	<xsl:attribute-set name="bibitem-note-fn-number-style">
-		<xsl:attribute name="keep-with-next.within-line">always</xsl:attribute>
-		<xsl:attribute name="font-size">60%</xsl:attribute>
-		<xsl:attribute name="vertical-align">super</xsl:attribute>
-	</xsl:attribute-set> <!-- bibitem-note-fn-number-style -->
-
-	<!-- footnote body (text) on the page bottom -->
-	<xsl:attribute-set name="bibitem-note-fn-body-style">
-		<xsl:attribute name="font-size">10pt</xsl:attribute>
-		<xsl:attribute name="margin-bottom">12pt</xsl:attribute>
-		<xsl:attribute name="start-indent">0pt</xsl:attribute>
-		<xsl:attribute name="font-family">Azo Sans Lt</xsl:attribute>
-		<xsl:attribute name="color">rgb(168, 170, 173)</xsl:attribute>
-	</xsl:attribute-set> <!-- bibitem-note-fn-body-style -->
 
 	<xsl:attribute-set name="references-non-normative-style">
 		<xsl:attribute name="line-height">145%</xsl:attribute>
