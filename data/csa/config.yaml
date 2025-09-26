@@ -2,30 +2,32 @@
 flavor: csa
 owner: Cloud Security Alliance
 base-flavor: generic
-customize: metanorma.yml
-copyright-notice: boilerplate.adoc
-i18n-dictionary: i18n.yaml
-publisher-logo: logo.svg
-htmlcoverpage: html_csa_titlepage.html
-htmlstylesheet: htmlstyle.scss
-htmlintropage: html_csa_intro.html
-wordcoverpage: word_csa_titlepage.html
-standardstylesheet: csa.scss
-wordstylesheet: wordstyle.scss
-wordintropage: word_csa_intro.html
-header: header.html
-pdf-stylesheet: csa.standard.xsl
 base-override:
-  publisher: Cloud Security Alliance
-  publisher_abbr: CSA
-  body-font: Lato,"Source Sans Pro",sans-serif
-  header-font: Lato,"Source Sans Pro",sans-serif
-  monospace-font: '"Source Code Pro",monospace'
-  presentation-metadata-ul-label-list: "&#x2022;, &#x2d;, &#x6f;"
-  presentation_metadata_annex_delim: "<br/>"
-  presentation_metadata_middle_title: ""
-  presentation_metadata_ol_label_template_alphabet_upper: "%<span class='fmt-label-delim'>)</span>"
-  output-extensions: xml,html,pdf,doc
+  filename-attributes:
+    customize: metanorma.yml
+    copyright-notice: boilerplate.adoc
+    i18n-dictionary: i18n.yaml
+    publisher-logo: logo.svg
+    htmlcoverpage: html_csa_titlepage.html
+    htmlstylesheet: htmlstyle.scss
+    htmlintropage: html_csa_intro.html
+    wordcoverpage: word_csa_titlepage.html
+    standardstylesheet: csa.scss
+    wordstylesheet: wordstyle.scss
+    wordintropage: word_csa_intro.html
+    header: header.html
+    pdf-stylesheet: csa.standard.xsl
+  value-attributes:
+    publisher: Cloud Security Alliance
+    publisher_abbr: CSA
+    body-font: Lato,"Source Sans Pro",sans-serif
+    header-font: Lato,"Source Sans Pro",sans-serif
+    monospace-font: '"Source Code Pro",monospace'
+    presentation-metadata-ul-label-list: "&#x2022;, &#x2d;, &#x6f;"
+    presentation_metadata_annex_delim: "<br/>"
+    presentation_metadata_middle_title: ""
+    presentation_metadata_ol_label_template_alphabet_upper: "%<span class='fmt-label-delim'>)</span>"
+    output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: standard
   base: standard

@@ -16,7 +16,7 @@ RSpec.describe Metanorma::TasteRegister do
       expect(info.flavor).to eq("icc")
       expect(info.owner).to eq("International Color Consortium")
       expect(info.base_flavor).to eq("iso")
-      expect(info.base_override.publisher).to eq("International Color Consortium")
+      expect(info.base_override.value_attributes.publisher).to eq("International Color Consortium")
       expect(info.doctypes.first.taste).to eq("specification")
       expect(info.doctypes.first.base).to eq("international-standard")
       expect(info.directory).to end_with(File.join("data", "icc"))
@@ -53,8 +53,10 @@ RSpec.describe Metanorma::TasteRegister do
     let(:register) { described_class.instance }
     let(:valid_base_override) do
       Metanorma::Taste::BaseOverride.new.tap do |bo|
-        bo.output_extensions = "html,pdf,doc"
-        bo.publisher = "Test Publisher"
+        bo.value_attributes = Metanorma::Taste::ValueAttributes.new.tap do |va|
+          va.output_extensions = "html,pdf,doc"
+          va.publisher = "Test Publisher"
+        end
       end
     end
     let(:valid_config) do
@@ -83,7 +85,7 @@ RSpec.describe Metanorma::TasteRegister do
           register.send(:validate_taste_config!, config, "test")
         end.to raise_error(
           Metanorma::TasteRegister::InvalidTasteConfigError,
-          "Taste must have base-override.output-extensions defined"
+          "Taste must have base-override.value-attributes.output-extensions defined"
         )
       end
     end
@@ -93,8 +95,10 @@ RSpec.describe Metanorma::TasteRegister do
         config = Metanorma::Taste::TasteConfig.new.tap do |c|
           c.flavor = "test"
           c.base_override = Metanorma::Taste::BaseOverride.new.tap do |bo|
-            bo.publisher = "Test Publisher"
-            bo.output_extensions = nil
+            bo.value_attributes = Metanorma::Taste::ValueAttributes.new.tap do |va|
+              va.publisher = "Test Publisher"
+              va.output_extensions = nil
+            end
           end
         end
 
@@ -102,7 +106,7 @@ RSpec.describe Metanorma::TasteRegister do
           register.send(:validate_taste_config!, config, "test")
         end.to raise_error(
           Metanorma::TasteRegister::InvalidTasteConfigError,
-          "Taste must have base-override.output-extensions defined"
+          "Taste must have base-override.value-attributes.output-extensions defined"
         )
       end
     end
@@ -112,8 +116,10 @@ RSpec.describe Metanorma::TasteRegister do
         config = Metanorma::Taste::TasteConfig.new.tap do |c|
           c.flavor = "test"
           c.base_override = Metanorma::Taste::BaseOverride.new.tap do |bo|
-            bo.publisher = "Test Publisher"
-            bo.output_extensions = ""
+            bo.value_attributes = Metanorma::Taste::ValueAttributes.new.tap do |va|
+              va.publisher = "Test Publisher"
+              va.output_extensions = ""
+            end
           end
         end
 
@@ -121,7 +127,7 @@ RSpec.describe Metanorma::TasteRegister do
           register.send(:validate_taste_config!, config, "test")
         end.to raise_error(
           Metanorma::TasteRegister::InvalidTasteConfigError,
-          "Taste must have base-override.output-extensions defined"
+          "Taste must have base-override.value-attributes.output-extensions defined"
         )
       end
     end
@@ -131,8 +137,10 @@ RSpec.describe Metanorma::TasteRegister do
         config = Metanorma::Taste::TasteConfig.new.tap do |c|
           c.flavor = "test"
           c.base_override = Metanorma::Taste::BaseOverride.new.tap do |bo|
-            bo.publisher = "Test Publisher"
-            bo.output_extensions = "   \n\t  "
+            bo.value_attributes = Metanorma::Taste::ValueAttributes.new.tap do |va|
+              va.publisher = "Test Publisher"
+              va.output_extensions = "   \n\t  "
+            end
           end
         end
 
@@ -140,7 +148,7 @@ RSpec.describe Metanorma::TasteRegister do
           register.send(:validate_taste_config!, config, "test")
         end.to raise_error(
           Metanorma::TasteRegister::InvalidTasteConfigError,
-          "Taste must have base-override.output-extensions defined"
+          "Taste must have base-override.value-attributes.output-extensions defined"
         )
       end
     end
@@ -166,104 +174,120 @@ RSpec.describe Metanorma::TasteRegister do
         config = Metanorma::Taste::TasteConfig.new.tap do |c|
           c.flavor = "test"
           c.base_override = Metanorma::Taste::BaseOverride.new.tap do |bo|
-            bo.output_extensions = "xml,html,pdf,doc"
+            bo.value_attributes = Metanorma::Taste::ValueAttributes.new.tap do |va|
+              va.output_extensions = "xml,html,pdf,doc"
+            end
           end
         end
 
         register.send(:validate_taste_config!, config, "test")
         
-        expect(config.base_override.output_extensions).to eq("xml,html,pdf,doc,presentation")
+        expect(config.base_override.value_attributes.output_extensions).to eq("xml,html,pdf,doc,presentation")
       end
 
       it "adds 'presentation' when xml and html are present but presentation is missing" do
         config = Metanorma::Taste::TasteConfig.new.tap do |c|
           c.flavor = "test"
           c.base_override = Metanorma::Taste::BaseOverride.new.tap do |bo|
-            bo.output_extensions = "xml,html"
+            bo.value_attributes = Metanorma::Taste::ValueAttributes.new.tap do |va|
+              va.output_extensions = "xml,html"
+            end
           end
         end
 
         register.send(:validate_taste_config!, config, "test")
         
-        expect(config.base_override.output_extensions).to eq("xml,html,presentation")
+        expect(config.base_override.value_attributes.output_extensions).to eq("xml,html,presentation")
       end
 
       it "adds 'presentation' when xml and doc are present but presentation is missing" do
         config = Metanorma::Taste::TasteConfig.new.tap do |c|
           c.flavor = "test"
           c.base_override = Metanorma::Taste::BaseOverride.new.tap do |bo|
-            bo.output_extensions = "xml,doc"
+            bo.value_attributes = Metanorma::Taste::ValueAttributes.new.tap do |va|
+              va.output_extensions = "xml,doc"
+            end
           end
         end
 
         register.send(:validate_taste_config!, config, "test")
         
-        expect(config.base_override.output_extensions).to eq("xml,doc,presentation")
+        expect(config.base_override.value_attributes.output_extensions).to eq("xml,doc,presentation")
       end
 
       it "adds 'presentation' when xml and pdf are present but presentation is missing" do
         config = Metanorma::Taste::TasteConfig.new.tap do |c|
           c.flavor = "test"
           c.base_override = Metanorma::Taste::BaseOverride.new.tap do |bo|
-            bo.output_extensions = "xml,pdf"
+            bo.value_attributes = Metanorma::Taste::ValueAttributes.new.tap do |va|
+              va.output_extensions = "xml,pdf"
+            end
           end
         end
 
         register.send(:validate_taste_config!, config, "test")
         
-        expect(config.base_override.output_extensions).to eq("xml,pdf,presentation")
+        expect(config.base_override.value_attributes.output_extensions).to eq("xml,pdf,presentation")
       end
 
       it "does not add 'presentation' when it already exists" do
         config = Metanorma::Taste::TasteConfig.new.tap do |c|
           c.flavor = "test"
           c.base_override = Metanorma::Taste::BaseOverride.new.tap do |bo|
-            bo.output_extensions = "xml,html,pdf,presentation"
+            bo.value_attributes = Metanorma::Taste::ValueAttributes.new.tap do |va|
+              va.output_extensions = "xml,html,pdf,presentation"
+            end
           end
         end
 
         register.send(:validate_taste_config!, config, "test")
         
-        expect(config.base_override.output_extensions).to eq("xml,html,pdf,presentation")
+        expect(config.base_override.value_attributes.output_extensions).to eq("xml,html,pdf,presentation")
       end
 
       it "does not add 'presentation' when xml is missing" do
         config = Metanorma::Taste::TasteConfig.new.tap do |c|
           c.flavor = "test"
           c.base_override = Metanorma::Taste::BaseOverride.new.tap do |bo|
-            bo.output_extensions = "html,pdf,doc"
+            bo.value_attributes = Metanorma::Taste::ValueAttributes.new.tap do |va|
+              va.output_extensions = "html,pdf,doc"
+            end
           end
         end
 
         register.send(:validate_taste_config!, config, "test")
         
-        expect(config.base_override.output_extensions).to eq("html,pdf,doc")
+        expect(config.base_override.value_attributes.output_extensions).to eq("html,pdf,doc")
       end
 
       it "does not add 'presentation' when xml exists but no html/doc/pdf" do
         config = Metanorma::Taste::TasteConfig.new.tap do |c|
           c.flavor = "test"
           c.base_override = Metanorma::Taste::BaseOverride.new.tap do |bo|
-            bo.output_extensions = "xml,rxl"
+            bo.value_attributes = Metanorma::Taste::ValueAttributes.new.tap do |va|
+              va.output_extensions = "xml,rxl"
+            end
           end
         end
 
         register.send(:validate_taste_config!, config, "test")
         
-        expect(config.base_override.output_extensions).to eq("xml,rxl")
+        expect(config.base_override.value_attributes.output_extensions).to eq("xml,rxl")
       end
 
       it "handles whitespace in extensions correctly" do
         config = Metanorma::Taste::TasteConfig.new.tap do |c|
           c.flavor = "test"
           c.base_override = Metanorma::Taste::BaseOverride.new.tap do |bo|
-            bo.output_extensions = " xml , html , pdf "
+            bo.value_attributes = Metanorma::Taste::ValueAttributes.new.tap do |va|
+              va.output_extensions = " xml , html , pdf "
+            end
           end
         end
 
         register.send(:validate_taste_config!, config, "test")
         
-        expect(config.base_override.output_extensions).to eq("xml,html,pdf,presentation")
+        expect(config.base_override.value_attributes.output_extensions).to eq("xml,html,pdf,presentation")
       end
     end
   end
@@ -276,23 +300,23 @@ RSpec.describe Metanorma::TasteRegister do
     let(:expected_boilerplate_path) do
       # Get the actual path from the taste info
       info = described_class.instance.get_config(:icc)
-      File.join(info.directory, info.copyright_notice)
+      File.join(info.directory, info.base_override.filename_attributes.copyright_notice)
     end
     let(:expected_i18n_path) do
       info = described_class.instance.get_config(:icc)
-      File.join(info.directory, info.i18n_dictionary)
+      File.join(info.directory, info.base_override.filename_attributes.i18n_dictionary)
     end
     let(:expected_logo_path) do
       info = described_class.instance.get_config(:icc)
-      File.join(info.directory, info.publisher_logo)
+      File.join(info.directory, info.base_override.filename_attributes.publisher_logo)
     end
     let(:expected_htmlcoverpage) do
       info = described_class.instance.get_config(:icc)
-      File.join(info.directory, info.htmlcoverpage)
+      File.join(info.directory, info.base_override.filename_attributes.htmlcoverpage)
     end
     let(:expected_htmlstylesheet_override) do
       info = described_class.instance.get_config(:icc)
-      File.join(info.directory, info.htmlstylesheet_override)
+      File.join(info.directory, info.base_override.filename_attributes.htmlstylesheet_override)
     end
 
     it "adds the correct attributes and updates options" do

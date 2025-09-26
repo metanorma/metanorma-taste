@@ -2,19 +2,21 @@
 flavor: icc
 owner: International Color Consortium
 base-flavor: iso
-copyright-notice: copyright.adoc
-i18n-dictionary: i18n.yaml
-publisher-logo: icc-full.svg
-htmlcoverpage: htmlcoverpage.html
-htmlstylesheet-override: htmlstylesheet-override.scss
 base-override:
-  publisher: International Color Consortium
-  publisher_abbr: ICC
-  presentation-metadata-color-secondary: '#376795'
-  presentation-metadata-backcover-text: color.org
-  body-font: Arial, 'Helvetica Neue', Helvetica, sans-serif
-  header-font: Arial, 'Helvetica Neue', Helvetica, sans-serif
-  output-extensions: xml,html,pdf,doc
+  filename-attributes:
+    copyright-notice: copyright.adoc
+    i18n-dictionary: i18n.yaml
+    publisher-logo: icc-full.svg
+    htmlcoverpage: htmlcoverpage.html
+    htmlstylesheet-override: htmlstylesheet-override.scss
+  value-attributes:
+    publisher: International Color Consortium
+    publisher_abbr: ICC
+    presentation-metadata-color-secondary: '#376795'
+    presentation-metadata-backcover-text: color.org
+    body-font: Arial, 'Helvetica Neue', Helvetica, sans-serif
+    header-font: Arial, 'Helvetica Neue', Helvetica, sans-serif
+    output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: specification # Specification # The name goes into i18n.yaml
   base: international-standard

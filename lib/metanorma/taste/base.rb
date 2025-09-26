@@ -7,7 +7,7 @@ module Metanorma
     # Base processor for taste-specific document attribute handling
     #
     # This class handles the processing of AsciiDoc attributes for taste-specific
-    # document generation, including file-based overrides, base configuration overrides,
+    # document generation, including filename-based attributes, value-based attributes,
     # and doctype-specific transformations.
     #
     # @example Basic usage
@@ -30,15 +30,15 @@ module Metanorma
       # @return [TasteConfig] The taste configuration object
       attr_reader :config
 
-      # Mapping of base override configuration keys to AsciiDoc attribute names
+      # Mapping of value-based attribute configuration keys to AsciiDoc attribute names
       #
-      # This constant defines how base_override configuration properties
+      # This constant defines how base_override.value_attributes configuration properties
       # are translated into AsciiDoc document attributes.
       #
       # @example Configuration to attribute mapping
-      #   config.base_override.publisher => :publisher:
-      #   config.base_override.presentation_metadata_color_secondary => :presentation-metadata-color-secondary:
-      BASE_OVERRIDE_MAPPINGS = {
+      #   config.base_override.value_attributes.publisher => :publisher:
+      #   config.base_override.value_attributes.presentation_metadata_color_secondary => :presentation-metadata-color-secondary:
+      VALUE_ATTRIBUTE_MAPPINGS = {
         publisher: "publisher",
         publisher_abbr: "publisher_abbr",
         presentation_metadata_color_secondary: "presentation-metadata-color-secondary",
@@ -55,8 +55,6 @@ module Metanorma
         header_font: "header-font",
         monospace_font: "monospace-font",
         fonts: "fonts",
-        coverpage_image: "coverpage-image",
-        backpage_image: "backpage-image",
         output_extensions: "output-extensions",
       }.freeze
 
@@ -124,8 +122,8 @@ module Metanorma
       # Build all attribute overrides from various sources
       #
       # This method coordinates the building of attributes from:
-      # - File-based sources (copyright, logo, i18n)
-      # - Base override configuration
+      # - Filename-based attributes (copyright, logo, i18n, stylesheets)
+      # - Value-based attributes (publisher, fonts, presentation metadata)
       # - Doctype-specific overrides
       #
       # @param attrs [Array<String>] Original attributes array
@@ -141,10 +139,10 @@ module Metanorma
         [attrs, override_attrs]
       end
 
-      # Add file-based attribute overrides
+      # Add filename-based attribute overrides
       #
-      # Processes file-based configuration properties and adds corresponding
-      # attributes if the files exist.
+      # Processes filename-based configuration properties from base_override.filename_attributes
+      # and adds corresponding attributes if the files exist.
       #
       # @param override_attrs [Array<String>] Array to append override attributes to
       def add_file_based_overrides(override_attrs)
@@ -153,7 +151,7 @@ module Metanorma
         end
       end
 
-      # Get the mapping of file-based configuration attributes to AsciiDoc attributes
+      # Get the mapping of filename-based configuration attributes to AsciiDoc attributes
       #
       # @return [Hash<Symbol, String>] Mapping of config attributes to AsciiDoc attribute names
       def file_override_mappings
@@ -192,7 +190,7 @@ module Metanorma
         override_attrs << ":#{attr_name}: #{filepath}"
       end
 
-      # Get the full file path for a configuration attribute
+      # Get the full file path for a filename-based configuration attribute
       #
       # @param config_attr [Symbol] The configuration attribute name
       # @return [String, nil] The full file path, or nil if not configured
@@ -201,23 +199,25 @@ module Metanorma
       #   file_path_for(:copyright_notice)  # => "data/icc/copyright.adoc"
       #   file_path_for(:publisher_logo)    # => "data/icc/logo.svg"
       def file_path_for(config_attr)
-        filename = @config.send(config_attr)
+        return nil unless @config.base_override&.filename_attributes
+
+        filename = @config.base_override.filename_attributes.send(config_attr)
         return nil unless filename
 
         File.join(@directory, filename)
       end
 
-      # Add base configuration override attributes
+      # Add value-based configuration override attributes
       #
-      # Processes base_override configuration and adds corresponding
+      # Processes base_override.value_attributes configuration and adds corresponding
       # AsciiDoc attributes for each configured property.
       #
       # @param override_attrs [Array<String>] Array to append override attributes to
       def add_base_configuration_overrides(override_attrs)
-        return unless @config.base_override
+        return unless @config.base_override&.value_attributes
 
-        BASE_OVERRIDE_MAPPINGS.each do |config_key, attr_key|
-          value = @config.base_override.send(config_key)
+        VALUE_ATTRIBUTE_MAPPINGS.each do |config_key, attr_key|
+          value = @config.base_override.value_attributes.send(config_key)
           next unless value
 
           override_attrs << ":#{attr_key}: #{value}"
