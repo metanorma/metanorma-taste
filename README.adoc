@@ -178,6 +178,11 @@ currently available:
 |Spatial Web Foundation
 |`ribose`
 |Spatial Web Foundation specifications and standards with SWF branding and copyright
+
+|`mbxif`
+|MBx Interoperability Forum
+|`ribose`
+|MBx Interoperability Forum specifications and standards with MBx-IF branding and copyright
 |===
 
 

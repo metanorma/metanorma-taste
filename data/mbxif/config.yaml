@@ -2,19 +2,21 @@
 flavor: mbxif
 owner: MBx Interoperability Forum
 base-flavor: ribose
-copyright-notice: copyright.adoc
-i18n-dictionary: i18n.yaml
-publisher-logo: mbxif-logos_mbxif.svg
-pdf-stylesheet-override: mbxif.xsl
-coverpage-image: mbxif-front-cover.pdf
-backpage-image: mbxif-back-cover.pdf
 base-override:
-  publisher: MBx Interoperability Forum
-  publisher_abbr: MBx-IF
-  presentation-metadata-color-secondary: '#007724'
-  presentation-metadata-backcover-text: https://www.mbx-if.org
-  fonts: Nacelle;Nacelle SemiBold;Nacelle Light
-  output-extensions: xml,html,pdf,doc
+  filename-attributes:
+    copyright-notice: copyright.adoc
+    i18n-dictionary: i18n.yaml
+    publisher-logo: mbxif-logos_mbxif.svg
+    pdfstylesheet-override: mbxif.xsl
+    coverpage-image: mbxif-front-cover.pdf
+    backpage-image: mbxif-back-cover.pdf
+  value-attributes:
+    publisher: MBx Interoperability Forum
+    publisher_abbr: MBx-IF
+    presentation-metadata-color-secondary: '#007724'
+    presentation-metadata-backcover-text: https://www.mbx-if.org
+    fonts: Nacelle;Nacelle SemiBold;Nacelle Light
+    output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: recommended-practices
   base: standard
