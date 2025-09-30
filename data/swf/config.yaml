@@ -7,7 +7,7 @@ base-override:
     copyright-notice: copyright.adoc
     i18n-dictionary: i18n.yaml
     publisher-logo: swf-logo.svg
-    pdfstylesheet-override: swf.xsl
+    pdf-stylesheet-override: swf.xsl
     coverpage-image: swf-front-cover.pdf
     backpage-image: swf-back-cover.pdf
   value-attributes:
