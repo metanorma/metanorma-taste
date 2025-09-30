@@ -9,7 +9,7 @@ base-override:
     publisher-logo: pdfa-logo.svg
     htmlcoverpage: htmlcoverpage.html
     htmlstylesheet-override: htmlstylesheet-override.scss
-    pdfstylesheet-override: pdfa.xsl
+    pdf-stylesheet-override: pdfa.xsl
   value-attributes:
     publisher: PDF Association
     publisher_abbr: PDF Association
