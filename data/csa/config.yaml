@@ -24,9 +24,9 @@ base-override:
     header-font: Lato,"Source Sans Pro",sans-serif
     monospace-font: '"Source Code Pro",monospace'
     presentation-metadata-ul-label-list: "&#x2022;, &#x2d;, &#x6f;"
-    presentation_metadata_annex_delim: "<br/>"
-    presentation_metadata_middle_title: ""
-    presentation_metadata_ol_label_template_alphabet_upper: "%<span class='fmt-label-delim'>)</span>"
+    presentation-metadata-annex-delim: "<br/>"
+    presentation-metadata-middle-title: ""
+    presentation-metadata-ol-label-template-alphabet_upper: "%<span class='fmt-label-delim'>)</span>"
     output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: standard

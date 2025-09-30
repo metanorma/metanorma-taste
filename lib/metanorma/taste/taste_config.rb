@@ -23,6 +23,7 @@ module Metanorma
         map "base-flavor", to: :base_flavor
         map "base-override", to: :base_override
         map "doctypes", to: :doctypes
+        map "stages", to: :stages
       end
     end
   end

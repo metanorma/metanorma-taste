@@ -44,7 +44,7 @@ module Metanorma
             to: :presentation_metadata_middle_title
         map "presentation-metadata-ol-label-template-alphabet",
             to: :presentation_metadata_ol_label_template_alphabet
-        map "presentation-metadata-ol-label-template-alphabet_upper",
+        map "presentation_metadata-ol-label-template-alphabet_upper",
             to: :presentation_metadata_ol_label_template_alphabet_upper
         map "presentation-metadata-ol-label-template-roman",
             to: :presentation_metadata_ol_label_template_roman
