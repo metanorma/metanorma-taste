@@ -183,6 +183,7 @@ currently available:
 |MBx Interoperability Forum
 |`ribose`
 |MBx Interoperability Forum specifications and standards with MBx-IF branding and copyright
+
 |===
 
 
@@ -208,7 +209,10 @@ taste.
 === General
 
 A taste package is a directory structure that contains all the necessary files
-to define a Metanorma taste. It includes configuration files, copyright notices, internationalization dictionaries, and stylesheets if any.
+to define a Metanorma taste.
+
+It includes configuration files, copyright notices, internationalization
+dictionaries, and stylesheets if any.
 
 === Directory structure
 
@@ -313,8 +317,11 @@ doctype_dict:             # Document type translations
   # Add more document type mappings as needed
 ----
 
-Note that any taste-specific doctypes need to have a renderable corresponding entry under
-`doctype_dict`. The same is the case for the native doctypes in the base flavor's i18n.yaml files.
+Every taste-specific doctype is required to have a renderable corresponding
+entry under `doctype_dict`.
+
+The same is the case for the native doctypes in the base flavor's `i18n.yaml`
+files.
 
 .i18n.yaml example from ICC
 [example]
@@ -329,7 +336,10 @@ doctype_dict:
 
 ==== copyright.adoc
 
-Organization-specific copyright, legal, license and feedback text. This file can contain:
+This file supplies taste-specific copyright, legal, license and feedback
+text.
+
+This file can contain:
 
 * Copyright statements with template variables (e.g., `{{ docyear }}`)
 * License information
@@ -354,62 +364,151 @@ The file is in the Metanorma AsciiDoc format, with the following syntax:
 
 Copyright (c) {{ docyear }} Your Organization Name
 
-[Legal text here...]
+[legal text here...]
 
 == feedback-statement
-=== Contact Information
+=== Contact information
 
-[Organization contact details...]
+[organization contact details...]
 ----
 ====
 
-The same file format is used internally for Metanorma flavors, and is documented in
-https://www.metanorma.org/develop/topics/metadata-and-boilerplate/[Metadata and predefined text]
-on the metaorma.org site.
+The same file format is used internally for Metanorma flavors, and is documented
+in
+https://www.metanorma.org/develop/topics/metadata-and-boilerplate/[Metadata and predefined text].
 
-=== Base-Override configuration
+=== Base-override configuration
+
+==== General
 
 The `base-override` section allows customization of document attributes
-supported by the base flavor through two nested categories:
+supported by the base flavor through two categories.
 
-==== Filename Attributes (`filename-attributes`)
+The reason for this division is that some attributes contain file paths relative
+to the taste definition, while others contain simple values that are not
+relevant to path resolution.
 
-These are Metanorma document attributes that contain filenames and file paths:
+* Filename attributes are used to point to custom files provided by the taste,
+under the `data/{taste}/` directory.
++
+[example]
+====
+When `:publisher-logo: {logo-file-path}` is defined in the taste's
+`config.yaml`, the actual logo file is expected to be located at
+`data/{taste}/{logo-file-path}`.
 
-* `copyright-notice`: Path to boilerplate file containing copyright, license, and legal notices
-* `i18n-dictionary`: Path to internationalization dictionary
-* `publisher-logo`: Path to organization logo file
-* `htmlcoverpage`, `htmlintropage`: HTML output page templates
-* `htmlstylesheet`, `htmlstylesheet-override`: HTML CSS stylesheets
-* `wordcoverpage`, `wordintropage`: Word output page templates  
-* `wordstylesheet`, `wordstylesheet-override`: Word CSS stylesheets
-* `standardstylesheet`, `standardstylesheet-override`: Secondary Word CSS stylesheets
-* `header`: Word output header and footer content
-* `pdf-stylesheet`, `pdf-stylesheet-override`: PDF XSLT stylesheets
-* `customize`: Path to custom metanorma configuration file
-* `coverpage-image`, `backpage-image`: Cover and back page image files
+When `:publisher-logo: {logo-file-path}` is defined as a document
+attribute in the input document, the logo file is expected to be located
+relative to the input document's location at
+`{input-document-directory}/{logo-file-path}`.
+====
 
-==== Value Attributes (`value-attributes`)
+* Value attributes are simple values (strings, numbers, lists) that do not
+involve file paths. These attributes are identical whether defined in the
+taste's `config.yaml` or as document attributes in the input document.
++
+[example]
+====
+`:publisher_abbr: {abbreviation}` is a simple string value and does not
+involve any file path resolution.
+====
 
-These are Metanorma document attributes that contain values (not filenames):
 
-* `publisher`: Organization name
-* `publisher_abbr`: Organization abbreviation
-* `body-font`, `header-font`, `monospace-font`: Typography settings
-* `fonts`: Comma-delimited list of fonts to retrieve from Fontist
-* `output-extensions`: Comma-delimited list of supported output formats
-* `presentation-metadata-*`: Visual styling attributes for presentation, including:
-  ** `presentation-metadata-color-secondary`: Secondary color for styling
-  ** `presentation-metadata-backcover-text`: Text for document back cover
-  ** `presentation-metadata-ul-label-list`: Unordered list label formatting
-  ** `presentation-metadata-annex-delim`: Annex delimiter formatting
-  ** `presentation-metadata-middle-title`: Middle title formatting
-  ** `presentation-metadata-ol-label-template-alphabet`: Ordered list alphabet template
-  ** `presentation-metadata-ol-label-template-alphabet_upper`: Ordered list uppercase alphabet template
-  ** `presentation-metadata-ol-label-template-roman`: Ordered list roman numeral template
-  ** `presentation-metadata-ol-label-template-roman_upper`: Ordered list uppercase roman numeral template
-  ** `presentation-metadata-ol-label-template-arabic`: Ordered list arabic numeral template
-* Custom organization-specific attributes
+==== Filename attributes (`filename-attributes`)
+
+These are Metanorma document attributes that take file paths as values.
+
+`copyright-notice`::
+Path to boilerplate file containing copyright, license, and legal notices
+
+`i18n-dictionary`::
+Path to internationalization dictionary
+
+`publisher-logo`::
+Path to organization logo file
+
+`htmlcoverpage`, `htmlintropage`::
+HTML output page templates
+
+`htmlstylesheet`, `htmlstylesheet-override`::
+HTML CSS stylesheets
+
+`wordcoverpage`, `wordintropage`::
+Word output page templates
+
+`wordstylesheet`, `wordstylesheet-override`::
+Word CSS stylesheets
+
+`standardstylesheet`, `standardstylesheet-override`::
+Secondary Word CSS stylesheets
+
+`header`::
+Word output header and footer content
+
+`pdf-stylesheet`, `pdf-stylesheet-override`::
+PDF XSLT stylesheets
+
+`customize`::
+Path to custom metanorma configuration file
+
+`coverpage-image`, `backpage-image`::
+Cover and back page image files
+
+
+==== Value attributes (`value-attributes`)
+
+These are Metanorma document attributes that contain path-independent values.
+
+`publisher`::
+Organization name
+
+`publisher_abbr`::
+Organization abbreviation
+
+`body-font`, `header-font`, `monospace-font`::
+Typography settings
+
+`fonts`::
+Comma-delimited list of fonts to retrieve from Fontist
+
+`output-extensions`::
+Comma-delimited list of supported output formats
+
+`presentation-metadata-*`::
+Visual styling attributes for presentation, including:
+
+`presentation-metadata-color-secondary`:::
+Secondary color for styling
+
+`presentation-metadata-backcover-text`:::
+Text for document back cover
+
+`presentation-metadata-ul-label-list`:::
+Unordered list label formatting
+
+`presentation-metadata-annex-delim`:::
+Annex delimiter formatting
+
+`presentation-metadata-middle-title`:::
+Middle title formatting
+
+`presentation-metadata-ol-label-template-alphabet`:::
+Ordered list alphabet template
+
+`presentation-metadata-ol-label-template-alphabet_upper`:::
+Ordered list uppercase alphabet template
+
+`presentation-metadata-ol-label-template-roman`:::
+Ordered list roman numeral template
+
+`presentation-metadata-ol-label-template-roman_upper`:::
+Ordered list uppercase roman numeral template
+
+`presentation-metadata-ol-label-template-arabic`:::
+Ordered list arabic numeral template
+
+Custom organization-specific attributes::
+These are any additional attributes supported by the base flavor or taste.
 
 The availability of these attributes depends on the base flavor's supported
 document attributes and template system.
@@ -421,13 +520,18 @@ flavor documentation for available attributes.
 
 == Mappings of structures from taste to base flavours
 
-The taste configuration includes various document classifications which need to be
-mapped between values specific to the taste, and corresponding values in the base flavor.
-The document will actually be compiled with the base flavor settings, but it will be
-rendered using the taste's corresponding values. These includes
+The taste configuration includes various document classifications which need to
+be mapped between values specific to the taste, and corresponding values in the
+base flavor.
+
+The document will actually be compiled with the base flavor settings, but it
+will be rendered using the taste's corresponding values.
+
+These include:
 
 * `doctype`: mapping of taste doctypes to native base flavor doctypes
 * `stage`: mapping of taste stages to native base flavor stages
+
 
 == Data model
 
@@ -474,11 +578,19 @@ content for each taste.
 
 === Workflow
 
-. Discovery: On gem load, `TasteRegister` scans `data/` directory for taste configurations
+. Discovery: On gem load, `TasteRegister` scans `data/` directory for taste
+configurations
+
 . Registration: Each valid taste directory is registered with its configuration
-. Access: Users call `TasteRegister.get(:flavor)` to obtain a configured taste instance
-. Processing: The taste instance applies overrides and customizations to document attributes
-. Integration: The customized attributes are used by Metanorma for document processing
+
+. Access: Users call `TasteRegister.get(:flavor)` to obtain a configured taste
+instance
+
+. Processing: The taste instance applies overrides and customizations to
+document attributes
+
+. Integration: The customized attributes are used by Metanorma for document
+processing
 
 
 [[creating-a-taste]]
@@ -493,10 +605,15 @@ configuration directory with the necessary files.
 
 To create a new taste:
 
-. Create directory: Add a new directory under `data/` with your unique taste code
+. Create directory: Add a new directory under `data/` with your unique taste
+code
+
 . Add configuration: Create `config.yaml` with your taste settings
+
 . Add content: Optionally add `copyright.adoc` and `i18n.yaml` files
-. Test: The taste will be automatically discovered and available via the TasteRegister
+
+. Test: The taste will be automatically discovered and available via the
+TasteRegister
 
 Example for a new `acme` taste:
 
