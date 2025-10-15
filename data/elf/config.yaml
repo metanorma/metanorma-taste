@@ -7,12 +7,14 @@ base-override:
     copyright-notice: copyright.adoc
     i18n-dictionary: i18n.yaml
     publisher-logo: logo.svg
+    pdf-stylesheet-override: elf.xsl
   value-attributes:
     publisher: EXPRESS Language Foundation
     publisher_abbr: ELF
     presentation-metadata-color-secondary: '#3f65a2'
     presentation-metadata-backcover-text: expresslang.org
     output-extensions: xml,html,pdf,doc
+    fonts: Source Sans 3
 doctypes:
 - taste: standard
   base: international-standard
