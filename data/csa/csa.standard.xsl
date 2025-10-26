@@ -465,25 +465,6 @@
 			<xsl:call-template name="getLevel"/>
 		</xsl:variable>
 
-		<xsl:variable name="font-size">
-			<xsl:choose>
-				<xsl:when test="ancestor::mn:preface and $level &gt;= 2">12pt</xsl:when>
-				<xsl:when test="ancestor::mn:preface">13pt</xsl:when>
-				<xsl:when test="$level = 1">26pt</xsl:when>
-				<xsl:when test="$level = 2 and ancestor::mn:terms">11pt</xsl:when>
-				<xsl:when test="$level = 2">14pt</xsl:when>
-				<xsl:when test="$level &gt;= 3">11pt</xsl:when>
-				<xsl:otherwise>16pt</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-
-		<xsl:variable name="font-weight">
-			<xsl:choose>
-				<xsl:when test="$level = 1">normal</xsl:when>
-				<xsl:otherwise>bold</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-
 		<xsl:variable name="element-name">
 			<xsl:choose>
 				<xsl:when test="../@inline-header = 'true'">fo:inline</xsl:when>
@@ -491,22 +472,12 @@
 			</xsl:choose>
 		</xsl:variable>
 
-		<xsl:variable name="color">
-			<xsl:choose>
-				<xsl:when test="$level &gt;= 2">rgb(3, 115, 200)</xsl:when>
-				<xsl:otherwise>black</xsl:otherwise>
-			</xsl:choose>
+		<xsl:variable name="title_styles">
+			<styles xsl:use-attribute-sets="title-style"><xsl:call-template name="refine_title-style"/></styles>
 		</xsl:variable>
 
 		<xsl:element name="{$element-name}">
-			<xsl:attribute name="font-size"><xsl:value-of select="$font-size"/></xsl:attribute>
-			<xsl:attribute name="font-weight"><xsl:value-of select="$font-weight"/></xsl:attribute>
-			<xsl:attribute name="space-before">13.5pt</xsl:attribute>
-			<xsl:attribute name="margin-bottom">12pt</xsl:attribute>
-			<xsl:attribute name="keep-with-next">always</xsl:attribute>
-			<xsl:attribute name="color"><xsl:value-of select="$color"/></xsl:attribute>
-			<xsl:attribute name="line-height">120%</xsl:attribute>
-			<xsl:attribute name="role">H<xsl:value-of select="$level"/></xsl:attribute>
+			<xsl:copy-of select="xalan:nodeset($title_styles)/styles/@*"/>
 
 			<xsl:if test="$level = 2">
 				<fo:inline padding-right="1mm">
@@ -12679,6 +12650,47 @@
 		<!-- $namespace = 'csa' -->
 
 	</xsl:template> <!-- refine_p-style -->
+
+	<xsl:attribute-set name="title-style">
+		<!-- Note: font-size for level 1 title -->
+		<xsl:attribute name="font-size">26pt</xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+		<xsl:attribute name="space-before">13.5pt</xsl:attribute>
+		<xsl:attribute name="margin-bottom">12pt</xsl:attribute>
+		<xsl:attribute name="keep-with-next">always</xsl:attribute>
+		<xsl:attribute name="color">black</xsl:attribute>
+		<xsl:attribute name="line-height">120%</xsl:attribute>
+	</xsl:attribute-set> <!-- title-style -->
+
+	<xsl:template name="refine_title-style">
+		<xsl:param name="element-name"/>
+		<xsl:variable name="level">
+			<xsl:call-template name="getLevel"/>
+		</xsl:variable>
+		<xsl:if test="$level &gt; 1">
+			<xsl:attribute name="font-weight">bold</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$level = 2">
+			<xsl:attribute name="font-size">14pt</xsl:attribute>
+			<xsl:if test="ancestor::mn:terms">
+				<xsl:attribute name="font-size">11pt</xsl:attribute>
+			</xsl:if>
+		</xsl:if>
+		<xsl:if test="$level &gt;= 2">
+			<xsl:attribute name="color">rgb(3, 115, 200)</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$level &gt;= 3">
+			<xsl:attribute name="font-size">11pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="ancestor::mn:preface">
+			<xsl:attribute name="font-size">13pt</xsl:attribute>
+			<xsl:if test="$level &gt;= 2">
+				<xsl:attribute name="font-size">12pt</xsl:attribute>
+			</xsl:if>
+		</xsl:if>
+		<!-- $namespace = 'csa' -->
+		<xsl:attribute name="role">H<xsl:value-of select="$level"/></xsl:attribute>
+	</xsl:template> <!-- refine_title-style -->
 
 	<xsl:template name="processPrefaceSectionsDefault">
 		<xsl:for-each select="/*/mn:preface/*[not(self::mn:note or self::mn:admonition)]">
