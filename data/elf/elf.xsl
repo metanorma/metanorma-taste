@@ -54,7 +54,7 @@
 										</xsl:for-each>
 									</fo:block>
 								</fo:table-cell>
-								<fo:table-cell text-align="right" color="rgb(58,102,148)">
+								<fo:table-cell text-align="right" color="{$color_blue}">
 									<fo:block font-size="15.24pt">
 										<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
 									</fo:block>
@@ -292,50 +292,79 @@
 		</fo:block-container>
 	</xsl:template>
 
+	<xsl:attribute-set name="title-style">
+		<xsl:attribute name="font-size">19pt</xsl:attribute>
+		<xsl:attribute name="color">rgb(34,30,31)</xsl:attribute>
+		<xsl:attribute name="space-before">25mm</xsl:attribute>
+		<xsl:attribute name="margin-bottom">12pt</xsl:attribute>
+		<xsl:attribute name="keep-with-next">always</xsl:attribute>		
+		<xsl:attribute name="line-height">125%</xsl:attribute>
+	</xsl:attribute-set>
+
+	<xsl:template name="refine_title-style">
+		<xsl:variable name="level">
+			<xsl:call-template name="getLevel"/>
+		</xsl:variable>
+		<xsl:if test="$level = 2">
+			<xsl:attribute name="font-size">13pt</xsl:attribute>
+			<xsl:attribute name="space-before">9mm</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$level &gt; 2">
+			<xsl:attribute name="font-size">11pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$level = 3">
+			<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
+			<xsl:attribute name="space-before">12pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$level &gt;= 4">
+			<xsl:attribute name="space-before">8pt</xsl:attribute>
+			<xsl:attribute name="margin-bottom">4pt</xsl:attribute>
+		</xsl:if>
+		<xsl:attribute name="role">H<xsl:value-of select="$level"/></xsl:attribute>
+		
+		<xsl:if test="parent::mn:annex"><!-- Annex title -->
+			<xsl:variable name="annex_title_styles">
+				<styles xsl:use-attribute-sets="annex-title-style"><xsl:call-template name="refine_annex-title-style"/></styles>
+			</xsl:variable>
+			<xsl:copy-of select="xalan:nodeset($annex_title_styles)/styles/@*"/>
+		</xsl:if>
+			
+		<xsl:if test="parent::mn:references[not(@normative='true')]"><!-- Bibliography section title -->
+			<xsl:variable name="bibliography_title_styles">
+				<styles xsl:use-attribute-sets="bibliography-title-style"><xsl:call-template name="refine_bibliography-title-style"/></styles>
+			</xsl:variable>
+			<xsl:copy-of select="xalan:nodeset($bibliography_title_styles)/styles/@*"/>
+		</xsl:if>
+	</xsl:template>
+
+	<xsl:attribute-set name="annex-title-style">
+		<xsl:attribute name="font-size">16pt</xsl:attribute>
+		<xsl:attribute name="text-align">left</xsl:attribute>
+		<xsl:attribute name="margin-bottom">48pt</xsl:attribute>
+		<xsl:attribute name="keep-with-next">always</xsl:attribute>
+		<xsl:attribute name="role">H1</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:template name="refine_annex-title-style">
+	</xsl:template>
+	
+	<xsl:attribute-set name="bibliography-title-style">
+		<xsl:attribute name="font-size">19pt</xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+		<xsl:attribute name="color">inherit</xsl:attribute>
+		<xsl:attribute name="text-align">left</xsl:attribute>
+		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+		<xsl:attribute name="space-before">0mm</xsl:attribute>
+		<xsl:attribute name="margin-bottom">12mm</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:template name="refine_bibliography-title-style">
+	</xsl:template>
+
 	<xsl:template match="mn:fmt-title" name="title">
 		
 		<xsl:variable name="level">
 			<xsl:call-template name="getLevel"/>
-		</xsl:variable>
-		
-		<xsl:variable name="font-size">
-			<xsl:choose>
-				<xsl:when test="$level = 1">19pt</xsl:when>
-				<xsl:when test="$level = 2">13pt</xsl:when>
-				<xsl:otherwise>11pt</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		
-		<xsl:variable name="color">
-			<xsl:choose>
-				<xsl:when test="$level = 3"><xsl:value-of select="$color_blue"/></xsl:when>
-				<xsl:otherwise>rgb(34,30,31)</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-	
-		<!-- <xsl:variable name="font-weight">
-			<xsl:choose>
-				<xsl:when test="$level &gt;= 4">normal</xsl:when>
-				<xsl:otherwise>bold</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable> -->
-	
-		<xsl:variable name="space-before">
-			<xsl:choose>
-				<xsl:when test="$level = 1">25mm</xsl:when>
-				<xsl:when test="$level = 2">9mm</xsl:when>
-				<xsl:when test="$level = 3">12pt</xsl:when>
-				<xsl:when test="$level &gt;= 4">8pt</xsl:when>
-				<xsl:otherwise>13.5pt</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		
-		<xsl:variable name="margin-bottom">
-			<xsl:choose>
-				<xsl:when test="$level = 1">12pt</xsl:when>
-				<xsl:when test="$level &gt;= 4">4pt</xsl:when>
-				<xsl:otherwise>12pt</xsl:otherwise>
-			</xsl:choose>
 		</xsl:variable>
 		
 		<xsl:variable name="element-name">
@@ -345,15 +374,10 @@
 			</xsl:choose>
 		</xsl:variable>
 		
+		<xsl:variable name="title_styles"><styles xsl:use-attribute-sets="title-style"><xsl:call-template name="refine_title-style"/></styles></xsl:variable>
+		
 		<xsl:element name="{$element-name}">
-			<xsl:attribute name="font-size"><xsl:value-of select="$font-size"/></xsl:attribute>
-			<xsl:attribute name="color"><xsl:value-of select="$color"/></xsl:attribute>
-			<!-- <xsl:attribute name="font-weight"><xsl:value-of select="$font-weight"/></xsl:attribute>  -->
-			<xsl:attribute name="space-before"><xsl:value-of select="$space-before"/></xsl:attribute>
-			<xsl:attribute name="margin-bottom"><xsl:value-of select="$margin-bottom"/></xsl:attribute>
-			<xsl:attribute name="keep-with-next">always</xsl:attribute>		
-			<xsl:attribute name="line-height">125%</xsl:attribute>
-			<xsl:attribute name="role">H<xsl:value-of select="$level"/></xsl:attribute>
+			<xsl:copy-of select="xalan:nodeset($title_styles)/styles/@*"/>
 			
 			<xsl:choose>
 				<xsl:when test="$level = 1">
@@ -622,14 +646,6 @@
 		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
 	</xsl:attribute-set>
 		
-	<xsl:attribute-set name="references-non-normative-title-style">
-		<xsl:attribute name="font-size">19pt</xsl:attribute>
-		<xsl:attribute name="font-weight">normal</xsl:attribute>
-		<xsl:attribute name="text-align">left</xsl:attribute>
-		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
-		<xsl:attribute name="margin-bottom">12mm</xsl:attribute>
-	</xsl:attribute-set>
-	
 	<xsl:template match="mn:references[not(@normative='true')]" priority="2">
 		<fo:block-container margin-left="-12.5mm" margin-right="12.5mm" role="SKIP">
 			<fo:block-container xsl:use-attribute-sets="reset-margins-style">
@@ -639,14 +655,6 @@
 			</fo:block-container>
 		</fo:block-container>
 	</xsl:template>
-	
-	<xsl:attribute-set name="annex-title-style">
-		<xsl:attribute name="font-size">16pt</xsl:attribute>
-		<xsl:attribute name="text-align">left</xsl:attribute>
-		<xsl:attribute name="margin-bottom">48pt</xsl:attribute>
-		<xsl:attribute name="keep-with-next">always</xsl:attribute>
-		<xsl:attribute name="role">H1</xsl:attribute>
-	</xsl:attribute-set>
 	
 	<xsl:attribute-set name="table-style">
 		<xsl:attribute name="table-omit-footer-at-break">true</xsl:attribute>
