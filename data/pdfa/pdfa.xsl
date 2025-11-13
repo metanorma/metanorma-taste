@@ -23,10 +23,12 @@
 		
 	<xsl:variable name="cover_page_color_box1">rgb(202,152,49)</xsl:variable>
 	<xsl:variable name="cover_page_color_box2">rgb(139,152,91)</xsl:variable>
-	<xsl:variable name="cover_page_color_box3">rgb(208,63,78)</xsl:variable>
+	<xsl:variable name="cover_page_color_box3">rgb(208,63,78)</xsl:variable><!-- #d03f4e -->
 	<xsl:variable name="cover_page_color_box4">rgb(72,145,175)</xsl:variable>
 	<xsl:variable name="cover_page_color_box_border_width">2.5pt</xsl:variable>
 	<xsl:variable name="cover_page_color_box_height">57mm</xsl:variable>
+	
+	<xsl:variable name="color_secondary" select="$cover_page_color_box3"/>
 	
 	<xsl:attribute-set name="cover_page_box">
 		<xsl:attribute name="padding-left">0.5mm</xsl:attribute>
@@ -96,12 +98,20 @@
 											<fo:block>
 												<!-- Status / Version.
 														e.g. "Draft Release Candidate 1.2", or just a version -->
-												<xsl:variable name="status" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:status"/>
-												<xsl:choose>
-													<xsl:when test="normalize-space($status) != ''">
-														<xsl:value-of select="$status"/>
-													</xsl:when>
-													<xsl:otherwise> <!-- just a version -->
+												<!-- <xsl:variable name="status" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:status"/> -->
+												<xsl:variable name="status">
+													<xsl:call-template name="capitalize">
+														<xsl:with-param name="str" select="/mn:metanorma/mn:bibdata/mn:status/mn:stage"/>
+													</xsl:call-template>
+												</xsl:variable>
+												<!-- <xsl:choose> -->
+													<xsl:if test="normalize-space($status) != '' and $status != 'Published'">
+														<fo:block color="{$color_secondary}">
+															<xsl:value-of select="$status"/>
+														</fo:block>
+													</xsl:if>
+													<!-- </xsl:when>
+													<xsl:otherwise>  --><!-- just a version -->
 														<xsl:variable name="i18n_version"><xsl:call-template name="getLocalizedString"><xsl:with-param name="key">version</xsl:with-param></xsl:call-template></xsl:variable>
 														<xsl:call-template name="capitalize">
 															<xsl:with-param name="str" select="$i18n_version"/>
@@ -110,8 +120,8 @@
 														<xsl:variable name="edition" select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) = '']"/>
 														<xsl:value-of select="$edition"/>
 														<xsl:if test="not(contains($edition, '.'))">.0</xsl:if>
-													</xsl:otherwise>
-												</xsl:choose>
+													<!-- </xsl:otherwise>
+												</xsl:choose> -->
 											</fo:block>
 											<fo:block margin-bottom="2mm">
 												<xsl:value-of select="substring(/mn:metanorma/mn:bibdata/mn:version/mn:revision-date, 1, 7)"/>
