@@ -18,15 +18,25 @@
 			<fo:simple-page-master master-name="copyright-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
 				<fo:region-body margin-top="20mm" margin-bottom="35mm" margin-left="18mm" margin-right="18mm"/>
 			</fo:simple-page-master>
+			
+			<fo:simple-page-master master-name="first" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="14mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header-LB-yellow" extent="14mm"/> 
+				<fo:region-after region-name="footer-even" extent="12.5mm"/>
+				<fo:region-start region-name="left-region" extent="13mm"/>
+				<fo:region-end region-name="right-region" extent="12mm"/>
+			</fo:simple-page-master>
 		</fo:layout-master-set>
 	</xsl:template>
 		
 	<xsl:variable name="cover_page_color_box1">rgb(202,152,49)</xsl:variable>
 	<xsl:variable name="cover_page_color_box2">rgb(139,152,91)</xsl:variable>
-	<xsl:variable name="cover_page_color_box3">rgb(208,63,78)</xsl:variable>
+	<xsl:variable name="cover_page_color_box3">rgb(208,63,78)</xsl:variable><!-- #d03f4e -->
 	<xsl:variable name="cover_page_color_box4">rgb(72,145,175)</xsl:variable>
 	<xsl:variable name="cover_page_color_box_border_width">2.5pt</xsl:variable>
 	<xsl:variable name="cover_page_color_box_height">57mm</xsl:variable>
+	
+	<xsl:variable name="color_secondary" select="$cover_page_color_box3"/>
 	
 	<xsl:attribute-set name="cover_page_box">
 		<xsl:attribute name="padding-left">0.5mm</xsl:attribute>
@@ -96,12 +106,20 @@
 											<fo:block>
 												<!-- Status / Version.
 														e.g. "Draft Release Candidate 1.2", or just a version -->
-												<xsl:variable name="status" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:status"/>
-												<xsl:choose>
-													<xsl:when test="normalize-space($status) != ''">
-														<xsl:value-of select="$status"/>
-													</xsl:when>
-													<xsl:otherwise> <!-- just a version -->
+												<!-- <xsl:variable name="status" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:status"/> -->
+												<xsl:variable name="status">
+													<xsl:call-template name="capitalize">
+														<xsl:with-param name="str" select="/mn:metanorma/mn:bibdata/mn:status/mn:stage"/>
+													</xsl:call-template>
+												</xsl:variable>
+												<!-- <xsl:choose> -->
+													<xsl:if test="normalize-space($status) != '' and $status != 'Published'">
+														<fo:block color="{$color_secondary}">
+															<xsl:value-of select="$status"/>
+														</fo:block>
+													</xsl:if>
+													<!-- </xsl:when>
+													<xsl:otherwise>  --><!-- just a version -->
 														<xsl:variable name="i18n_version"><xsl:call-template name="getLocalizedString"><xsl:with-param name="key">version</xsl:with-param></xsl:call-template></xsl:variable>
 														<xsl:call-template name="capitalize">
 															<xsl:with-param name="str" select="$i18n_version"/>
@@ -110,8 +128,8 @@
 														<xsl:variable name="edition" select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) = '']"/>
 														<xsl:value-of select="$edition"/>
 														<xsl:if test="not(contains($edition, '.'))">.0</xsl:if>
-													</xsl:otherwise>
-												</xsl:choose>
+													<!-- </xsl:otherwise>
+												</xsl:choose> -->
 											</fo:block>
 											<fo:block margin-bottom="2mm">
 												<xsl:value-of select="substring(/mn:metanorma/mn:bibdata/mn:version/mn:revision-date, 1, 7)"/>
@@ -256,8 +274,8 @@
 	<xsl:template name="insertFooter">
 		<!-- <xsl:param name="invert"/> -->
 		<xsl:variable name="footerText"> 
-			<xsl:text>PDF Association</xsl:text>
-			<xsl:text>&#xA0;</xsl:text>
+			<!-- <xsl:text>PDF Association</xsl:text>
+			<xsl:text>&#xA0;</xsl:text> -->
 			<xsl:call-template name="capitalizeWords">
 				<xsl:with-param name="str">
 					<xsl:choose>
@@ -283,6 +301,48 @@
 		<xsl:if test="ancestor::*['preferred']">
 			<xsl:attribute name="role">SKIP</xsl:attribute>
 		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="refine_list-item-label-style"><?extend?>
+		<xsl:if test="parent::mn:ul">
+			<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="refine_title-style"><?extend?>
+		<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
+	</xsl:template>
+	
+	<xsl:template name="refine_list-item-label-style"><?extend?>
+		<xsl:if test="parent::mn:ul">
+			<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="refine_sourcecode-style"><?extend?>
+		<xsl:attribute name="font-size">85%</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:template match="mn:ul/mn:li/mn:fmt-name[normalize-space() = 'o']" priority="3" mode="update_xml_step1">
+		<xsl:attribute name="label">■</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:attribute-set name="note-style"><?extend?>
+		<xsl:attribute name="background-color">rgb(236,242,246)</xsl:attribute>
+		<xsl:attribute name="margin-left">0.5mm</xsl:attribute>
+		<xsl:attribute name="margin-right">0.5mm</xsl:attribute>
+		<xsl:attribute name="padding">1mm</xsl:attribute>
+		<xsl:attribute name="padding-left">1.5mm</xsl:attribute>
+		<xsl:attribute name="padding-right">1.5mm</xsl:attribute>
+		<xsl:attribute name="font-size">85%</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="note-name-style"><?extend?>
+		<xsl:attribute name="padding-right">3mm</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:template match="mn:note/mn:fmt-name/mn:tab" mode="tab">
+		<xsl:attribute name="padding-right">1mm</xsl:attribute>
 	</xsl:template>
 	
 </xsl:stylesheet>
