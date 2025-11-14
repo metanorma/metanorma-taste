@@ -18,6 +18,14 @@
 			<fo:simple-page-master master-name="copyright-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
 				<fo:region-body margin-top="20mm" margin-bottom="35mm" margin-left="18mm" margin-right="18mm"/>
 			</fo:simple-page-master>
+			
+			<fo:simple-page-master master-name="first" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="14mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header-LB-yellow" extent="14mm"/> 
+				<fo:region-after region-name="footer-even" extent="12.5mm"/>
+				<fo:region-start region-name="left-region" extent="13mm"/>
+				<fo:region-end region-name="right-region" extent="12mm"/>
+			</fo:simple-page-master>
 		</fo:layout-master-set>
 	</xsl:template>
 		
@@ -317,6 +325,24 @@
 	
 	<xsl:template match="mn:ul/mn:li/mn:fmt-name[normalize-space() = 'o']" priority="3" mode="update_xml_step1">
 		<xsl:attribute name="label">■</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:attribute-set name="note-style"><?extend?>
+		<xsl:attribute name="background-color">rgb(236,242,246)</xsl:attribute>
+		<xsl:attribute name="margin-left">0.5mm</xsl:attribute>
+		<xsl:attribute name="margin-right">0.5mm</xsl:attribute>
+		<xsl:attribute name="padding">1mm</xsl:attribute>
+		<xsl:attribute name="padding-left">1.5mm</xsl:attribute>
+		<xsl:attribute name="padding-right">1.5mm</xsl:attribute>
+		<xsl:attribute name="font-size">85%</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="note-name-style"><?extend?>
+		<xsl:attribute name="padding-right">3mm</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:template match="mn:note/mn:fmt-name/mn:tab" mode="tab">
+		<xsl:attribute name="padding-right">1mm</xsl:attribute>
 	</xsl:template>
 	
 </xsl:stylesheet>
