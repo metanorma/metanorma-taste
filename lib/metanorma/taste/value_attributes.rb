@@ -24,6 +24,13 @@ module Metanorma
       attribute :presentation_metadata_ol_label_template_arabic, :string
       attribute :fonts, :string
       attribute :output_extensions, :string
+      attribute :toclevels, :string
+      attribute :htmltoclevels, :string
+      attribute :doctoclevels, :string
+      attribute :pdftoclevels, :string
+      attribute :toc_figures, :string
+      attribute :toc_tables, :string
+      attribute :toc_recommendations, :string
 
       key_value do
         map "publisher", to: :publisher
@@ -53,6 +60,13 @@ module Metanorma
         map "presentation-metadata-ol-label-template-arabic",
             to: :presentation_metadata_ol_label_template_arabic
         map "output-extensions", to: :output_extensions
+        map "toclevels", to: :toclevels
+        map "toclevels-html", to: :htmltoclevels
+        map "doclevels-doc", to: :doctoclevels
+        map "toclevels-pdf", to: :pdftoclevels
+        map "toc-figures", to: :toc_figures
+        map "toc-tables", to: :toc_tables
+        map "toc-recommendations", to: :toc_recommendations
       end
     end
   end

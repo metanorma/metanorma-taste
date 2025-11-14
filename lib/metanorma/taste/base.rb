@@ -38,6 +38,8 @@ module Metanorma
       # @example Configuration to attribute mapping
       #   config.base_override.value_attributes.publisher => :publisher:
       #   config.base_override.value_attributes.presentation_metadata_color_secondary => :presentation-metadata-color-secondary:
+      #
+      # TODO: metaprogramming to extract these from value_attributes.rb
       VALUE_ATTRIBUTE_MAPPINGS = {
         publisher: "publisher",
         publisher_abbr: "publisher_abbr",
@@ -56,6 +58,14 @@ module Metanorma
         monospace_font: "monospace-font",
         fonts: "fonts",
         output_extensions: "output-extensions",
+        toclevels: "toclevels",
+        htmltoclevels: "toclevels-html",
+        doctoclevels: "toclevels-doc",
+        pdftoclevels: "toclevels-pdf",
+        toc_figures: "toc-figures",
+        toc_tables: "toc-tables",
+        toc_recommendations: "toc-recommendations",
+
       }.freeze
 
 
