@@ -266,8 +266,8 @@
 	<xsl:template name="insertFooter">
 		<!-- <xsl:param name="invert"/> -->
 		<xsl:variable name="footerText"> 
-			<xsl:text>PDF Association</xsl:text>
-			<xsl:text>&#xA0;</xsl:text>
+			<!-- <xsl:text>PDF Association</xsl:text>
+			<xsl:text>&#xA0;</xsl:text> -->
 			<xsl:call-template name="capitalizeWords">
 				<xsl:with-param name="str">
 					<xsl:choose>
@@ -293,6 +293,30 @@
 		<xsl:if test="ancestor::*['preferred']">
 			<xsl:attribute name="role">SKIP</xsl:attribute>
 		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="refine_list-item-label-style"><?extend?>
+		<xsl:if test="parent::mn:ul">
+			<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="refine_title-style"><?extend?>
+		<xsl:attribute name="color">black</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:template name="refine_list-item-label-style"><?extend?>
+		<xsl:if test="parent::mn:ul">
+			<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="refine_sourcecode-style"><?extend?>
+		<xsl:attribute name="font-size">85%</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:template match="mn:ul/mn:li/mn:fmt-name[normalize-space() = 'o']" priority="3" mode="update_xml_step1">
+		<xsl:attribute name="label">■</xsl:attribute>
 	</xsl:template>
 	
 </xsl:stylesheet>
