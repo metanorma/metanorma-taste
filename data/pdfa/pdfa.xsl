@@ -310,7 +310,7 @@
 	</xsl:template>
 	
 	<xsl:template name="refine_title-style"><?extend?>
-		<xsl:attribute name="color">black</xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
 	</xsl:template>
 	
 	<xsl:template name="refine_list-item-label-style"><?extend?>
