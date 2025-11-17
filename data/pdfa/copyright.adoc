@@ -38,6 +38,10 @@ any of the mentioned information, services, products, or providers.
 
 === {blank}
 
+== license-statement
+
+=== {blank}
+
 
 // [align=center]
 // **PDF Association**:
