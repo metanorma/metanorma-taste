@@ -37,3 +37,9 @@ doctypes:
   base: report
   override-attributes:
   - presentation-metadata-color-secondary: '#4891af'
+stages:
+  draft:
+  published:
+    default: true
+    published: true
+
