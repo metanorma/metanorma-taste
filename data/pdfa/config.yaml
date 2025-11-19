@@ -39,6 +39,7 @@ doctypes:
   - presentation-metadata-color-secondary: '#4891af'
 stages:
   draft:
+  release-candidate:
   published:
     default: true
     published: true
