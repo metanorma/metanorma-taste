@@ -184,6 +184,12 @@ currently available:
 |`ribose`
 |MBx Interoperability Forum specifications and standards with MBx-IF branding and copyright
 
+|`oiml`
+|Organisation Internationale de Métrologie Légale / International Organization of Legal Metrology
+|`iso`
+|International Organization of Legal Metrology specifications and standards with OIML branding and copyright
+
+
 |===
 
 

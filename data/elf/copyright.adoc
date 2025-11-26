@@ -8,6 +8,7 @@ otherwise in any form or by any means, electronic or mechanical, including
 photocopying, or posting on the internet or an intranet, without prior written
 permission. Permission can be requested from the EXPRESS Language Foundation.
 
+[align=left]
 EXPRESS Language Foundation +
 2093 Philadelphia Pike Ste 3311 +
 Claymont, Delaware 19703 +
