@@ -1,0 +1,22 @@
+---
+flavor: oiml
+owner: Organisation Internationale de Métrologie Légale / International Organization of Legal Metrology
+base-flavor: iso
+base-override:
+  filename-attributes:
+    copyright-notice: copyright.adoc
+    i18n-dictionary: i18n.yaml
+    publisher-logo: logo.jpeg
+    # pdf-stylesheet-override: elf.xsl
+  value-attributes:
+    publisher: Organisation Internationale de Métrologie Légale / International Organization of Legal Metrology
+    publisher_abbr: OIML
+    #presentation-metadata-color-secondary: '#3f65a2'
+    #presentation-metadata-backcover-text: expresslang.org
+    output-extensions: xml,html,pdf,doc
+    fonts: Source Sans 3
+doctypes:
+- taste: standard
+  base: international-standard
+- taste: recommendation
+  base: recommendation
