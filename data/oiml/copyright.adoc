@@ -1,21 +1,14 @@
-////
 == copyright-statement
 === {blank}
-(c) {{ docyear }} EXPRESS Language Foundation.
+(c) OIML {{ docyear }}
 
-All rights reserved. Unless otherwise specified, or required in the context of
-its implementation, no part of this publication may be reproduced or utilized
-otherwise in any form or by any means, electronic or mechanical, including
-photocopying, or posting on the internet or an intranet, without prior written
-permission. Permission can be requested from the EXPRESS Language Foundation.
-
+[align=left]
 Bureau International de Métrologie Légale +
 11, rue Turgot – 75009 Paris – France +
-Telephone: 33 (0)1 48 78 12 82
-Fax: 33 (0)1 42 82 17 27
-E-mail: link:mailto:biml@oiml.org
+Telephone: 33 (0)1 48 78 12 82 +
+Fax: 33 (0)1 42 82 17 27 +
+E-mail: link:mailto:biml@oiml.org +
 Internet: https://www.oiml.org[www.oiml.org]
-////
 
 == feedback-statement
 
@@ -28,7 +21,7 @@ headquarters:
 [align=left]
 Bureau International de Métrologie Légale +
 11, rue Turgot – 75009 Paris – France +
-Telephone: 33 (0)1 48 78 12 82
-Fax: 33 (0)1 42 82 17 27
-E-mail: link:mailto:biml@oiml.org
+Telephone: 33 (0)1 48 78 12 82 +
+Fax: 33 (0)1 42 82 17 27 +
+E-mail: link:mailto:biml@oiml.org +
 Internet: https://www.oiml.org[www.oiml.org]
