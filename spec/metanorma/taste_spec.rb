@@ -10,6 +10,7 @@ RSpec.describe Metanorma::Taste do
                  enosema: :iso,
                  icc: :iso,
                  mbxif: :ribose,
+                 oiml: :iso,
                  pdfa: :ribose,
                  swf: :ribose,
                })
