@@ -1,0 +1,27 @@
+== copyright-statement
+=== {blank}
+(c) OIML {{ docyear }}
+
+[align=left]
+Bureau International de Métrologie Légale +
+11, rue Turgot – 75009 Paris – France +
+Telephone: 33 (0)1 48 78 12 82 +
+Fax: 33 (0)1 42 82 17 27 +
+E-mail: link:mailto:biml@oiml.org +
+Internet: https://www.oiml.org[www.oiml.org]
+
+== feedback-statement
+
+=== {blank}
+
+OIML Publications may be downloaded from the OIML web site in the form of PDF files.
+Additional information on OIML Publications may be obtained from the Organisation's
+headquarters:
+
+[align=left]
+Bureau International de Métrologie Légale +
+11, rue Turgot – 75009 Paris – France +
+Telephone: 33 (0)1 48 78 12 82 +
+Fax: 33 (0)1 42 82 17 27 +
+E-mail: link:mailto:biml@oiml.org +
+Internet: https://www.oiml.org[www.oiml.org]
