@@ -6,8 +6,8 @@ base-override:
   filename-attributes:
     copyright-notice: copyright.adoc
     i18n-dictionary: i18n.yaml
-    publisher-logo: logo.jpeg
-    # pdf-stylesheet-override: elf.xsl
+    publisher-logo: oiml-logo.svg
+    pdf-stylesheet-override: oiml.xsl
   value-attributes:
     publisher: International Organization of Legal Metrology
     publisher_abbr: OIML
