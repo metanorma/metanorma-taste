@@ -19,6 +19,13 @@
 				<fo:region-body margin-top="27mm" margin-bottom="25mm" margin-left="75mm" margin-right="15.7mm"/>
 			</fo:simple-page-master>
 			
+			<fo:page-sequence-master master-name="document_first_sequence">
+				<fo:repeatable-page-master-alternatives>
+					<fo:conditional-page-master-reference odd-or-even="even" master-reference="even"/>
+					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="odd"/>
+				</fo:repeatable-page-master-alternatives>
+			</fo:page-sequence-master>
+			
 		</fo:layout-master-set>
 	</xsl:template>
 	
@@ -197,11 +204,10 @@
 
 	<xsl:template name="get_docidentifier">
 		<!-- Example: OIML R 60-1 -->
-		<xsl:variable name="abbr" select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'publisher']/mn:organization/mn:abbreviation"/>
+		<!-- <xsl:variable name="abbr" select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'publisher']/mn:organization/mn:abbreviation"/>
 		<xsl:variable name="doctype" select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype"/>
 		<xsl:variable name="doctype_short">
 			<xsl:choose>
-				<!-- <xsl:when test="$doctype = 'international-recommendation'">R</xsl:when> -->
 				<xsl:when test="contains($doctype, '-')"><xsl:value-of select="java:java.lang.Character.toUpperCase(substring(substring-after($doctype, '-'),1,1))"/></xsl:when>
 				<xsl:otherwise><xsl:value-of select="$doctype"/></xsl:otherwise>
 			</xsl:choose>
@@ -209,13 +215,17 @@
 		<xsl:variable name="docnumber" select="/mn:metanorma/mn:bibdata/mn:docnumber"/>
 		<xsl:variable name="part_" select="/mn:metanorma/mn:bibdata/mn:ext/mn:structuredidentifier/mn:project-number/@part"/>
 		<xsl:variable name="part"><xsl:if test="$part_ != ''">-<xsl:value-of select="$part_"/></xsl:if></xsl:variable>
-		<xsl:value-of select="concat($abbr, ' ', $doctype_short, ' ', $docnumber, $part)"/>
+		<xsl:value-of select="concat($abbr, ' ', $doctype_short, ' ', $docnumber, $part)"/> -->
+		<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier[@primary = 'true']"/>
 	</xsl:template>
 	
 	<xsl:template name="get_edition">
 		<!-- ... :2021(E) -->
-		<xsl:variable name="reference" select="substring-after(/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'iso-reference'], ':')"/>
-		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($reference),'(\()', ' $1')"/>
+		<!-- <xsl:variable name="reference" select="substring-after(/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'iso-reference'], ':')"/>
+		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($reference),'(\()', ' $1')"/> -->
+		<xsl:variable name="curr_lang"><xsl:call-template name="getLang"/></xsl:variable>
+		<xsl:variable name="curr_lang_1st_letter" select="java:java.lang.Character.toUpperCase(substring($curr_lang,1,1))"/>
+		<xsl:value-of select="concat(' ', substring(/mn:metanorma/mn:bibdata/mn:version/mn:revision-date, 1, 4), ' (', $curr_lang_1st_letter, ')')"/>
 	</xsl:template>
 
 	<!-- omit copyright-statement -->
@@ -226,13 +236,15 @@
 	<xsl:template name="back-page">
 	</xsl:template>
 	
+	<xsl:template name="insertHeaderFirst2">
+	</xsl:template>
+	
 	<xsl:template name="insertHeaderEven">
 		<xsl:param name="text_align">left</xsl:param>
 		<xsl:param name="flow_name">header-even</xsl:param>
 		<fo:static-content flow-name="{$flow_name}" role="artifact">
 			<fo:block font-family="Arial" font-size="9pt" margin-top="13mm" border-bottom="0.5pt solid black" text-align="{$text_align}">
 				<xsl:call-template name="get_docidentifier"/><xsl:text>:</xsl:text><xsl:call-template name="get_edition"/>
-				
 			</fo:block>
 		</fo:static-content>
 	</xsl:template>
@@ -244,5 +256,71 @@
 		</xsl:call-template>
 	</xsl:template>
 
+	<xsl:template name="insertFooterEven">
+		<xsl:param name="flow_name">footer-even</xsl:param>
+		<fo:static-content flow-name="{$flow_name}" role="artifact">
+			<fo:block font-family="Arial" font-size="9pt" margin-top="8mm" border-top="0.5pt solid black" text-align="center" padding-top="0.5mm">
+				<fo:page-number/>
+			</fo:block>
+		</fo:static-content>
+	</xsl:template>
+
+	<xsl:template name="insertFooterOdd">
+		<xsl:call-template name="insertFooterEven">
+			<xsl:with-param name="flow_name">footer-odd</xsl:with-param>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template name="refine_page-sequence-preface">
+		<xsl:attribute name="format">1</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:template name="refine_page-sequence-main">
+		<xsl:attribute name="initial-page-number">auto</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:attribute-set name="toc-title-style">
+		<xsl:attribute name="font-size">14pt</xsl:attribute>
+		<xsl:attribute name="text-align">center</xsl:attribute>
+		<xsl:attribute name="space-after">26pt</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:template match="mn:preface//mn:clause[@type = 'toc']/mn:fmt-title" priority="3">
+		<fo:block xsl:use-attribute-sets="toc-title-style">
+			<xsl:apply-templates />
+		</fo:block>
+	</xsl:template>
+	
+	<xsl:template name="refine_toc-leader-style">
+		<xsl:if test="@level = 1">
+			<xsl:attribute name="font-weight">bold</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="refine_title-style"><?extend?>
+		<xsl:if test="$level = 1">
+			<xsl:attribute name="font-size">14pt</xsl:attribute>
+			<xsl:if test="ancestor::mn:preface">
+				<xsl:attribute name="text-align">center</xsl:attribute>
+			</xsl:if>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:attribute-set name="p-style"><?extend?>
+		<xsl:attribute name="line-height">1.2</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:template match="mn:sections//mn:p[@class = 'zzSTDTitle1']" priority="4">
+		<fo:block font-size="18pt" font-weight="bold" text-align="center" margin-bottom="18pt" role="H1">
+			<!-- Example: Part 1 - Metrological and technical requirements -->
+			<xsl:variable name="bibdata_"><xsl:copy-of select="ancestor::mn:metanorma/mn:bibdata/node()"/></xsl:variable>
+			<xsl:variable name="bibdata" select="xalan:nodeset($bibdata_)"/>
+			<xsl:variable name="part" select="$bibdata/mn:ext/mn:structuredidentifier/mn:project-number/@part"/>
+			<xsl:variable name="i18n_locality_part"><xsl:call-template name="getLocalizedString"><xsl:with-param name="key">locality.part</xsl:with-param></xsl:call-template></xsl:variable>
+			<xsl:variable name="curr_lang"><xsl:call-template name="getLang"/></xsl:variable>
+			<xsl:value-of select="concat($i18n_locality_part, ' ', $part, ' - ')"/>
+			<xsl:apply-templates select="$bibdata/mn:title[@type = 'title-part' and @language = $curr_lang]"/>
+		</fo:block>
+	</xsl:template>
 	
 </xsl:stylesheet>
