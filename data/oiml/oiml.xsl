@@ -225,7 +225,7 @@
 		<xsl:value-of select="java:replaceAll(java:java.lang.String.new($reference),'(\()', ' $1')"/> -->
 		<xsl:variable name="curr_lang"><xsl:call-template name="getLang"/></xsl:variable>
 		<xsl:variable name="curr_lang_1st_letter" select="java:java.lang.Character.toUpperCase(substring($curr_lang,1,1))"/>
-		<xsl:value-of select="concat(' ', substring(/mn:metanorma/mn:bibdata/mn:version/mn:revision-date, 1, 4), ' (', $curr_lang_1st_letter, ')')"/>
+		<xsl:value-of select="concat(substring(/mn:metanorma/mn:bibdata/mn:version/mn:revision-date, 1, 4), ' (', $curr_lang_1st_letter, ')')"/>
 	</xsl:template>
 
 	<!-- omit copyright-statement -->
@@ -297,12 +297,19 @@
 		</xsl:if>
 	</xsl:template>
 	
+	<xsl:template name="refine_clause_style">
+		<xsl:attribute name="text-align">justify</xsl:attribute>
+	</xsl:template>
+	
 	<xsl:template name="refine_title-style"><?extend?>
 		<xsl:if test="$level = 1">
 			<xsl:attribute name="font-size">14pt</xsl:attribute>
 			<xsl:if test="ancestor::mn:preface">
 				<xsl:attribute name="text-align">center</xsl:attribute>
 			</xsl:if>
+		</xsl:if>
+		<xsl:if test="$level &gt;= 2">
+			<xsl:attribute name="font-size">11pt</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
 	
@@ -311,7 +318,7 @@
 	</xsl:attribute-set>
 	
 	<xsl:template match="mn:sections//mn:p[@class = 'zzSTDTitle1']" priority="4">
-		<fo:block font-size="18pt" font-weight="bold" text-align="center" margin-bottom="18pt" role="H1">
+		<fo:block font-size="18pt" font-weight="bold" text-align="center" margin-bottom="36pt" role="H1">
 			<!-- Example: Part 1 - Metrological and technical requirements -->
 			<xsl:variable name="bibdata_"><xsl:copy-of select="ancestor::mn:metanorma/mn:bibdata/node()"/></xsl:variable>
 			<xsl:variable name="bibdata" select="xalan:nodeset($bibdata_)"/>
@@ -322,5 +329,84 @@
 			<xsl:apply-templates select="$bibdata/mn:title[@type = 'title-part' and @language = $curr_lang]"/>
 		</fo:block>
 	</xsl:template>
+
+	<xsl:attribute-set name="note-style"><?extend?>
+		<xsl:attribute name="font-size">11pt</xsl:attribute>
+		<xsl:attribute name="margin-bottom">8pt</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="note-name-style"><?extend?>
+		<xsl:attribute name="font-style">italic</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:template match="mn:note" name="note">
+		<xsl:call-template name="setNamedDestination"/>
+		<fo:block xsl:use-attribute-sets="note-style" role="SKIP">
+			<xsl:if test="not(parent::mn:references)">
+				<xsl:copy-of select="@id"/>
+			</xsl:if>
+			<xsl:call-template name="refine_note-style"/>
+			<fo:list-block>
+				<xsl:attribute name="provisional-distance-between-starts">14.5mm</xsl:attribute>
+				<fo:list-item>
+					<fo:list-item-label end-indent="label-end()">
+						<fo:block xsl:use-attribute-sets="note-name-style">
+							<xsl:call-template name="refine_note-name-style"/>
+							
+							<xsl:variable name="note_name">
+								<xsl:apply-templates select="mn:fmt-name">
+									<xsl:with-param name="sfx">:</xsl:with-param>
+								</xsl:apply-templates>
+							</xsl:variable>
+							
+							<xsl:call-template name="capitalize">
+								<xsl:with-param name="str">
+									<xsl:value-of select="java:toLowerCase(java:java.lang.String.new($note_name))"/>
+								</xsl:with-param>
+							</xsl:call-template>
+							
+						</fo:block>
+					</fo:list-item-label>
+					<fo:list-item-body start-indent="body-start()">
+						<fo:block>
+							<xsl:apply-templates select="node()[not(self::mn:fmt-name)]" />
+						</fo:block>
+					</fo:list-item-body>
+				</fo:list-item>
+			</fo:list-block>
+		</fo:block>
+	</xsl:template>
+	
+	<xsl:template match="mn:ul/mn:li/mn:fmt-name[normalize-space() = '—']" priority="3" mode="update_xml_step1">
+		<xsl:attribute name="label">■</xsl:attribute>
+		<xsl:if test="ancestor::mn:term">
+			<xsl:attribute name="label">●</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:variable name="ul_labels_">
+		<label font-size="60%">■</label>
+		<label font-size="90%" line-height="140%">●</label>
+	</xsl:variable>
+	
+	<xsl:attribute-set name="list-style"><?extend?>
+		<xsl:attribute name="margin-left">6.5mm</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="figure-name-style"><?extend?>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="table-name-style"><?extend?>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="term-style">
+		<xsl:attribute name="margin-bottom">12pt</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="term-definition-style"><?extend?>
+		<xsl:attribute name="space-before">6pt</xsl:attribute>
+	</xsl:attribute-set>
 	
 </xsl:stylesheet>
