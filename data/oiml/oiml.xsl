@@ -308,14 +308,35 @@
 				<xsl:attribute name="text-align">center</xsl:attribute>
 			</xsl:if>
 		</xsl:if>
+		<xsl:if test="$level = 2">
+			<xsl:attribute name="space-after">12pt</xsl:attribute>
+		</xsl:if>
 		<xsl:if test="$level &gt;= 2">
 			<xsl:attribute name="font-size">11pt</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
 	
+	<!-- clause number -->
+	<!-- <xsl:template match="mn:fmt-title[@depth = 2 or @depth = 3]//text()[following-sibling::mn:tab]" priority="5">
+		<fo:inline font-size="12pt"><xsl:value-of select="."/></fo:inline>
+	</xsl:template> -->
+	
 	<xsl:attribute-set name="p-style"><?extend?>
 		<xsl:attribute name="line-height">1.2</xsl:attribute>
 	</xsl:attribute-set>
+	
+	
+	<xsl:template name="refine_p-style">
+		<xsl:if test="parent::mn:li/following-sibling::*">
+			<xsl:attribute name="margin-bottom">6pt</xsl:attribute>
+			<xsl:if test="ancestor::mn:term">
+				<xsl:attribute name="margin-bottom">4pt</xsl:attribute>
+			</xsl:if>
+		</xsl:if>
+		<xsl:if test="parent::mn:dd">
+			<xsl:attribute name="margin-bottom">3pt</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
 	
 	<xsl:template match="mn:sections//mn:p[@class = 'zzSTDTitle1']" priority="4">
 		<fo:block font-size="18pt" font-weight="bold" text-align="center" margin-bottom="36pt" role="H1">
@@ -335,7 +356,31 @@
 		<xsl:attribute name="margin-bottom">8pt</xsl:attribute>
 	</xsl:attribute-set>
 	
+	<xsl:attribute-set name="termnote-style"><?extend?>
+		<xsl:attribute name="font-size">11pt</xsl:attribute>
+		<xsl:attribute name="margin-bottom">8pt</xsl:attribute>
+	</xsl:attribute-set>
+	
 	<xsl:attribute-set name="note-name-style"><?extend?>
+		<xsl:attribute name="font-style">italic</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="example-style"><?extend?>
+		<xsl:attribute name="font-size">11pt</xsl:attribute>
+		<xsl:attribute name="margin-bottom">8pt</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="example-body-style">
+		<xsl:attribute name="margin-left">12.5mm</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="example-p-style">
+		<xsl:attribute name="font-size">11pt</xsl:attribute>
+		<xsl:attribute name="margin-top">2pt</xsl:attribute>
+		<xsl:attribute name="margin-bottom">2pt</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="termnote-name-style"><?extend?>
 		<xsl:attribute name="font-style">italic</xsl:attribute>
 	</xsl:attribute-set>
 	
@@ -353,18 +398,9 @@
 						<fo:block xsl:use-attribute-sets="note-name-style">
 							<xsl:call-template name="refine_note-name-style"/>
 							
-							<xsl:variable name="note_name">
-								<xsl:apply-templates select="mn:fmt-name">
-									<xsl:with-param name="sfx">:</xsl:with-param>
-								</xsl:apply-templates>
-							</xsl:variable>
-							
-							<xsl:call-template name="capitalize">
-								<xsl:with-param name="str">
-									<xsl:value-of select="java:toLowerCase(java:java.lang.String.new($note_name))"/>
-								</xsl:with-param>
-							</xsl:call-template>
-							
+							<xsl:apply-templates select="mn:fmt-name">
+								<xsl:with-param name="sfx">:</xsl:with-param>
+							</xsl:apply-templates>
 						</fo:block>
 					</fo:list-item-label>
 					<fo:list-item-body start-indent="body-start()">
@@ -375,6 +411,43 @@
 				</fo:list-item>
 			</fo:list-block>
 		</fo:block>
+	</xsl:template>
+	
+	<xsl:template match="mn:example" name="example">
+		<fo:block-container id="{@id}" xsl:use-attribute-sets="example-style" role="SKIP">
+			<xsl:call-template name="setBlockSpanAll"/>
+			<xsl:call-template name="refine_example-style"/>
+			<fo:block-container margin-left="0mm" role="SKIP">
+				<!-- display name 'EXAMPLE' in a separate block  -->
+				<fo:block>
+					<xsl:apply-templates select="mn:fmt-name">
+						<xsl:with-param name="fo_element">fo:block</xsl:with-param>
+					</xsl:apply-templates>
+				</fo:block>
+				<fo:block-container xsl:use-attribute-sets="example-body-style" role="SKIP">
+					<xsl:call-template name="refine_example-body-style"/>
+					<fo:block-container margin-left="0mm" margin-right="0mm" role="SKIP">
+						<xsl:variable name="example_body">
+							<xsl:apply-templates select="node()[not(self::mn:fmt-name)]">
+								<xsl:with-param name="fo_element">fo:block</xsl:with-param>
+							</xsl:apply-templates>
+						</xsl:variable>
+						<xsl:choose>
+							<xsl:when test="xalan:nodeset($example_body)/*">
+								<xsl:copy-of select="$example_body"/>
+							</xsl:when>
+							<xsl:otherwise><fo:block/><!-- prevent empty block-container --></xsl:otherwise>
+						</xsl:choose>
+					</fo:block-container>
+				</fo:block-container>
+			</fo:block-container>
+		</fo:block-container>
+	</xsl:template>
+	
+	<xsl:template match="mn:example/mn:fmt-name/text()" priority="5">
+		<!-- remove all digits -->
+		<xsl:variable name="example_name" select="java:replaceAll(java:java.lang.String.new(.),'\d','')"/>
+		<xsl:value-of select="concat(normalize-space($example_name), ':')"/>
 	</xsl:template>
 	
 	<xsl:template match="mn:ul/mn:li/mn:fmt-name[normalize-space() = '—']" priority="3" mode="update_xml_step1">
@@ -389,9 +462,22 @@
 		<label font-size="90%" line-height="140%">●</label>
 	</xsl:variable>
 	
-	<xsl:attribute-set name="list-style"><?extend?>
-		<xsl:attribute name="margin-left">6.5mm</xsl:attribute>
-	</xsl:attribute-set>
+	<!-- <xsl:attribute-set name="list-style"><?extend?>
+		
+	</xsl:attribute-set> -->
+	
+	<xsl:template name="refine_list-style">
+		<xsl:if test="self::mn:ul">
+			<xsl:attribute name="margin-left">6.5mm</xsl:attribute>
+			<xsl:if test="ancestor::mn:term">
+				<xsl:attribute name="margin-left">15mm</xsl:attribute>
+			</xsl:if>
+		</xsl:if>
+		<xsl:attribute name="space-after">6pt</xsl:attribute>
+		<xsl:if test="ancestor::mn:term">
+			<xsl:attribute name="margin-top">6pt</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
 	
 	<xsl:attribute-set name="figure-name-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
@@ -405,8 +491,39 @@
 		<xsl:attribute name="margin-bottom">12pt</xsl:attribute>
 	</xsl:attribute-set>
 	
+	<xsl:template name="refine_term-style">
+		<xsl:if test="mn:termnote">
+			<xsl:attribute name="margin-bottom">6pt</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	
 	<xsl:attribute-set name="term-definition-style"><?extend?>
 		<xsl:attribute name="space-before">6pt</xsl:attribute>
 	</xsl:attribute-set>
+	
+	<xsl:template name="refine_dt-block-style">
+		<xsl:attribute name="margin-bottom">3pt</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:attribute-set name="link-style">
+	<!-- no underline and color -->
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="xref-style">
+		<!-- no underline and color -->
+	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="table-row-style"><?extend?>
+		<xsl:attribute name="min-height">8.3mm</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:template name="insertFootnoteSeparatorCommon">
+		<xsl:param name="leader_length">30%</xsl:param>
+		<fo:static-content flow-name="xsl-footnote-separator" role="artifact">
+			<fo:block border="1pt solid red">
+				<fo:leader leader-pattern="rule" leader-length="{$leader_length}"/>
+			</fo:block>
+		</fo:static-content>
+	</xsl:template>
 	
 </xsl:stylesheet>
