@@ -17,7 +17,7 @@ base-override:
     presentation-metadata-backcover-text: pdfa.org
     body-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
     header-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
-    fonts: Source Sans 3;Source Sans Pro
+    fonts: Source Sans Pro
     output-extensions: xml,html,pdf
     toclevels-html: 6
 doctypes:
