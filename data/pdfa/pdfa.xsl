@@ -3,9 +3,10 @@
 	<xsl:variable name="pageWidth">210</xsl:variable>
 	<xsl:variable name="pageHeight">297</xsl:variable>
 
-	<xsl:attribute-set name="root-style">
+	<xsl:attribute-set name="root-style"><?extend?>
 		<xsl:attribute name="font-family">Source Sans 3, STIX Two Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
 		<xsl:attribute name="font-size">11pt</xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="color">black</xsl:attribute>
 	</xsl:attribute-set>
 

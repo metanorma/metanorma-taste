@@ -116,19 +116,6 @@ module Metanorma
         attrs
       end
 
-      private
-
-      # Calculate the appropriate insertion index for new attributes
-      #
-      # Attributes are inserted after the second element to maintain
-      # proper AsciiDoc document structure.
-      #
-      # @param attrs [Array] The attributes array
-      # @return [Integer] The insertion index
-      def calculate_insertion_index(attrs)
-        [attrs.length, 2].min
-      end
-
       # Build all attribute overrides from various sources
       #
       # This method coordinates the building of attributes from:
@@ -147,6 +134,19 @@ module Metanorma
         apply_doctype_overrides(attrs, override_attrs)
 
         [attrs, override_attrs]
+      end
+
+      private
+
+      # Calculate the appropriate insertion index for new attributes
+      #
+      # Attributes are inserted after the second element to maintain
+      # proper AsciiDoc document structure.
+      #
+      # @param attrs [Array] The attributes array
+      # @return [Integer] The insertion index
+      def calculate_insertion_index(attrs)
+        [attrs.length, 2].min
       end
 
       # Add filename-based attribute overrides

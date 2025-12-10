@@ -58,12 +58,9 @@ module Metanorma
     # @raise [UnknownTasteError] If the flavor is not registered
     def get(flavor)
       flavor_sym = normalize_flavor_name(flavor)
-
-      return @taste_instances[flavor_sym] if @taste_instances[flavor_sym]
-
-      config = @taste_configs[flavor_sym]
-      raise UnknownTasteError, "Unknown taste: #{flavor}" unless config
-
+      ret = @taste_instances[flavor_sym] and return ret
+      config = @taste_configs[flavor_sym] or
+        raise UnknownTasteError, "Unknown taste: #{flavor}"
       @taste_instances[flavor_sym] = create_taste_instance(flavor_sym, config)
     end
 
@@ -98,6 +95,81 @@ module Metanorma
       # Set the directory on the config object
       config.directory = config_directory_for(flavor_sym)
       config
+    end
+
+    # Get config attributes to be passed to IsoDoc::Convert.new
+    #
+    # @param flavor [String, Symbol] The flavor name
+    # @param format [Symbol] The format name
+    # @return [Hash] A hash of format-specific config attributes
+    #
+    # @example
+    #   config = TasteRegister.get_config("icc")
+    #   puts config.owner  # => "International Color Consortium"
+    def self.isodoc_attrs(flavor, format)
+      instance.isodoc_attrs(flavor, format)
+    end
+
+    class NodeAttr
+      def initialize(options)
+        @options = options
+      end
+
+      def attr(key)
+        @options[key]
+      end
+    end
+
+    def isodoc_attrs(flavor, format)
+      require "metanorma-standoc" unless defined?(::Metanorma::Standoc)
+      
+      # Define ExtractorHelper class dynamically after metanorma-standoc is loaded
+      extractor_class = Class.new do
+        include ::Metanorma::Standoc::Base
+
+        def initialize(attrs_hash)
+          @attrs_hash = attrs_hash
+          @htmltoclevels = nil
+          @doctoclevels = nil
+          @pdftoclevels = nil
+          @tocfigures = nil
+          @toctables = nil
+          @tocrecommendations = nil
+          @localdir = Dir.pwd
+        end
+
+        def create_node
+          TasteRegister::NodeAttr.new(@attrs_hash)
+        end
+
+        def i18nyaml_path(node)
+          node.attr("i18nyaml")
+        end
+
+        def relaton_render_path(node)
+          node.attr("relaton-render-config")
+        end
+      end
+      
+      taste = get(flavor)
+      _, overrides = taste.build_all_attribute_overrides([])
+      
+      # Convert overrides array to hash
+      attrs_hash = overrides.each_with_object({}) do |attr_str, hash|
+        if attr_str =~ /^:([^:]+):\s*(.*)$/
+          hash[$1] = $2
+        end
+      end
+      
+      helper = extractor_class.new(attrs_hash)
+      node = helper.create_node
+      
+      case format
+      when :html then helper.html_extract_attributes(node)
+      when :pdf then helper.pdf_extract_attributes(node)
+      when :doc then helper.doc_extract_attributes(node)
+      else {}
+      end
     end
 
     # Get flavor aliases mapping
@@ -195,13 +267,13 @@ module Metanorma
       # Auto-enhance output-extensions: if it contains xml and any of html/doc/pdf,
       # and doesn't already contain "presentation", then add "presentation"
       if config.base_override&.value_attributes&.output_extensions
-        extensions = config.base_override.value_attributes.output_extensions.split(',').map(&:strip)
+        extensions = config.base_override.value_attributes.output_extensions.split(",").map(&:strip)
         
-        if extensions.include?('xml') && 
-           (extensions.include?('html') || extensions.include?('doc') || extensions.include?('pdf')) &&
-           !extensions.include?('presentation')
-          extensions << 'presentation'
-          config.base_override.value_attributes.output_extensions = extensions.join(',')
+        if extensions.include?("xml") && 
+            (extensions.include?("html") || extensions.include?("doc") || extensions.include?("pdf")) &&
+            !extensions.include?("presentation")
+          extensions << "presentation"
+          config.base_override.value_attributes.output_extensions = extensions.join(",")
         end
       end
     end
