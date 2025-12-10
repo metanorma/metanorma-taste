@@ -23,6 +23,45 @@ RSpec.describe Metanorma::TasteRegister do
     end
   end
 
+  describe "#isodoc_attrs" do
+    it "returns isodoc attributes" do
+      info = register.isodoc_attrs(:csa, :html).compact.transform_values do |v|
+        v.is_a?(String) && File.exist?(v) ? File.expand_path(v) : v
+      end
+      dir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "data"))
+      expect(info).to eq({
+                           bodyfont: "Lato,\"Source Sans Pro\",sans-serif",
+                           datauriimage: true,
+                           headerfont: "Lato,\"Source Sans Pro\",sans-serif",
+                           htmlcoverpage: "#{dir}/csa/html_csa_titlepage.html",
+                           htmlintropage: "#{dir}/csa/html_csa_intro.html",
+                           htmlstylesheet: "#{dir}/csa/htmlstyle.scss",
+                           monospacefont: "\"Source Code Pro\",monospace",
+                           sourcehighlighter: true,
+                           suppressasciimathdup: false,
+                         })
+      info = register.isodoc_attrs(:csa, :pdf).compact.transform_values do |v|
+        v.is_a?(String) && File.exist?(v) ? File.expand_path(v) : v
+      end
+      expect(info).to eq({ pdfstylesheet: "#{dir}/csa/csa.standard.xsl" })
+      info = register.isodoc_attrs(:csa, :doc).compact.transform_values do |v|
+        v.is_a?(String) && File.exist?(v) ? File.expand_path(v) : v
+      end
+      expect(info).to eq({ bodyfont: "Lato,\"Source Sans Pro\",sans-serif",
+                           header: "#{dir}/csa/header.html",
+                           headerfont: "Lato,\"Source Sans Pro\",sans-serif",
+                           monospacefont: "\"Source Code Pro\",monospace",
+                           standardstylesheet: "#{dir}/csa/csa.scss",
+                           wordcoverpage: "#{dir}/csa/word_csa_titlepage.html",
+                           wordintropage: "#{dir}/csa/word_csa_intro.html",
+                           wordstylesheet: "#{dir}/csa/wordstyle.scss" })
+      info = register.isodoc_attrs(:csa, :presentation).compact.transform_values do |v|
+        v.is_a?(String) && File.exist?(v) ? File.expand_path(v) : v
+      end
+      expect(info).to eq({})
+    end
+  end
+
   describe "#get" do
     it "returns a taste instance" do
       taste = register.get(:icc)
@@ -85,7 +124,7 @@ RSpec.describe Metanorma::TasteRegister do
           register.send(:validate_taste_config!, config, "test")
         end.to raise_error(
           Metanorma::TasteRegister::InvalidTasteConfigError,
-          "Taste must have base-override.value-attributes.output-extensions defined"
+          "Taste must have base-override.value-attributes.output-extensions defined",
         )
       end
     end
@@ -106,7 +145,7 @@ RSpec.describe Metanorma::TasteRegister do
           register.send(:validate_taste_config!, config, "test")
         end.to raise_error(
           Metanorma::TasteRegister::InvalidTasteConfigError,
-          "Taste must have base-override.value-attributes.output-extensions defined"
+          "Taste must have base-override.value-attributes.output-extensions defined",
         )
       end
     end
@@ -127,7 +166,7 @@ RSpec.describe Metanorma::TasteRegister do
           register.send(:validate_taste_config!, config, "test")
         end.to raise_error(
           Metanorma::TasteRegister::InvalidTasteConfigError,
-          "Taste must have base-override.value-attributes.output-extensions defined"
+          "Taste must have base-override.value-attributes.output-extensions defined",
         )
       end
     end
@@ -148,7 +187,7 @@ RSpec.describe Metanorma::TasteRegister do
           register.send(:validate_taste_config!, config, "test")
         end.to raise_error(
           Metanorma::TasteRegister::InvalidTasteConfigError,
-          "Taste must have base-override.value-attributes.output-extensions defined"
+          "Taste must have base-override.value-attributes.output-extensions defined",
         )
       end
     end
@@ -164,7 +203,7 @@ RSpec.describe Metanorma::TasteRegister do
           register.send(:validate_taste_config!, config, nil)
         end.to raise_error(
           Metanorma::TasteRegister::InvalidTasteConfigError,
-          "Taste must have a flavor name"
+          "Taste must have a flavor name",
         )
       end
     end
@@ -181,7 +220,7 @@ RSpec.describe Metanorma::TasteRegister do
         end
 
         register.send(:validate_taste_config!, config, "test")
-        
+
         expect(config.base_override.value_attributes.output_extensions).to eq("xml,html,pdf,doc,presentation")
       end
 
@@ -196,7 +235,7 @@ RSpec.describe Metanorma::TasteRegister do
         end
 
         register.send(:validate_taste_config!, config, "test")
-        
+
         expect(config.base_override.value_attributes.output_extensions).to eq("xml,html,presentation")
       end
 
@@ -211,7 +250,7 @@ RSpec.describe Metanorma::TasteRegister do
         end
 
         register.send(:validate_taste_config!, config, "test")
-        
+
         expect(config.base_override.value_attributes.output_extensions).to eq("xml,doc,presentation")
       end
 
@@ -226,7 +265,7 @@ RSpec.describe Metanorma::TasteRegister do
         end
 
         register.send(:validate_taste_config!, config, "test")
-        
+
         expect(config.base_override.value_attributes.output_extensions).to eq("xml,pdf,presentation")
       end
 
@@ -241,7 +280,7 @@ RSpec.describe Metanorma::TasteRegister do
         end
 
         register.send(:validate_taste_config!, config, "test")
-        
+
         expect(config.base_override.value_attributes.output_extensions).to eq("xml,html,pdf,presentation")
       end
 
@@ -256,7 +295,7 @@ RSpec.describe Metanorma::TasteRegister do
         end
 
         register.send(:validate_taste_config!, config, "test")
-        
+
         expect(config.base_override.value_attributes.output_extensions).to eq("html,pdf,doc")
       end
 
@@ -271,7 +310,7 @@ RSpec.describe Metanorma::TasteRegister do
         end
 
         register.send(:validate_taste_config!, config, "test")
-        
+
         expect(config.base_override.value_attributes.output_extensions).to eq("xml,rxl")
       end
 
@@ -286,7 +325,7 @@ RSpec.describe Metanorma::TasteRegister do
         end
 
         register.send(:validate_taste_config!, config, "test")
-        
+
         expect(config.base_override.value_attributes.output_extensions).to eq("xml,html,pdf,presentation")
       end
     end
