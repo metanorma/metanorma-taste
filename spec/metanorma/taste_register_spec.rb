@@ -25,10 +25,10 @@ RSpec.describe Metanorma::TasteRegister do
 
   describe "#isodoc_attrs" do
     it "returns isodoc attributes" do
+      dir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "data"))
       info = register.isodoc_attrs(:csa, :html).compact.transform_values do |v|
         v.is_a?(String) && File.exist?(v) ? File.expand_path(v) : v
       end
-      dir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "data"))
       expect(info).to eq({
                            bodyfont: "Lato,\"Source Sans Pro\",sans-serif",
                            datauriimage: true,
