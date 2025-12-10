@@ -65,9 +65,13 @@ module Metanorma
         toc_figures: "toc-figures",
         toc_tables: "toc-tables",
         toc_recommendations: "toc-recommendations",
-
       }.freeze
 
+      # Additive value attributes: if the document already has a value for this attribute,
+      # add the taste config values to it
+      VALUE_ATTR_ADDITIVE = {
+        fonts: { delimiter: ";" },
+      }.freeze
 
       # Initialize a new Base processor
       #
@@ -127,12 +131,10 @@ module Metanorma
       # @return [Array<Array<String>, Array<String>>] Tuple of [original_attrs, override_attrs]
       def build_all_attribute_overrides(attrs)
         override_attrs = []
-
         # Add attributes from different sources
         add_file_based_overrides(override_attrs)
-        add_base_configuration_overrides(override_attrs)
+        add_base_configuration_overrides(override_attrs, attrs)
         apply_doctype_overrides(attrs, override_attrs)
-
         [attrs, override_attrs]
       end
 
@@ -223,14 +225,26 @@ module Metanorma
       # AsciiDoc attributes for each configured property.
       #
       # @param override_attrs [Array<String>] Array to append override attributes to
-      def add_base_configuration_overrides(override_attrs)
-        return unless @config.base_override&.value_attributes
-
+      # @param attrs [Array<String>] Existing document attributes
+      def add_base_configuration_overrides(override_attrs, attrs)
+        @config.base_override&.value_attributes or return
         VALUE_ATTRIBUTE_MAPPINGS.each do |config_key, attr_key|
           value = @config.base_override.value_attributes.send(config_key)
-          next unless value
-
+          value or next
+          value += add_base_configuration_additive(config_key, attr_key, attrs)
           override_attrs << ":#{attr_key}: #{value}"
+        end
+      end
+
+      # If config base attribute already appears as a document attribute,
+      # and expect it to be additive, add the old value before the config value
+      def add_base_configuration_additive(config_key, attr_key, attrs)
+        delim = VALUE_ATTR_ADDITIVE.dig(config_key, :delimiter)
+        idx = attrs.find_index { |x| x.start_with?(":#{attr_key}: ") }
+        if delim && idx
+          old_val = attrs.delete_at(idx)
+          delim + old_val.sub(":#{attr_key}: ", "").strip
+        else ""
         end
       end
 

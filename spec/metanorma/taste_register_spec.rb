@@ -398,5 +398,13 @@ RSpec.describe Metanorma::TasteRegister do
       expect(boilerplate_content)
         .to include("Visit the ICC Web site: http://www.color.org")
     end
+
+    it "processes additive attributes correctly" do
+       fonts = "D050000L;TeXGyreTermes;STIX Two Math;FreeSerif;FreeSans;Source Sans 3"
+       attrs = [":fonts: #{fonts}"]
+       taste = described_class.get(:pdfa)
+       result = taste.process_input_adoc_overrides(attrs, {})
+       expect(result).to include(":fonts: Source Sans Pro;#{fonts}")
+    end
   end
 end
