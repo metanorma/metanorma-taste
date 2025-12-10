@@ -19,4 +19,4 @@ doctypes:
 - taste: standard
   base: international-standard
 - taste: recommendation
-  base: recommendation
+  base: international-standard

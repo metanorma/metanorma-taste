@@ -1,3 +1,9 @@
+term_def_boilerplate: 
+internal_terms_boilerplate: 
+abbrev: Abbreviations
+note: Note
+termnote: Note
+example: Example
 doctype_dict:
   standard: Standard
   recommendation: Recommendation
