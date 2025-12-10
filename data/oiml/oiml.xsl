@@ -82,33 +82,35 @@
 						<fo:table-body role="SKIP">
 							<fo:table-row height="55mm" font-size="14.5pt" role="SKIP">
 								<fo:table-cell role="SKIP">
-									<xsl:variable name="titles">
-										<title><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-intro' and @language = $curr_lang]/node()"/></title>
-										<title><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-main' and @language = $curr_lang]/node()"/></title>
-									</xsl:variable>
-									<xsl:for-each select="xalan:nodeset($titles)/title[normalize-space() != '']">
-										<fo:block role="H1">
-											<xsl:if test="position() = 1">
-												<xsl:attribute name="margin-top">11mm</xsl:attribute>
-											</xsl:if>
-											<xsl:if test="position() != 1">
-												<xsl:attribute name="space-before">6pt</xsl:attribute>
-											</xsl:if>
-											<xsl:copy-of select="node()"/>
-										</fo:block>
-									</xsl:for-each>
-									<xsl:variable name="title_part">
-										<xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-part' and @language = $curr_lang]/node()"/>
-									</xsl:variable>
-									<xsl:if test="normalize-space($title_part) != ''">
-										<xsl:variable name="i18n_locality_part"><xsl:call-template name="getLocalizedString"><xsl:with-param name="key">locality.part</xsl:with-param></xsl:call-template></xsl:variable>
-										
-										<xsl:variable name="space_fr"><xsl:if test="$curr_lang = 'fr'"><xsl:text>&#xa0;</xsl:text></xsl:if></xsl:variable>
-										<fo:block space-before="5mm" role="H1">
-											<xsl:value-of select="concat($i18n_locality_part, ' ', $part, $space_fr, ': ')"/>
-											<xsl:copy-of select="$title_part"/>
-										</fo:block>
-									</xsl:if>
+									<fo:block role="SKIP">
+										<xsl:variable name="titles">
+											<title><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-intro' and @language = $curr_lang]/node()"/></title>
+											<title><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-main' and @language = $curr_lang]/node()"/></title>
+										</xsl:variable>
+										<xsl:for-each select="xalan:nodeset($titles)/title[normalize-space() != '']">
+											<fo:block role="H1">
+												<xsl:if test="position() = 1">
+													<xsl:attribute name="margin-top">11mm</xsl:attribute>
+												</xsl:if>
+												<xsl:if test="position() != 1">
+													<xsl:attribute name="space-before">6pt</xsl:attribute>
+												</xsl:if>
+												<xsl:copy-of select="node()"/>
+											</fo:block>
+										</xsl:for-each>
+										<xsl:variable name="title_part">
+											<xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-part' and @language = $curr_lang]/node()"/>
+										</xsl:variable>
+										<xsl:if test="normalize-space($title_part) != ''">
+											<xsl:variable name="i18n_locality_part"><xsl:call-template name="getLocalizedString"><xsl:with-param name="key">locality.part</xsl:with-param></xsl:call-template></xsl:variable>
+											
+											<xsl:variable name="space_fr"><xsl:if test="$curr_lang = 'fr'"><xsl:text>&#xa0;</xsl:text></xsl:if></xsl:variable>
+											<fo:block space-before="5mm" role="H1">
+												<xsl:value-of select="concat($i18n_locality_part, ' ', $part, $space_fr, ': ')"/>
+												<xsl:copy-of select="$title_part"/>
+											</fo:block>
+										</xsl:if>
+									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
 							<fo:table-row height="25mm" font-size="10pt" role="SKIP">
@@ -178,7 +180,7 @@
 				
 				<!-- vertical identifier -->
 				<fo:block-container position="absolute" left="-63mm" top="1mm" reference-orientation="90" font-size="11pt" text-align="left" role="SKIP"> <!-- top="215mm"  -->
-					<fo:block ><xsl:value-of select="concat($docidentifier, ' ', $edition)"/></fo:block> <!-- margin-left="25mm" margin-top="12.5mm" -->
+					<fo:block><xsl:value-of select="concat($docidentifier, ' ', $edition)"/></fo:block> <!-- margin-left="25mm" margin-top="12.5mm" -->
 				</fo:block-container>
 			</fo:flow>
 		</fo:page-sequence>
