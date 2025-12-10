@@ -25,10 +25,10 @@ RSpec.describe Metanorma::TasteRegister do
 
   describe "#isodoc_attrs" do
     it "returns isodoc attributes" do
+      dir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "data"))
       info = register.isodoc_attrs(:csa, :html).compact.transform_values do |v|
         v.is_a?(String) && File.exist?(v) ? File.expand_path(v) : v
       end
-      dir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "data"))
       expect(info).to eq({
                            bodyfont: "Lato,\"Source Sans Pro\",sans-serif",
                            datauriimage: true,
@@ -397,6 +397,18 @@ RSpec.describe Metanorma::TasteRegister do
         .to include("International Color Consortium and the ICC logo are registered trademarks")
       expect(boilerplate_content)
         .to include("Visit the ICC Web site: http://www.color.org")
+    end
+
+    it "processes additive attributes correctly" do
+       fonts = "D050000L;TeXGyreTermes;STIX Two Math;FreeSerif;FreeSans;Source Sans 3"
+       attrs = [":fonts: #{fonts}"]
+       taste = described_class.get(:pdfa)
+       result = taste.process_input_adoc_overrides(attrs, {})
+       expect(result).to include(":fonts: Source Sans Pro;#{fonts}")
+
+       attrs = []
+       result = taste.process_input_adoc_overrides(attrs, {})
+       expect(result).to include(":fonts: Source Sans Pro")
     end
   end
 end
