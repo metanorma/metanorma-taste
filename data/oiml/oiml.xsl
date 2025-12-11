@@ -31,8 +31,10 @@
 	
 	<xsl:template name="cover-page">
 		<xsl:param name="num"/>
-		<fo:page-sequence master-reference="cover-page" force-page-count="end-on-even" font-family="Futura" color="rgb(34,30,31)">
+		<fo:page-sequence master-reference="cover-page" force-page-count="end-on-even" font-family="Futura" color="rgb(34,30,31)"> <!--  League Spartan -->
+			<xsl:variable name="curr_lang"><xsl:call-template name="getLang"/></xsl:variable>
 			<xsl:variable name="docidentifier"><xsl:call-template name="get_docidentifier"/></xsl:variable>
+			<xsl:variable name="title_complementary"><xsl:call-template name="get_title_complementary"/></xsl:variable>
 			<xsl:variable name="edition">
 				<!-- Example: Edition 2021 (E) -->
 				<xsl:variable name="i18n_edition"><xsl:call-template name="getLocalizedString"><xsl:with-param name="key">edition</xsl:with-param></xsl:call-template></xsl:variable>
@@ -64,6 +66,7 @@
 								<fo:block font-size="25pt" font-weight="bold">
 									<!-- Example: OIML R 60-1 -->
 									<xsl:value-of select="$docidentifier"/>
+									<xsl:copy-of select="$title_complementary"/>
 								</fo:block>
 								<fo:block font-size="15pt" margin-top="2mm">
 									<!-- Edition 2021 (E) -->
@@ -74,7 +77,6 @@
 					</fo:table-body>
 				</fo:table>
 				
-				<xsl:variable name="curr_lang"><xsl:call-template name="getLang"/></xsl:variable>
 				<xsl:variable name="part" select="/mn:metanorma/mn:bibdata/mn:ext/mn:structuredidentifier/mn:project-number/@part"/>
 				<xsl:variable name="border_title">1pt solid black</xsl:variable>
 				<fo:block-container position="absolute" top="65mm" width="119mm" height="80mm" role="SKIP" border-top="{$border_title}" border-bottom="{$border_title}">
@@ -86,6 +88,8 @@
 										<xsl:variable name="titles">
 											<title><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-intro' and @language = $curr_lang]/node()"/></title>
 											<title><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-main' and @language = $curr_lang]/node()"/></title>
+											<title><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-complementary' and @language = $curr_lang]/node()"/></title>
+											<title><xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-addendum' and @language = $curr_lang]/node()"/></title>
 										</xsl:variable>
 										<xsl:for-each select="xalan:nodeset($titles)/title[normalize-space() != '']">
 											<fo:block role="H1">
@@ -93,7 +97,7 @@
 													<xsl:attribute name="margin-top">11mm</xsl:attribute>
 												</xsl:if>
 												<xsl:if test="position() != 1">
-													<xsl:attribute name="space-before">6pt</xsl:attribute>
+													<xsl:attribute name="space-before">12pt</xsl:attribute>
 												</xsl:if>
 												<xsl:copy-of select="node()"/>
 											</fo:block>
@@ -127,8 +131,20 @@
 										<xsl:variable name="bibdata" select="xalan:nodeset($bibdata_)"/>
 										<xsl:for-each select="xalan:nodeset($lang_other)/mnx:lang">
 											<xsl:variable name="lang_other_" select="."/>
-											<fo:block role="H1"><xsl:apply-templates select="$bibdata/mn:title[@type = 'title-intro' and @language = $lang_other_]/node()"/></fo:block>
-											<fo:block role="H1"><xsl:apply-templates select="$bibdata/mn:title[@type = 'title-main' and @language = $lang_other_]/node()"/></fo:block>
+											<xsl:variable name="titles_lang_other">
+												<title><xsl:apply-templates select="$bibdata/mn:title[@type = 'title-intro' and @language = $lang_other_]/node()"/></title>
+												<title><xsl:apply-templates select="$bibdata/mn:title[@type = 'title-main' and @language = $lang_other_]/node()"/></title>
+												<title><xsl:apply-templates select="$bibdata/mn:title[@type = 'title-complementary' and @language = $lang_other_]/node()"/></title>
+												<title><xsl:apply-templates select="$bibdata/mn:title[@type = 'title-addendum' and @language = $lang_other_]/node()"/></title>
+											</xsl:variable>
+											<xsl:for-each select="xalan:nodeset($titles_lang_other)/title[normalize-space() != '']">
+												<fo:block role="H1">
+													<xsl:if test="position() != 1">
+														<xsl:attribute name="space-before">8pt</xsl:attribute>
+													</xsl:if>
+													<xsl:copy-of select="node()"/>
+												</fo:block>
+											</xsl:for-each>
 											<xsl:variable name="title_part">
 												<xsl:apply-templates select="$bibdata/mn:title[@type = 'title-part' and @language = $lang_other_]/node()"/>
 											</xsl:variable>
@@ -180,7 +196,15 @@
 				
 				<!-- vertical identifier -->
 				<fo:block-container position="absolute" left="-63mm" top="1mm" reference-orientation="90" font-size="11pt" text-align="left" role="SKIP"> <!-- top="215mm"  -->
-					<fo:block><xsl:value-of select="concat($docidentifier, ' ', $edition)"/></fo:block> <!-- margin-left="25mm" margin-top="12.5mm" -->
+					<fo:block>
+						<xsl:variable name="title_complementary">
+							<xsl:call-template name="get_title_complementary"/>
+						</xsl:variable>
+						<xsl:value-of select="$docidentifier"/>
+						<xsl:copy-of select="$title_complementary"/>
+						<xsl:if test="normalize-space($title_complementary) = ''"><xsl:text>&#xa0;</xsl:text></xsl:if>
+						<xsl:value-of select="$edition"/>
+					</fo:block>
 				</fo:block-container>
 			</fo:flow>
 		</fo:page-sequence>
@@ -206,19 +230,14 @@
 
 	<xsl:template name="get_docidentifier">
 		<!-- Example: OIML R 60-1 -->
-		<!-- <xsl:variable name="abbr" select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'publisher']/mn:organization/mn:abbreviation"/>
-		<xsl:variable name="doctype" select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype"/>
-		<xsl:variable name="doctype_short">
-			<xsl:choose>
-				<xsl:when test="contains($doctype, '-')"><xsl:value-of select="java:java.lang.Character.toUpperCase(substring(substring-after($doctype, '-'),1,1))"/></xsl:when>
-				<xsl:otherwise><xsl:value-of select="$doctype"/></xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		<xsl:variable name="docnumber" select="/mn:metanorma/mn:bibdata/mn:docnumber"/>
-		<xsl:variable name="part_" select="/mn:metanorma/mn:bibdata/mn:ext/mn:structuredidentifier/mn:project-number/@part"/>
-		<xsl:variable name="part"><xsl:if test="$part_ != ''">-<xsl:value-of select="$part_"/></xsl:if></xsl:variable>
-		<xsl:value-of select="concat($abbr, ' ', $doctype_short, ' ', $docnumber, $part)"/> -->
 		<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier[@primary = 'true']"/>
+	</xsl:template>
+	
+	<xsl:template name="get_title_complementary">
+		<xsl:variable name="curr_lang"><xsl:call-template name="getLang"/></xsl:variable>
+		<xsl:text> </xsl:text>
+		<xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'title-complementary' and @language = $curr_lang]/node()"/>
+		<xsl:text> </xsl:text>
 	</xsl:template>
 	
 	<xsl:template name="get_edition">
@@ -244,9 +263,27 @@
 	<xsl:template name="insertHeaderEven">
 		<xsl:param name="text_align">left</xsl:param>
 		<xsl:param name="flow_name">header-even</xsl:param>
-		<fo:static-content flow-name="{$flow_name}" role="artifact">
+		<fo:static-content flow-name="{$flow_name}" > <!-- role="artifact" commented, because <fo:retrieve-marker occurs the FOP error -->
 			<fo:block font-family="Arial" font-size="9pt" margin-top="13mm" border-bottom="0.5pt solid black" text-align="{$text_align}">
-				<xsl:call-template name="get_docidentifier"/><xsl:text>:</xsl:text><xsl:call-template name="get_edition"/>
+				<xsl:variable name="title_complementary">
+					<xsl:call-template name="get_title_complementary"/>
+				</xsl:variable>
+				<xsl:if test="normalize-space($title_complementary) != ''">
+					<xsl:attribute name="text-align">center</xsl:attribute>
+				</xsl:if>
+				<xsl:call-template name="get_docidentifier"/><xsl:text>:</xsl:text>
+				<xsl:call-template name="get_edition"/>
+				<xsl:choose>
+					<xsl:when test="mn:annex">
+						<fo:retrieve-marker retrieve-class-name="annex_number" retrieve-boundary="document" /> <!-- retrieve-position="first-starting-within-page" -->
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:if test="normalize-space($title_complementary) != ''">
+							<xsl:text> – </xsl:text>
+						</xsl:if>
+						<xsl:copy-of select="$title_complementary"/>
+					</xsl:otherwise>
+				</xsl:choose>
 			</fo:block>
 		</fo:static-content>
 	</xsl:template>
@@ -287,6 +324,14 @@
 		<xsl:attribute name="space-after">26pt</xsl:attribute>
 	</xsl:attribute-set>
 	
+	<!-- no need Mandatory or Informative in ToC, replace to indent -->
+	<xsl:template match="mn:span[@class = 'fmt-obligation']" priority="3" mode="contents_item">
+		<xsl:element name="span" namespace="{$namespace_full}">
+			<xsl:attribute name="style">text-indent:4mm</xsl:attribute>
+			<xsl:value-of select="$zero_width_space"/>
+		</xsl:element>
+	</xsl:template>
+	
 	<xsl:template match="mn:preface//mn:clause[@type = 'toc']/mn:fmt-title" priority="3">
 		<fo:block xsl:use-attribute-sets="toc-title-style">
 			<xsl:apply-templates />
@@ -308,6 +353,11 @@
 			<xsl:attribute name="font-size">14pt</xsl:attribute>
 			<xsl:if test="ancestor::mn:preface">
 				<xsl:attribute name="text-align">center</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="ancestor::mn:annex">
+				<!-- <xsl:attribute name="margin-left">20mm</xsl:attribute>
+				<xsl:attribute name="margin-right">20mm</xsl:attribute> -->
+				<xsl:attribute name="margin-bottom">30pt</xsl:attribute>
 			</xsl:if>
 		</xsl:if>
 		<xsl:if test="$level = 2">
@@ -339,6 +389,9 @@
 			<xsl:attribute name="margin-bottom">3pt</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
+	
+	<!-- no need to show title, if there aren't main section -->
+	<xsl:template match="mn:sections[mn:p[@class = 'zzSTDTitle1'] and count(*) = 1]" priority="3" mode="update_xml_step1"/>
 	
 	<xsl:template match="mn:sections//mn:p[@class = 'zzSTDTitle1']" priority="4">
 		<fo:block font-size="18pt" font-weight="bold" text-align="center" margin-bottom="36pt" role="H1">
@@ -527,5 +580,58 @@
 			</fo:block>
 		</fo:static-content>
 	</xsl:template>
+	
+	<!-- (Mandatory) and (Informative) in bold -->
+	<xsl:template match="mn:annex/mn:fmt-title//mn:span[@class = 'fmt-obligation']" priority="3" mode="update_xml_step1">
+		<xsl:element name="strong" namespace="{$namespace_full}">
+			<xsl:apply-templates mode="update_xml_step1"/>
+		</xsl:element>
+	</xsl:template>
+	<!-- remove redundant br in annex title -->
+	<xsl:template match="mn:annex/mn:fmt-title//mn:br[preceding-sibling::node()[1][self::mn:br]]" priority="3" mode="update_xml_step1"/>
+	
+	<!-- copyed from iso.internation-standard.iso, added <fo:marker marker-class-name="annex_number"> -->
+	<xsl:template match="mn:annex[normalize-space() != '']">
+		<xsl:choose>
+			<xsl:when test="@continue = 'true'"> <!-- it's using for figure/table on top level for block span -->
+				<fo:block>
+					<xsl:apply-templates />
+				</fo:block>
+			</xsl:when>
+			<xsl:otherwise>
+			
+				<fo:block break-after="page"/>
+				<xsl:call-template name="setNamedDestination"/>
+				
+				<fo:block id="{@id}" role="Sect">
+					<xsl:attribute name="role">Sect</xsl:attribute>
+					<xsl:call-template name="addTagElementT"/>
+					
+					<xsl:call-template name="setBlockSpanAll"/>
+					
+					<fo:marker marker-class-name="annex_number">
+						<!-- Example: Annex A -->
+						<xsl:variable name="annex_number" select="normalize-space(mn:fmt-title/*[1])"/>
+						<xsl:if test="normalize-space($annex_number) != ''"><xsl:text>&#xa0;–&#xa0;</xsl:text></xsl:if>
+						<xsl:value-of select="$annex_number"/>
+					</fo:marker>
+					
+					<xsl:call-template name="refine_annex_style"/>
+					
+				</fo:block>
+				
+				<xsl:apply-templates select="mn:fmt-title[@columns = 1]"/>
+				
+				<fo:block>
+					<xsl:apply-templates select="node()[not(self::mn:fmt-title and @columns = 1)]" />
+				</fo:block>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template match="mn:annex/mn:fmt-title//mn:br">
+		<fo:block font-size="1pt" margin-top="2mm">&#xa0;</fo:block>
+	</xsl:template>
+
 	
 </xsl:stylesheet>
