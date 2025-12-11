@@ -4,6 +4,8 @@ abbrev: Abbreviations
 note: Note
 termnote: Note
 example: Example
+inform_annex: Informative
+norm_annex: Mandatory
 doctype_dict:
   standard: Standard
   recommendation: Recommendation
