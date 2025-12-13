@@ -14,9 +14,16 @@ base-override:
     #presentation-metadata-color-secondary: '#3f65a2'
     #presentation-metadata-backcover-text: expresslang.org
     output-extensions: xml,html,pdf,doc
-    fonts: Source Sans 3
 doctypes:
-- taste: standard
+- taste: international-guide
   base: international-standard
-- taste: recommendation
+- taste: international-recommendation
+  base: international-standard
+- taste: international-document
+  base: international-standard
+- taste: international-basic-publication
+  base: international-standard
+- taste: expert-report
+  base: international-standard
+- taste: vocabulary
   base: international-standard
