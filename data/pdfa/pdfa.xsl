@@ -265,9 +265,14 @@
 	
 	<xsl:attribute-set name="link-style">
 		<xsl:attribute name="color">rgb(14,85,117)</xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="text-decoration">underline</xsl:attribute>
 	</xsl:attribute-set>
-
+	
+	<xsl:template name="refine_link-style"><?extend?>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+	</xsl:template>
+	
 	<xsl:template name="insertHeaderFooter">
 		<xsl:call-template name="insertFooter"/>
 	</xsl:template>
@@ -346,4 +351,22 @@
 		<xsl:attribute name="padding-right">1mm</xsl:attribute>
 	</xsl:template>
 	
+	<xsl:attribute-set name="dl-name-style"><?extend?>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+	</xsl:attribute-set>
+	<xsl:attribute-set name="figure-name-style"><?extend?>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+	</xsl:attribute-set>
+	<xsl:attribute-set name="list-name-style"><?extend?>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+	</xsl:attribute-set>
+	<xsl:attribute-set name="sourcecode-name-style"><?extend?>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+	</xsl:attribute-set>
+	<xsl:attribute-set name="table-name-style"><?extend?>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+	</xsl:attribute-set>
+	<xsl:attribute-set name="term-kind-style"><?extend?>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+	</xsl:attribute-set>
 </xsl:stylesheet>
