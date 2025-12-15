@@ -14,6 +14,7 @@ base-override:
     #presentation-metadata-color-secondary: '#3f65a2'
     #presentation-metadata-backcover-text: expresslang.org
     output-extensions: xml,html,pdf,doc
+    fonts: Futura Bk;Futura-Light;Futura-Heavy
 doctypes:
   # OIML G
 - taste: international-guide

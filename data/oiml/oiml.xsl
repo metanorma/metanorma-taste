@@ -64,7 +64,7 @@
 								</fo:block>
 							</fo:table-cell>
 							<fo:table-cell text-align="right">
-								<fo:block font-size="25pt" font-family="Futura" font-weight="900" margin-top="-2mm"> <!-- Futura-Heavy -->
+								<fo:block font-size="25pt" font-family="Futura-Heavy" font-weight="900" margin-top="-2mm"> <!-- Futura-Heavy -->
 									<!-- Example: OIML R 60-1 -->
 									<xsl:value-of select="$docidentifier"/>
 									<xsl:if test="$title_complementary != ''"><xsl:text> </xsl:text></xsl:if>
@@ -120,7 +120,7 @@
 							</fo:table-row>
 							<fo:table-row height="26mm" font-size="10pt" role="SKIP">
 								<fo:table-cell role="SKIP">
-									<fo:block role="SKIP" font-family="Futura" font-weight="300"> <!-- Futura-Light -->
+									<fo:block role="SKIP" font-family="Futura-Light" font-weight="300"> <!-- Futura-Light -->
 										<xsl:variable name="lang_other">
 											<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:title[@language != $curr_lang]">
 												<xsl:if test="not(preceding-sibling::mn:title[@language = current()/@language])">
