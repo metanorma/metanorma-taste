@@ -14,9 +14,25 @@ base-override:
     #presentation-metadata-color-secondary: '#3f65a2'
     #presentation-metadata-backcover-text: expresslang.org
     output-extensions: xml,html,pdf,doc
-    fonts: Source Sans 3
 doctypes:
-- taste: standard
+  # OIML G
+- taste: international-guide
   base: international-standard
-- taste: recommendation
+  # OIML R
+- taste: international-recommendation
+  base: international-standard
+  # OIML D
+- taste: international-document
+  base: international-standard
+  # OIML B
+- taste: international-basic-publication
+  base: international-standard
+  # OIML E
+- taste: expert-report
+  base: international-standard
+  # OIML V
+- taste: vocabulary
+  base: international-standard
+  # OIML S
+- taste: seminar-report
   base: international-standard
