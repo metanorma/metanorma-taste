@@ -571,14 +571,14 @@
 		<xsl:attribute name="min-height">8.3mm</xsl:attribute>
 	</xsl:attribute-set>
 	
-	<xsl:template name="insertFootnoteSeparatorCommon">
+	<!-- <xsl:template name="insertFootnoteSeparatorCommon">
 		<xsl:param name="leader_length">30%</xsl:param>
 		<fo:static-content flow-name="xsl-footnote-separator" role="artifact">
 			<fo:block border="1pt solid red">
 				<fo:leader leader-pattern="rule" leader-length="{$leader_length}"/>
 			</fo:block>
 		</fo:static-content>
-	</xsl:template>
+	</xsl:template> -->
 	
 	<!-- (Mandatory) and (Informative) in bold -->
 	<xsl:template match="mn:annex/mn:fmt-title//mn:span[@class = 'fmt-obligation']" priority="3" mode="update_xml_step1">
