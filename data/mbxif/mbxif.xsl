@@ -7,13 +7,14 @@
 	<xsl:variable name="marginBottom">25</xsl:variable>
 
 	<xsl:variable name="color_black">rgb(30, 25, 29)</xsl:variable>
-	<xsl:variable name="color_header_background">rgb(240, 234, 219)</xsl:variable>
+	<xsl:variable name="color_header_background">rgb(255, 251, 223)</xsl:variable>
+	<xsl:variable name="color_yellow">rgb(255, 218, 0)</xsl:variable>
 
 	<xsl:template name="layout-master-set">
 		<fo:layout-master-set>
 			<fo:simple-page-master master-name="cover-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
-				<fo:region-body margin-top="60mm" margin-bottom="30mm" margin-left="19mm" margin-right="20mm"/>
-				<fo:region-before region-name="header" extent="10mm"/>
+				<fo:region-body margin-top="60mm" margin-bottom="30mm" margin-left="19mm" margin-right="38mm"/>
+				<fo:region-before region-name="header" extent="70mm"/>
 				<fo:region-after region-name="footer" extent="20mm"/>
 			</fo:simple-page-master>
 
@@ -85,11 +86,62 @@
 		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" font-family="Nacelle" >
 			<fo:static-content flow-name="header">
 				<xsl:call-template name="insertBackgroundPageImage"/>
+				
+				<fo:block-container margin-left="19mm" margin-right="-20mm">
+					<fo:block-container margin-left="0mm" margin-right="0mm">
+					<xsl:variable name="logos">
+						<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'author']/mn:organization[mn:logo/mn:image]">
+							<xsl:variable name="logo_width">
+								<xsl:choose>
+									<xsl:when test="mn:abbreviation = 'JT-IF'">43mm</xsl:when>
+									<xsl:otherwise>71mm</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:for-each select="mn:logo/mn:image"> <!-- set context to logo/image -->
+								<xsl:element name="logo" namespace="{$namespace_full}">
+									<xsl:element name="image" namespace="{$namespace_full}">
+										<xsl:copy-of select="@*"/>
+										<xsl:attribute name="width"><xsl:value-of select="$logo_width"/></xsl:attribute>
+										<xsl:copy-of select="node()"/>
+									</xsl:element>
+								</xsl:element>
+							</xsl:for-each>
+						</xsl:for-each>
+					</xsl:variable>
+					<fo:block>
+						<xsl:if test="xalan:nodeset($logos)//mn:logo">
+							<fo:table table-layout="fixed" width="100%">
+								<xsl:for-each select="xalan:nodeset($logos)//mn:logo">
+									<fo:table-column column-width="proportional-column-width(1)"/>
+								</xsl:for-each>
+								<fo:table-body>
+									<fo:table-row>
+										<xsl:for-each select="xalan:nodeset($logos)//mn:logo">
+											<fo:table-cell text-align="center">
+												<xsl:if test="position() = last()">
+													<xsl:attribute name="text-align">right</xsl:attribute>
+												</xsl:if>
+												<xsl:if test="position() = 1">
+													<xsl:attribute name="text-align">left</xsl:attribute>
+												</xsl:if>
+												<fo:block>
+													<xsl:apply-templates select="mn:image"/>
+												</fo:block>
+											</fo:table-cell>
+										</xsl:for-each>
+									</fo:table-row>
+								</fo:table-body>
+							</fo:table>
+						</xsl:if>
+					</fo:block>
+					</fo:block-container>
+				</fo:block-container>
+				
 			</fo:static-content>
 
 			<fo:static-content flow-name="footer">
 				<fo:block-container height="20mm" display-align="center">
-					<fo:block font-size="12pt" font-weight="300" color="white" margin-left="11.3mm">
+					<fo:block font-size="12pt" font-weight="300" color="white" margin-right="6mm" text-align="right">
 						<xsl:value-of select="$copyrightText"/>
 					</fo:block>
 				</fo:block-container>
@@ -97,13 +149,19 @@
 
 			<fo:flow flow-name="xsl-region-body" color="{$color_black}">
 
-				<fo:block-container margin-right="30mm">
+				<fo:block-container margin-right="0mm">
 					<fo:block-container margin-right="0mm">
 
 						<fo:block font-size="20pt" font-weight="600" margin-left="1mm">
 							<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
 						</fo:block>
-
+						
+						<fo:block-container absolute-position="fixed" left="0mm" top="82.4mm" width="137.4mm" height="13mm" display-align="center" background-color="{$color_yellow}">
+							<fo:block margin-left="19mm" font-size="22pt" font-weight="300" font-style="italic" margin-top="0.5mm">
+								<xsl:call-template name="capitalizeWords"><xsl:with-param name="str" select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype"/></xsl:call-template>
+							</fo:block>
+						</fo:block-container>
+						
 						<xsl:variable name="titles">
 							<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and (@type = 'intro' or not(@type))]"/>
 							<xsl:copy-of select="/mn:metanorma/mn:bibdata/mn:title[@language = $lang and @type = 'main'][last()]"/>
@@ -113,7 +171,7 @@
 							<fo:block font-size="21pt" font-weight="600" margin-top="6mm" role="H1">
 								<xsl:if test="position() = 1">
 									<xsl:attribute name="font-size">22pt</xsl:attribute>
-									<xsl:attribute name="margin-top">17mm</xsl:attribute>
+									<xsl:attribute name="margin-top">31.5mm</xsl:attribute>
 								</xsl:if>
 								<xsl:apply-templates />
 							</fo:block>
@@ -128,11 +186,14 @@
 							</fo:block>
 						</xsl:for-each>
 
-						<fo:block font-size="14pt" font-weight="normal" margin-top="17mm">
-							<xsl:call-template name="convertDate">
-								<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:version/mn:revision-date"/>
-								<xsl:with-param name="format">full</xsl:with-param>
-							</xsl:call-template>
+						<fo:block font-size="14pt" font-weight="normal" margin-top="8mm">
+							<fo:block>Release <xsl:value-of select="/mn:metanorma/mn:bibdata/mn:version/mn:draft"/></fo:block>
+							<fo:block margin-top="2.5mm">
+								<xsl:call-template name="convertDate">
+									<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:date[1]/mn:on"/>
+									<xsl:with-param name="format">ddMMyyyy</xsl:with-param>
+								</xsl:call-template>
+							</fo:block>
 						</fo:block>
 					</fo:block-container>
 				</fo:block-container>
@@ -159,67 +220,7 @@
 			</fo:static-content>
 
 			<fo:flow flow-name="xsl-region-body" color="{$color_black}">
-				<fo:block-container margin-left="1mm" margin-right="5mm">
-					<fo:block-container margin-left="0mm">
-
-						<xsl:variable name="contributors_">
-							<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role[@type = 'author' and normalize-space(mn:description) != 'leadership']]/mn:person/mn:name/mn:completename">
-								<xsl:copy-of select="."/>
-							</xsl:for-each>
-						</xsl:variable>
-						<xsl:variable name="contributors" select="xalan:nodeset($contributors_)"/>
-
-						<xsl:if test="$contributors/*">
-							<fo:block font-size="14pt" font-weight="600">Document contributors</fo:block>
-							<fo:block font-size="12pt" font-weight="300" margin-top="5.5mm">
-								<xsl:for-each select="$contributors/*">
-									<fo:inline keep-together.within-line="always"><xsl:value-of select="."/></fo:inline><xsl:if test="position() != last()">, </xsl:if>
-								</xsl:for-each>
-							</fo:block>
-						</xsl:if>
-
-						<xsl:variable name="leadership_">
-							<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role[@type = 'author' and mn:description = 'leadership']]/mn:person">
-								<xsl:copy-of select="."/>
-							</xsl:for-each>
-						</xsl:variable>
-						<xsl:variable name="leadership" select="xalan:nodeset($leadership_)"/>
-
-						<xsl:if test="$leadership/*">
-							<fo:block font-size="14pt" font-weight="600" margin-top="11mm">Spatial Web Foundation leadership</fo:block>
-
-							<fo:block font-size="12pt" font-weight="300" margin-top="5.5mm">
-								<fo:table table-layout="fixed" width="100%">
-									<fo:table-column column-width="51mm"/>
-									<fo:table-column column-width="90mm"/>
-									<fo:table-body>
-										<xsl:for-each select="$leadership/*">
-											<fo:table-row>
-												<fo:table-cell>
-													<fo:block font-weight="600">
-														<xsl:value-of select="mn:name/mn:completename"/>
-													</fo:block>
-												</fo:table-cell>
-												<fo:table-cell>
-													<fo:block font-weight="300">
-														<xsl:value-of select="mn:affiliation"/>
-													</fo:block>
-												</fo:table-cell>
-											</fo:table-row>
-										</xsl:for-each>
-									</fo:table-body>
-								</fo:table>
-							</fo:block>
-						</xsl:if>
-
-
-						<fo:block font-size="12pt" font-weight="300" margin-top="15mm">
-							<xsl:text>Comments about this document can be sent to</xsl:text>
-							<xsl:value-of select="$linebreak"/>
-							<xsl:text>the MBx Interoperability Forum at info@mbx-if.org</xsl:text>
-						</fo:block>
-					</fo:block-container>
-				</fo:block-container>
+				<fo:block>&#xa0;</fo:block>
 			</fo:flow>
 		</fo:page-sequence>
 	</xsl:template> <!-- Ena back-page -->
@@ -248,7 +249,7 @@
 		<xsl:attribute name="font-family">Nacelle</xsl:attribute>
 		<xsl:attribute name="font-size">12pt</xsl:attribute>
 		<xsl:attribute name="font-weight">300</xsl:attribute>
-		<xsl:attribute name="height">20mm</xsl:attribute>
+		<xsl:attribute name="height">18mm</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_black"/></xsl:attribute>
 		<xsl:attribute name="background-color"><xsl:value-of select="$color_header_background"/></xsl:attribute>
 		<xsl:attribute name="display-align">center</xsl:attribute>
@@ -285,8 +286,8 @@
 		<xsl:attribute name="font-size">10pt</xsl:attribute>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="height">20mm</xsl:attribute>
-		<xsl:attribute name="color">white</xsl:attribute>
-		<xsl:attribute name="background-color"><xsl:value-of select="$color_black"/></xsl:attribute>
+		<xsl:attribute name="color">rgb(240, 234, 219)</xsl:attribute>
+		<xsl:attribute name="background-color">rgb(51, 51, 51)</xsl:attribute>
 		<xsl:attribute name="display-align">center</xsl:attribute>
 	</xsl:attribute-set>
 
@@ -314,17 +315,18 @@
 		<xsl:param name="text"/>
 		<fo:static-content flow-name="footer-odd" role="artifact">
 			<fo:block-container xsl:use-attribute-sets="footer-style" id="__internal_layout__footerodd_{generate-id()}_{.//*[@id][1]/@id}">
-				<fo:table table-layout="fixed" width="100%">
+				<xsl:call-template name="insertFooterYellowBox"/>
+				<fo:table table-layout="fixed" width="100%" margin-top="-1mm">
 					<fo:table-column column-width="proportional-column-width(9)"/>
 					<fo:table-column column-width="proportional-column-width(1)"/>
 					<fo:table-body>
 						<fo:table-row>
-							<fo:table-cell padding-left="7mm">
+							<fo:table-cell padding-left="9mm">
 								<fo:block>
 									<xsl:copy-of select="$text"/>
 								</fo:block>
 							</fo:table-cell>
-							<fo:table-cell text-align="right" padding-right="7mm">
+							<fo:table-cell text-align="right" padding-right="8mm">
 								<fo:block><fo:page-number/></fo:block>
 							</fo:table-cell>
 						</fo:table-row>
@@ -338,7 +340,8 @@
 		<xsl:param name="text"/>
 		<fo:static-content flow-name="footer-even" role="artifact">
 			<fo:block-container xsl:use-attribute-sets="footer-style" id="__internal_layout__footereven_{generate-id()}_{.//*[@id][1]/@id}">
-				<fo:table table-layout="fixed" width="100%">
+				<xsl:call-template name="insertFooterYellowBox"><xsl:with-param name="left">72</xsl:with-param></xsl:call-template>
+				<fo:table table-layout="fixed" width="100%" margin-top="-1mm">
 					<fo:table-column column-width="proportional-column-width(1)"/>
 					<fo:table-column column-width="proportional-column-width(9)"/>
 					<fo:table-body>
@@ -346,7 +349,7 @@
 							<fo:table-cell padding-left="10mm">
 								<fo:block><fo:page-number/></fo:block>
 							</fo:table-cell>
-							<fo:table-cell text-align="right" padding-right="9mm">
+							<fo:table-cell text-align="right" padding-right="8mm">
 								<fo:block>
 									<xsl:copy-of select="$text"/>
 								</fo:block>
@@ -356,6 +359,11 @@
 				</fo:table>
 			</fo:block-container>
 		</fo:static-content>
+	</xsl:template>
+	
+	<xsl:template name="insertFooterYellowBox">
+		<xsl:param name="left">0.2</xsl:param>
+		<fo:block-container absolute-position="absolute" left="{$left}mm" top="0.2mm" width="138mm" height="1.5mm" background-color="{$color_yellow}"><fo:block font-size="0.1pt">&#xa0;</fo:block></fo:block-container>
 	</xsl:template>
 
 </xsl:stylesheet>
