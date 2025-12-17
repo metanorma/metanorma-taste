@@ -61,6 +61,14 @@
 				</fo:repeatable-page-master-alternatives>
 			</fo:page-sequence-master>
 
+			<fo:simple-page-master master-name="back-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="30mm" margin-bottom="30mm" margin-left="60mm" margin-right="0mm"/>
+				<fo:region-before region-name="header" extent="30mm"/>
+				<fo:region-after region-name="footer" extent="20mm"/>
+				<fo:region-start region-name="left-region" extent="60mm"/>
+				<fo:region-end region-name="right-region" extent="0mm"/>
+			</fo:simple-page-master>
+
 		</fo:layout-master-set>
 	</xsl:template>
 
@@ -202,8 +210,13 @@
 	</xsl:template> <!-- END cover-page -->
 
 
+	<xsl:attribute-set name="back-page-contacts-border-style">
+		<xsl:attribute name="border-bottom">1.5mm solid <xsl:value-of select="$color_yellow"/></xsl:attribute>
+		<xsl:attribute name="padding-bottom">-2mm</xsl:attribute>
+	</xsl:attribute-set>
+	
 	<xsl:template name="back-page">
-		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" font-family="Nacelle" >
+		<fo:page-sequence master-reference="back-page" force-page-count="no-force" font-family="Nacelle" >
 			<fo:static-content flow-name="header">
 				<xsl:call-template name="insertBackgroundPageImage">
 					<xsl:with-param name="name">backpage-image</xsl:with-param>
@@ -220,7 +233,72 @@
 			</fo:static-content>
 
 			<fo:flow flow-name="xsl-region-body" color="{$color_black}">
-				<fo:block>&#xa0;</fo:block>
+				<fo:block font-size="11pt">
+					<xsl:variable name="organizational_contacts_">
+						<xsl:for-each select="mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'author' and mn:role/mn:description != 'Technical']/mn:person">
+							<fo:block font-weight="bold">
+								<xsl:if test="position() != 1"><xsl:attribute name="space-before">7mm</xsl:attribute></xsl:if>
+								<xsl:value-of select="mn:name/mn:completename"/>
+							</fo:block>
+							<fo:block><xsl:value-of select="mn:affiliation/mn:organization/mn:name"/></fo:block>
+							<fo:block color="rgb(67, 84, 152)" text-decoration="underline"><xsl:value-of select="mn:email"/></fo:block>
+							
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:variable name="organizational_contacts" select="xalan:nodeset($organizational_contacts_)"/>
+					<xsl:variable name="technical_contacts_">
+						<xsl:for-each select="mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'author' and mn:role/mn:description = 'Technical']/mn:person">
+							<fo:block font-weight="bold">
+								<xsl:if test="position() != 1"><xsl:attribute name="space-before">7mm</xsl:attribute></xsl:if>
+								<xsl:value-of select="mn:name/mn:completename"/>
+								</fo:block>
+							<fo:block><xsl:value-of select="mn:affiliation/mn:organization/mn:name"/></fo:block>
+							<fo:block color="rgb(67, 84, 152)" text-decoration="underline"><xsl:value-of select="mn:email"/></fo:block>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:variable name="technical_contacts" select="xalan:nodeset($technical_contacts_)"/>
+					<xsl:if test="$organizational_contacts/* or $technical_contacts/*">
+						<fo:table table-layout="fixed" width="100%">
+							<fo:table-column column-width="proportional-column-width(14)"/>
+							<fo:table-column column-width="proportional-column-width(51)"/>
+							<fo:table-column column-width="proportional-column-width(14)"/>
+							<fo:table-column column-width="proportional-column-width(56)"/>
+							<fo:table-column column-width="proportional-column-width(14)"/>
+							<fo:table-header>
+								<fo:table-row font-size="12pt" font-weight="bold" font-style="italic">
+									<fo:table-cell><fo:block xsl:use-attribute-sets="back-page-contacts-border-style">&#xa0;</fo:block></fo:table-cell>
+									<fo:table-cell>
+										<fo:block xsl:use-attribute-sets="back-page-contacts-border-style">
+											<xsl:if test="$organizational_contacts/*">Organizational Contacts</xsl:if>
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell><fo:block xsl:use-attribute-sets="back-page-contacts-border-style">&#xa0;</fo:block></fo:table-cell>
+									<fo:table-cell>
+										<fo:block xsl:use-attribute-sets="back-page-contacts-border-style">
+											<xsl:if test="$technical_contacts/*">Technical Contacts</xsl:if>
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell><fo:block xsl:use-attribute-sets="back-page-contacts-border-style">&#xa0;</fo:block></fo:table-cell>
+								</fo:table-row>
+							</fo:table-header>
+							<fo:table-body>
+								<fo:table-row>
+									<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell>
+									<fo:table-cell>
+										<fo:block font-size="8pt">&#xa0;</fo:block>
+										<xsl:copy-of select="$organizational_contacts"/>
+									</fo:table-cell>
+									<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell>
+									<fo:table-cell>
+										<fo:block font-size="8pt">&#xa0;</fo:block>
+										<xsl:copy-of select="$technical_contacts"/>
+									</fo:table-cell>
+									<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell>
+								</fo:table-row>
+							</fo:table-body>
+						</fo:table>
+					</xsl:if>
+				</fo:block>
 			</fo:flow>
 		</fo:page-sequence>
 	</xsl:template> <!-- Ena back-page -->
