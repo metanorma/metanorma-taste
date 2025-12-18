@@ -54,8 +54,9 @@
 						<fo:table-row>
 							<fo:table-cell>
 								<fo:block font-size="16pt" line-height="1.36">
+									<xsl:variable name="doctype"><xsl:call-template name="getDoctype"/></xsl:variable>
 									<xsl:variable name="doctype_capitalized">
-										<xsl:call-template name="capitalizeWords"><xsl:with-param name="str" select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype"/></xsl:call-template>
+										<xsl:call-template name="capitalizeWords"><xsl:with-param name="str" select="$doctype"/></xsl:call-template>
 									</xsl:variable>
 									<xsl:call-template name="capitalize_oiml">
 										<xsl:with-param name="str" select="$doctype_capitalized"/>
