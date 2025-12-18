@@ -26,6 +26,7 @@ module Metanorma
       attribute :customize, :string
       attribute :coverpage_image, :string
       attribute :backpage_image, :string
+      attribute :coverpage_pdf_portfolio, :string
 
       key_value do
         map "copyright-notice", to: :copyright_notice
@@ -47,6 +48,7 @@ module Metanorma
         map "customize", to: :customize
         map "coverpage-image", to: :coverpage_image
         map "backpage-image", to: :backpage_image
+        map "coverpage-pdf_portfolio", to: :coverpage_pdf_portfolio
       end
     end
   end
