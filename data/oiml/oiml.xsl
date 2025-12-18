@@ -32,7 +32,7 @@
 	
 	<xsl:template name="cover-page">
 		<xsl:param name="num"/>
-		<fo:page-sequence master-reference="cover-page" force-page-count="end-on-even" font-family="Futura Bk" color="rgb(34,30,31)"> <!--  League Spartan -->
+		<fo:page-sequence master-reference="cover-page" force-page-count="end-on-even" font-family="Futura PT Book" color="rgb(34,30,31)"> <!-- Futura Bk -->
 			<xsl:variable name="curr_lang"><xsl:call-template name="getLang"/></xsl:variable>
 			<xsl:variable name="docidentifier"><xsl:call-template name="get_docidentifier"/></xsl:variable>
 			<xsl:variable name="title_complementary"><xsl:call-template name="get_title_complementary"/></xsl:variable>
@@ -53,7 +53,7 @@
 					<fo:table-body>
 						<fo:table-row>
 							<fo:table-cell>
-								<fo:block font-size="16pt" line-height="1.36">
+								<fo:block font-size="16.5pt" line-height="1.36">
 									<xsl:variable name="doctype"><xsl:call-template name="getDoctype"/></xsl:variable>
 									<xsl:variable name="doctype_capitalized">
 										<xsl:call-template name="capitalizeWords"><xsl:with-param name="str" select="$doctype"/></xsl:call-template>
@@ -65,13 +65,13 @@
 								</fo:block>
 							</fo:table-cell>
 							<fo:table-cell text-align="right">
-								<fo:block font-size="25pt" font-family="Futura-Heavy" font-weight="900" margin-top="-2mm"> <!-- Futura-Heavy -->
+								<fo:block font-size="27pt" font-family="Futura PT Demi"> <!-- Futura-Heavy font-weight="900"  Futura PT Heavy margin-top="-2mm"-->
 									<!-- Example: OIML R 60-1 -->
 									<xsl:value-of select="$docidentifier"/>
 									<xsl:if test="$title_complementary != ''"><xsl:text> </xsl:text></xsl:if>
 									<xsl:copy-of select="$title_complementary"/>
 								</fo:block>
-								<fo:block font-size="15pt" margin-top="5mm" margin-right="2mm">
+								<fo:block font-size="15.5pt" margin-top="2mm" margin-right="2mm"> <!-- margin-top="5mm" -->
 									<!-- Edition 2021 (E) -->
 									<xsl:value-of select="$edition"/>
 								</fo:block>
@@ -85,7 +85,7 @@
 				<fo:block-container position="absolute" top="65mm" width="119mm" height="80mm" role="SKIP" border-top="{$border_title}" border-bottom="{$border_title}">
 					<fo:table table-layout="fixed" width="100%" role="SKIP">
 						<fo:table-body role="SKIP">
-							<fo:table-row height="54mm" font-size="14.5pt" role="SKIP">
+							<fo:table-row height="55mm" font-size="16pt" role="SKIP">
 								<fo:table-cell role="SKIP">
 									<fo:block role="SKIP">
 										<xsl:variable name="titles">
@@ -119,9 +119,9 @@
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
-							<fo:table-row height="26mm" font-size="10pt" role="SKIP">
+							<fo:table-row height="25mm" font-size="11pt" role="SKIP">
 								<fo:table-cell role="SKIP">
-									<fo:block role="SKIP" font-family="Futura-Light" font-weight="300"> <!-- Futura-Light -->
+									<fo:block role="SKIP" font-family="Futura PT Light"> <!-- Futura-Light font-weight="300" -->
 										<xsl:variable name="lang_other">
 											<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:title[@language != $curr_lang]">
 												<xsl:if test="not(preceding-sibling::mn:title[@language = current()/@language])">
@@ -153,7 +153,7 @@
 											<xsl:if test="normalize-space($title_part) != ''">
 												<xsl:variable name="space_fr"><xsl:if test="$lang_other_ = 'fr'"><xsl:text> </xsl:text></xsl:if></xsl:variable>
 												<xsl:variable name="i18n_locality_part" select="java:replaceAll(java:java.lang.String.new($titles/title-part[@lang = $lang_other_]),'#',concat($part, $space_fr))"/>
-												<fo:block space-before="4mm" role="H1">
+												<fo:block space-before="3mm" role="H1">
 													<xsl:value-of select="concat($i18n_locality_part, ' ')"/>
 													<xsl:copy-of select="$title_part"/>
 												</fo:block>
@@ -166,7 +166,7 @@
 					</fo:table>
 				</fo:block-container>
 				
-				<fo:block-container position="absolute" top="215mm" width="119mm" font-size="11.25pt" role="SKIP">
+				<fo:block-container position="absolute" top="214mm" width="119mm" font-size="11.25pt" line-height="1.3" role="SKIP">
 					<fo:table table-layout="fixed" width="100%" role="SKIP">
 						<fo:table-column column-width="57mm"/>
 						<fo:table-column column-width="62mm"/>
@@ -180,7 +180,7 @@
 										</xsl:for-each>
 									</fo:block>
 								</fo:table-cell>
-								<fo:table-cell font-size="10.5pt" text-align="right" role="SKIP"> <!-- 11.25pt -->
+								<fo:table-cell text-align="right" role="SKIP">
 									<fo:block border-bottom="0.5pt solid black" padding-bottom="3mm">
 										<xsl:variable name="oiml_fr">Organisation Internationale de Métrologie Légale</xsl:variable>
 										<xsl:call-template name="capitalize_oiml">
@@ -197,7 +197,7 @@
 				</fo:block-container>
 				
 				<!-- vertical identifier -->
-				<fo:block-container position="absolute" left="-63mm" top="1mm" reference-orientation="90" font-size="11pt" text-align="left" role="SKIP"> <!-- top="215mm"  -->
+				<fo:block-container position="absolute" left="-63mm" top="1mm" reference-orientation="90" font-size="11.5pt" text-align="left" role="SKIP"> <!-- top="215mm"  -->
 					<fo:block>
 						<xsl:value-of select="$docidentifier"/>
 						<xsl:if test="$title_complementary != ''"><xsl:text> </xsl:text></xsl:if>
