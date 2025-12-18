@@ -263,6 +263,7 @@ base-override:             # Document attributes to override from base flavor
     header: string             # Word output header and footer content
     pdf-stylesheet: string     # PDF output XSLT stylesheet
     pdf-stylesheet-override: string     # PDF output XSLT stylesheet, overriding base flavor stylesheet
+    coverpage-pdf-portfolio: string     # Fallback PDF for PDF Portfolio if PDF Portfolio not supported
     customize: string          # Path to custom metanorma configuration file
     coverpage-image: string    # Path to coverpage image file
     backpage-image: string     # Path to backpage image file
