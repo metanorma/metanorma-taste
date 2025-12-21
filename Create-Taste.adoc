@@ -1,3 +1,200 @@
 == Creating a Taste
 
 Consult the link:README.adoc[README] on necessary background information on how tastes work and are configured.
+
+=== 1. Selecting a base flavor
+
+Tastes are config-only modifications of a Metanorma flavor: all behaviour that needs to be coded for must be available
+already in the base flavor. That makes it important to select an appropriate flavor, so that its necessary behaviour
+can be carried across to the taste without any need for coding. The decision on which flavor to use is not in the first
+instance a matter of document presentation: the taste will supply its own rendering styling, in the form of CSS stylesheets
+and PDF stylesheets. But it does require consistent behaviour for document metadata, validation, XML processing,
+and cross-referencing—all those aspects of document generation that cannot currently be left up to attribute configuration.
+For example, if ISO is used as a base flavor, the taste will inherit ISO's styling of subclause cross-references (i.e. that ISO
+does not prefix subclause numbers with "Clause"); ISO's validation rules around language and numbers; ISO's sequencing of
+sections; and so on.
+
+Of the eight tastes defined as of this writing, four are based on ISO. ISO is a familiar SDO, with broadly known and rigorous
+rules around document structure, and SDOs often intend at least some of their documents to be also published through ISO. Another
+three are based on Ribose, the house standard format for the developers of Metanorma: this takes advantage of the fact that
+Ribose has full control over the document format for the Ribose flavor, and can adjust it to encompass the requirements of
+tastes—but also the fact that, compared to ISO, Ribose is a relatively bare-bones document format. One taste, finally, CSA,
+is based on metanorma-generic, a Metanorma flavor which allows for more extensive configuration through YAML
+(the `customize` file attribute), but which also presupposes some degree of coding (unlike tastes).
+
+=== 2. Output formats
+
+You will need to select which output formats should be generated for the taste; these must be a subset of the formats supported
+by the flavor. Since the taste renders documents through code for the base flavor, the rendering of output formats will be
+a modification of the styling of the base flavor, and will normally be undertaken on your behalf by Metanorma staff, who will
+align your formatting needs to the structures of the base flavor. This is a relatively light-weight task for HTML output,
+involving changes in the CSS stylesheet and the coverpage. It is a more involved task for DOC output, as the coverpage needs
+to be created in Word HTML, which is more idiosyncratic. In the case of PDF, it involves custom development of XSLT stylesheets,
+either supplementing or replacing the XSLT stylesheet for the base flavor.
+
+=== 3. Initial metadata
+
+At the outset, a taste is defined through some base metadata, provided in the `data/{TASTE}/config.yaml` configuration file,
+which needs to be created:
+
+`flavor`:: the abbreviated name of the taste
+`base-flavor`:: the pre-existing full flavor of Metanorma that the taste is derived from
+`owner`:: the name of the SDO for the taste
+
+=== 4. Document attributes
+
+The customisation of document behaviour under tastes is substantially done through document attributes, which are inserted
+in the document header of a Metanorma document in preprocessing. The repertoire of document attributes is given on
+metanorma.org, in https://www.metanorma.org/author/ref/document-attributes/[Document attributes], supplemented by
+the Document attributes specific to the chosen flavor,
+e.g. https://www.metanorma.org/author/iso/ref/document-attributes/[Document attributes for ISO]. Document attributes
+can add or remove behaviour from the base flavor, but there are limits to what customisation of behaviour they make available,
+and it may not be feasible for behaviour to be taken away from the base flavour for the sake of a taste. You will need
+to negotiate your requirements with the Metanorma developers.
+
+There are two types of attribute that can be added to a taste: value attributes, which involve strings (either single values, or
+comma or semicolon-delimited lists of values), and filename attributes.
+
+Because of the serialisation tool that Metanorma Taste uses, the document attributes available for use in Metanorma Taste
+is preset, and need to be updated in code; the list defined currently is available in `/lib/metanorma/taste/value_attributes.rb`
+and `/lib/metanorma/taste/filename_attributes.rb`, respectively. (This even includes the `presentation-metadata-*` document attributes,
+which are open-ended in Asciidoc processing.) You will need to contact Metanorma developers to add an attribute for your taste.
+
+==== 4.1 Value attributes
+
+Value attributes are given under `base-override: value-attributes` in the `config.yaml` configuration file. They relate
+to document metadata, document structure, or document rendering:
+
+===== Document metadata
+
+`publisher`:: (mandatory) the publisher name, overriding the publisher name in the base flavor; this is the full name of the SDO,
+as it should appear in document metadata and boilerplate
+`publisher_abbr`:: the canonical abbreviation of the SDO, as it should appear in document metadata and boilerplate
+(cf. "ISO" for "International Organization for Standardization).
+
+===== Document structure
+Table of contents::
+`toclevels`::: Default number of clause levels to be included in all tables of contents
+`toclevels-html`::: Number of clause levels to be included in HTML tables of contents
+`toclevels-doc`::: Number of clause levels to be included in DOC tables of contents
+`toclevels-pdf`::: Number of clause levels to be included in PDF tables of contents
+`toc-figures`::: Directive to include a table of figures alongside the table of contents
+`toc-tables`::: Directive to include a table of tables alongside the table of contents
+`toc-recommendations`::: Directive to include a table of provisions (requirements, recommendations, permissions) alongside the table of contents
+
+===== Rendering
+
+CSS base attributes (applied to HTML and DOC output)::
+`body-font`::: The default font to use for HTML and DOC, passed as a parameter to CSS stylesheets (potentially the base flavor stylesheet,
+if no distinct stylesheet is supplied)
+`header-font`::: Header font to use in HTML and DOC
+`monospace-font`::: Monospace font to use in HTML and DOC
+Fonts (applied to PDF and DOC primarily: HTML uses web fonts)::
+`fonts`::: Comma-delimited font names, as defined in the `Fontist` library. Exceptionally, this document attribute value is added to
+any value of the attribute provided by the user in the document; normally a user-provided value overrides the taste default value.
+Output formats::
+`output-extensions`::: Comma-delimited list of formats to be output for the taste. This must be a subset of the formats defined for
+the base flavor; the attribute allows it to be a proper subset, and to suppress formats supported by the base flavor.
+Presentation Metadata::
+Various idiosyncratic key/value pairs to be passed to the Presentation XML for processing, primarily by PDF. Includes directives
+for colors, ordered list labels and unordered list bullets, delimiters between annex label and title, back cover text, and
+middle title template. Custom requirements will need to be included through code.
+
+==== 4.2 Filename attributes
+Filename attributes give the file location of various configuration and template files and images, which are used to generate the document.
+These files are stored in `data/{TASTE}/*` along with the configuration YAML file; the preprocessing of the document attributes
+invokes them from the directory where Metanorma Taste is installed on the computer. 
+
+As described above, these files will need to align to the requirements of the base flavor, and will be prepared by Metanorma
+developers.
+
+`copyright_notice`:: The boilerplate text for the taste, following the structure given in
+https://www.metanorma.org/develop/topics/metadata-and-boilerplate/#boilerplate[Predefined text]. This file 
+supplies taste-specific copyright, legal, license and feedback text (the latter including contact information),
+and it takes the form of a Liquid template for Metanorma Asciidoc, populated with template variables drawn
+from the document attributes.
+`i18n_dictionary`:: Internationalisation file for the taste, providing reusable snippets of text (e.g. terms and definitions front text,
+normative references front text) and standardised renderings of words specific to the taste (e.g. custom name for formulas,
+warnings, doctype labels -- for which its use is expected). This follows the structure given 
+in https://www.metanorma.org/develop/topics/localization/[Localization]. 
+`customize`:: Customisation file for `metanorma-generic`, for tastes based on that flavor. This file follows the structure given
+in https://www.metanorma.org/develop/topics/simple-adoption/[Creating your own Metanorma flavor].
+CSS files::
+`htmlstylesheet`::: HTML CSS stylesheet for taste, supplementing the stylesheet of the base flavor.
+`htmlstylesheet_override`::: HTML CSS stylesheet for taste, replacing the stylesheet of the base flavor.
+`wordstylesheet`::: DOC CSS stylesheet for taste, supplementing the stylesheet of the base flavor.
+`wordstylesheet_override`::: DOC CSS stylesheet for taste, replacing the stylesheet of the base flavor.
+`pdfstylesheet`::: PDF XSLT stylesheet for taste, supplementing the stylesheet of the base flavor.
+`pdfstylesheet_override`::: PDF XSLT stylesheet for taste, replacing the stylesheet of the base flavor.
+Cover pages::
+`htmlcoverpage`::: Cover page for HTML output as Liquid Template in HTML, populated with variables from document metadata, following
+the structure given in https://www.metanorma.org/develop/topics/metadata-and-boilerplate/#default-metadata[Default metadata values].
+`htmlintropage`::: Introductory page for HTML, as above
+`wordcoverpage`::: Cover page for DOC, as above
+`wordintropage`::: Introductory page for DOC, as above
+`header`::: Header and footer for DOC, as above, following Word HTML formatting for that information
+PDF portfolio::
+`coverpage_pdf_portfolio`::: The fallback PDF to be rendered for PDF portfolios, in PDF viewers that do not support that format.
+Unlike other attributes, this is processed in Metanorma collections, not in the compilation of standalone Metanorma documents.
+Images::
+`publisher_logo`::: Logo for the SDO, to be included in cover pages for supported formats.
+`coverpage_image`::: Image to be included alongside any SDO logo, for all documents under the taste.
+`backpage_image`::: Image to be placed on the back page of all documents under the taste. Normally implemented only for PDF.
+
+==== 5. Metadata dictionaries
+
+Metanorma flavors presuppose different lists of possible values for certain document metadata attributes, such as the legal document
+types (doctype), or the allowed document stages of publication. An SDO may require different possible values for the taste, but the taste is
+implemented as a configuration of the base flavor, so it necessarily uses the base flavor's document types and publication stages.
+
+This discrepancy is addressed for tastes by including a dictionary in the taste configuration, mapping between taste values and base flavor
+values. As far as Metanorma processing is concerned, the document is processed with the base flavor value, as that is what is recognised
+on code. The document's Presentation XML also includes the taste's value for the category, and Metanorma renderers are instructed
+to use that in preference to the base flavor's label, when displaying the information in rendering.
+
+===== 5.1 Doctype
+
+The `doctypes` map provides a list of structs: a `taste` value, for the taste's label of the doctype, and a `base` value, for the
+corresponding value in the base flavor to be used in processing.
+
+Occasionally, a doctype may introduce document attributes specific to it, these are indicated with `override-attributes`. For
+example, under ICC, the `specification` doctype (mapped to ISO `international-standard`) has its own value of
+secondary color; this is indicated as:
+
+[source,asciidoc]
+----
+doctypes:
+- taste: specification
+  base: international-standard
+  override-attributes:
+  - presentation-metadata-color-secondary: '#376795'
+----
+
+===== 5.2 Stage
+
+A limited number of tastes (CSA, PDFA) also provide a dictionary of stage values. Unlike the doctype, this does not map to the base flavor,
+but gives the listing of stages applicable to the taste. The dictionary is formatted as for `metanorma-generic`: it gives a hash
+of stage names, mapping optionally to standard stage abbreviations. Each stage may optionally have a boolean value given for whether it
+is the `default` stage applied to documents (legal for only one stage), and whether it constitutes a `published` stage (may apply to more
+than one stage). So CSA has the following stage dictionary:
+
+[source,asciidoc]
+----
+stages:
+  proposal:
+  working-draft:
+    abbreviation: wd
+  committee-draft:
+    abbreviation: cd
+  draft-standard:
+    abbreviation: d
+  final-draft:
+  published:
+    default: true
+    published: true
+  withdrawn:
+    published: true
+----
+
+
+
