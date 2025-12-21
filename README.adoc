@@ -647,6 +647,8 @@ taste = Metanorma::TasteRegister.get(:acme)
 * Must be valid Ruby constant names when capitalized
 * Should reflect the owner organization's name
 
+For more complete instructions, see link:Create-Taste.adoc[Creating a taste].
+
 
 == Copyright
 

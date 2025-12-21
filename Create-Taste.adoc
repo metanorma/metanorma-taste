@@ -1,0 +1,3 @@
+== Creating a Taste
+
+Consult the link:README.adoc[README] on necessary background information on how tastes work and are configured.
