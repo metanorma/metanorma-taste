@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:mn="https://www.metanorma.org/ns/standoc" xmlns:mnx="https://www.metanorma.org/ns/xslt" xmlns:mathml="http://www.w3.org/1998/Math/MathML" xmlns:xalan="http://xml.apache.org/xalan" xmlns:fox="http://xmlgraphics.apache.org/fop/extensions" xmlns:pdf="http://xmlgraphics.apache.org/fop/extensions/pdf" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:java="http://xml.apache.org/xalan/java" xmlns:barcode="http://barcode4j.krysalis.org/ns" xmlns:redirect="http://xml.apache.org/xalan/redirect" exclude-result-prefixes="java" extension-element-prefixes="redirect" version="1.0">
+<?xml version="1.0" encoding="UTF-8"?><xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:mn="https://www.metanorma.org/ns/standoc" xmlns:mnx="https://www.metanorma.org/ns/xslt" xmlns:mathml="http://www.w3.org/1998/Math/MathML" xmlns:xalan="http://xml.apache.org/xalan" xmlns:fox="http://xmlgraphics.apache.org/fop/extensions" xmlns:pdf="http://xmlgraphics.apache.org/fop/extensions/pdf" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:java="http://xml.apache.org/xalan/java" xmlns:barcode="http://barcode4j.krysalis.org/ns" xmlns:redirect="http://xml.apache.org/xalan/redirect" xmlns:svg="http://www.w3.org/2000/svg" exclude-result-prefixes="java" extension-element-prefixes="redirect" version="1.0">
 
 	<xsl:attribute-set name="root-style">
 		<xsl:attribute name="font-family">Times New Roman, Cambria Math, <xsl:value-of select="$font_noto_serif"/></xsl:attribute>
@@ -47,33 +47,87 @@
 			<fo:flow flow-name="xsl-region-body">
 				<xsl:call-template name="insert_firstpage_id"><xsl:with-param name="num" select="$num"/></xsl:call-template>
 				
+				<xsl:variable name="ratio">0.82</xsl:variable>
+				
 				<fo:table table-layout="fixed" width="100%">
 					<fo:table-column column-width="proportional-column-width(1)"/>
 					<fo:table-column column-width="proportional-column-width(1)"/>
 					<fo:table-body>
 						<fo:table-row>
 							<fo:table-cell>
-								<fo:block font-size="16.5pt" line-height="1.36">
-									<xsl:variable name="doctype"><xsl:call-template name="getDoctype"/></xsl:variable>
-									<xsl:variable name="doctype_capitalized">
-										<xsl:call-template name="capitalizeWords"><xsl:with-param name="str" select="$doctype"/></xsl:call-template>
-									</xsl:variable>
+								<xsl:variable name="doctype"><xsl:call-template name="getDoctype"/></xsl:variable>
+								<xsl:variable name="doctype_capitalized">
+									<xsl:call-template name="capitalizeWords"><xsl:with-param name="str" select="$doctype"/></xsl:call-template>
+								</xsl:variable>
+								<!-- <fo:block font-size="16.5pt" line-height="1.36">
 									<xsl:call-template name="capitalize_oiml">
 										<xsl:with-param name="str" select="$doctype_capitalized"/>
 										<xsl:with-param name="font_size_capital">22</xsl:with-param>
 									</xsl:call-template>
+								</fo:block> -->
+								<xsl:variable name="doctype_splitted">
+									<xsl:call-template name="split">
+										<xsl:with-param name="pText" select="$doctype_capitalized"/>
+										<xsl:with-param name="sep" select="' '"/>
+									</xsl:call-template>
+								</xsl:variable>
+								<fo:block margin-top="-2mm">
+									<fo:instream-foreign-object fox:alt-text="doctype" width="100%" content-height="100%" scaling="uniform">
+										<svg xmlns="http://www.w3.org/2000/svg" width="60mm" height="60mm">
+											<xsl:variable name="y">30</xsl:variable>
+											<xsl:for-each select="xalan:nodeset($doctype_splitted)//mnx:item">
+												<!-- <xsl:copy-of select="."/> -->
+												<text font-family="Futura PT Book" x="0" y="{$y * position() + 10 * (position() - 1)}" font-size="19pt" transform="scale({$ratio},1)">
+													<xsl:call-template name="capitalize_oiml">
+														<xsl:with-param name="str" select="."/>
+														<xsl:with-param name="font_size_capital">25</xsl:with-param>
+														<xsl:with-param name="element_name">svg:tspan</xsl:with-param>
+													</xsl:call-template>
+												</text>
+											</xsl:for-each>
+										</svg>
+									</fo:instream-foreign-object>
 								</fo:block>
 							</fo:table-cell>
 							<fo:table-cell text-align="right">
-								<fo:block font-size="27pt" font-family="Futura PT Demi"> <!-- Futura-Heavy font-weight="900"  Futura PT Heavy margin-top="-2mm"-->
-									<!-- Example: OIML R 60-1 -->
+								<!-- Example: OIML R 60-1 -->
+								<!-- <fo:block font-size="27pt" font-family="Futura PT Demi"> 
 									<xsl:value-of select="$docidentifier"/>
 									<xsl:if test="$title_complementary != ''"><xsl:text> </xsl:text></xsl:if>
 									<xsl:copy-of select="$title_complementary"/>
+								</fo:block> -->
+								<fo:block>
+									<fo:instream-foreign-object fox:alt-text="docidentifier" width="100%" content-height="100%" scaling="uniform">
+										<svg xmlns="http://www.w3.org/2000/svg" width="250" height="35">
+											<xsl:if test="$title_complementary != ''">
+												<xsl:attribute name="height">70</xsl:attribute>
+											</xsl:if>
+											<g font-family="Futura PT Demi" font-size="28pt" transform="scale({$ratio},1)">
+												<text x="{250 div $ratio}" y="25" text-anchor="end">
+													<xsl:value-of select="$docidentifier"/>
+												</text>
+												<xsl:if test="$title_complementary != ''">
+													<text x="{250 div $ratio}" y="60" text-anchor="end">
+														<xsl:value-of select="$title_complementary"/>
+													</text>
+												</xsl:if>
+											</g>
+										</svg>
+									</fo:instream-foreign-object>
 								</fo:block>
-								<fo:block font-size="15.5pt" margin-top="2mm" margin-right="2mm"> <!-- margin-top="5mm" -->
-									<!-- Edition 2021 (E) -->
+								<!-- Edition 2021 (E) -->
+								<!-- <fo:block font-size="15.5pt" margin-top="2mm" margin-right="2mm">
 									<xsl:value-of select="$edition"/>
+								</fo:block> -->
+								<fo:block margin-top="1mm">
+									<fo:instream-foreign-object fox:alt-text="edition" width="100%" content-height="100%" scaling="uniform">
+										<svg xmlns="http://www.w3.org/2000/svg" width="250" height="60">
+											<!-- <line x1="250" y1="0" x2="250" y2="50" stroke="red" /> -->
+											<text font-family="Futura PT Book" x="{250 div $ratio}" y="20" font-size="18pt" transform="scale({$ratio},1)" text-anchor="end" dominant-baseline="middle">
+												<xsl:value-of select="$edition"/>
+											</text>
+										</svg>
+									</fo:instream-foreign-object>
 								</fo:block>
 							</fo:table-cell>
 						</fo:table-row>
@@ -181,14 +235,27 @@
 									</fo:block>
 								</fo:table-cell>
 								<fo:table-cell text-align="right" role="SKIP">
-									<fo:block border-bottom="0.5pt solid black" padding-bottom="3mm">
-										<xsl:variable name="oiml_fr">Organisation Internationale de Métrologie Légale</xsl:variable>
+									<fo:block border-bottom="0.5pt solid black">
+										<!-- <xsl:variable name="oiml_fr">Organisation Internationale de Métrologie Légale</xsl:variable>
 										<xsl:call-template name="capitalize_oiml">
 											<xsl:with-param name="str" select="$oiml_fr"/>
+										</xsl:call-template> -->
+										<xsl:variable name="oiml_fr_part1">Organisation Internationale</xsl:variable>
+										<xsl:variable name="oiml_fr_part2">de Métrologie Légale</xsl:variable>
+										<xsl:call-template name="insert_oiml_title">
+											<xsl:with-param name="oiml_part1" select="$oiml_fr_part1"/>
+											<xsl:with-param name="oiml_part2" select="$oiml_fr_part2"/>
 										</xsl:call-template>
 									</fo:block>
 									<fo:block padding-top="3mm">
-										<xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'publisher']/mn:organization/mn:name/node()" mode="capitalize"/>
+										<!-- <xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'publisher']/mn:organization/mn:name/node()" mode="capitalize"/> -->
+										<xsl:variable name="oiml" select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'publisher']/mn:organization/mn:name"/>
+										<xsl:variable name="oiml_part1" select="substring-before($oiml, ' of ')"/>
+										<xsl:variable name="oiml_part2" select="concat(' of ' , substring-after($oiml, ' of '))"/>
+										<xsl:call-template name="insert_oiml_title">
+											<xsl:with-param name="oiml_part1" select="$oiml_part1"/>
+											<xsl:with-param name="oiml_part2" select="$oiml_part2"/>
+										</xsl:call-template>
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
@@ -197,33 +264,74 @@
 				</fo:block-container>
 				
 				<!-- vertical identifier -->
-				<fo:block-container position="absolute" left="-63mm" top="1mm" reference-orientation="90" font-size="11.5pt" text-align="left" role="SKIP"> <!-- top="215mm"  -->
+				<fo:block-container position="absolute" left="-63.5mm" top="0mm" reference-orientation="90" font-size="11.5pt" text-align="left" role="SKIP"> <!-- top="215mm"  -->
 					<fo:block>
-						<xsl:value-of select="$docidentifier"/>
-						<xsl:if test="$title_complementary != ''"><xsl:text> </xsl:text></xsl:if>
-						<xsl:copy-of select="$title_complementary"/>
-						<xsl:text>&#xa0;</xsl:text>
-						<xsl:value-of select="$edition"/>
+						<xsl:variable name="docidentifier_full">
+							<xsl:value-of select="$docidentifier"/>
+							<xsl:if test="$title_complementary != ''"><xsl:text> </xsl:text></xsl:if>
+							<xsl:copy-of select="$title_complementary"/>
+							<xsl:text>&#xa0;</xsl:text>
+							<xsl:value-of select="$edition"/>
+						</xsl:variable>
+						<!-- <xsl:value-of select="$docidentifier_full"/> -->
+						<fo:instream-foreign-object fox:alt-text="doctype" width="100%" content-height="100%" scaling="uniform">
+							<svg xmlns="http://www.w3.org/2000/svg" width="100mm" height="10mm">
+								<text font-family="Futura PT Book" x="0" y="15" font-size="13pt" transform="scale(0.85,1)">
+									<xsl:value-of select="$docidentifier_full"/>
+								</text>
+							</svg>
+						</fo:instream-foreign-object>
 					</fo:block>
 				</fo:block-container>
 			</fo:flow>
 		</fo:page-sequence>
 	</xsl:template> <!-- END cover-page -->
 
+	<xsl:template name="insert_oiml_title">
+		<xsl:param name="oiml_part1"/>
+		<xsl:param name="oiml_part2"/>
+		<xsl:param name="ratio">0.82</xsl:param>
+		<fo:instream-foreign-object fox:alt-text="doctype" width="100%" content-height="100%" scaling="uniform">
+			<svg xmlns="http://www.w3.org/2000/svg" width="250" height="52">
+				<g font-family="Futura PT Book" font-size="13pt" transform="scale({$ratio},1)">
+					<text x="{250 div $ratio}" y="15" text-anchor="end">
+						<xsl:call-template name="capitalize_oiml">
+							<xsl:with-param name="str" select="$oiml_part1"/>
+							<xsl:with-param name="font_size_capital">17</xsl:with-param>
+							<xsl:with-param name="element_name">svg:tspan</xsl:with-param>
+						</xsl:call-template>
+					</text>
+					<text x="{250 div $ratio}" y="42" text-anchor="end">
+						<xsl:call-template name="capitalize_oiml">
+							<xsl:with-param name="str" select="$oiml_part2"/>
+							<xsl:with-param name="font_size_capital">17</xsl:with-param>
+							<xsl:with-param name="element_name">svg:tspan</xsl:with-param>
+						</xsl:call-template>
+					</text>
+				</g>
+			</svg>
+		</fo:instream-foreign-object>
+	</xsl:template>
+	
 	<xsl:template match="text()" mode="capitalize" name="capitalize_oiml">
 		<xsl:param name="str" select="."/>
 		<xsl:param name="font_size_capital">15</xsl:param>
+		<xsl:param name="element_name">fo:inline</xsl:param>
 		<xsl:if test="string-length($str) &gt; 0">
 			<xsl:variable name="char" select="substring($str, 1,1)"/>
 			<xsl:choose>
 				<xsl:when test="normalize-space(java:java.lang.Character.isUpperCase($char)) = 'true'">
-					<fo:inline font-size="{$font_size_capital}pt"><xsl:value-of select="$char"/></fo:inline>
+					<xsl:element name="{$element_name}">
+						<xsl:attribute name="font-size"><xsl:value-of select="$font_size_capital"/>pt</xsl:attribute>
+						<xsl:value-of select="$char"/>
+					</xsl:element>
 				</xsl:when>
 				<xsl:otherwise><xsl:value-of select="java:java.lang.Character.toUpperCase($char)"/></xsl:otherwise>
 			</xsl:choose>
 			<xsl:call-template name="capitalize_oiml">
 				<xsl:with-param name="str" select="substring($str, 2)"/>
 				<xsl:with-param name="font_size_capital" select="$font_size_capital"/>
+				<xsl:with-param name="element_name" select="$element_name"/>
 			</xsl:call-template>
 		</xsl:if>
 	</xsl:template>
