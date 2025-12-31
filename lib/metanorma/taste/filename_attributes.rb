@@ -48,7 +48,7 @@ module Metanorma
         map "customize", to: :customize
         map "coverpage-image", to: :coverpage_image
         map "backpage-image", to: :backpage_image
-        map "coverpage-pdf_portfolio", to: :coverpage_pdf_portfolio
+        map "coverpage-pdf-portfolio", to: :coverpage_pdf_portfolio
       end
     end
   end
