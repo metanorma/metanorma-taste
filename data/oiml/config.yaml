@@ -8,6 +8,7 @@ base-override:
     i18n-dictionary: i18n.yaml
     publisher-logo: oiml-logo.svg
     pdf-stylesheet-override: oiml.xsl
+    coverpage-pdf-portfolio: pdfportfolio_taste_page.pdf
   value-attributes:
     publisher: International Organization of Legal Metrology
     publisher_abbr: OIML
