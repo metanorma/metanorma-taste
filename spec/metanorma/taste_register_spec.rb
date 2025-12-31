@@ -1,6 +1,7 @@
 require_relative "../spec_helper"
 
 RSpec.describe Metanorma::TasteRegister do
+
   let(:register) { described_class.instance }
 
   describe "#available_tastes" do
@@ -14,6 +15,7 @@ RSpec.describe Metanorma::TasteRegister do
       info = register.get_config(:icc)
       expect(info).to be_a(Metanorma::Taste::TasteConfig)
       expect(info.flavor).to eq("icc")
+      expect(info.directory).to eq(Pathname.new(File.join(File.dirname(__FILE__), "..", "..", "data", "icc")).cleanpath.to_s)
       expect(info.owner).to eq("International Color Consortium")
       expect(info.base_flavor).to eq("iso")
       expect(info.base_override.value_attributes.publisher).to eq("International Color Consortium")

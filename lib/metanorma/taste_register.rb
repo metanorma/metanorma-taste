@@ -207,7 +207,7 @@ module Metanorma
     #
     # @return [String] Path to the data directory
     def data_directory
-      File.join(File.dirname(__FILE__), "..", "..", "data")
+      Pathname.new(File.join(File.dirname(__FILE__), "..", "..", "data")).cleanpath.to_s
     end
 
     # Find all valid taste directories in the data directory
