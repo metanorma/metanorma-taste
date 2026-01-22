@@ -267,6 +267,7 @@ base-override:             # Document attributes to override from base flavor
     customize: string          # Path to custom metanorma configuration file
     coverpage-image: string    # Path to coverpage image file
     backpage-image: string     # Path to backpage image file
+    relaton-render-config: string      # Path to Relaton Render configuration YAML
   value-attributes:        # Metanorma document attributes that contain values
     publisher: string        # Publisher name override
     publisher_abbr: string   # Publisher abbreviation
@@ -460,6 +461,9 @@ Path to custom metanorma configuration file
 
 `coverpage-image`, `backpage-image`::
 Cover and back page image files
+
+`relaton-render-config`::
+Configuration for Relaton Render (rendering of citations)
 
 
 ==== Value attributes (`value-attributes`)

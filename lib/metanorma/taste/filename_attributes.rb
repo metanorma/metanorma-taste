@@ -27,6 +27,8 @@ module Metanorma
       attribute :coverpage_image, :string
       attribute :backpage_image, :string
       attribute :coverpage_pdf_portfolio, :string
+      attribute :relaton_render_config, :string
+
 
       key_value do
         map "copyright-notice", to: :copyright_notice
@@ -49,6 +51,7 @@ module Metanorma
         map "coverpage-image", to: :coverpage_image
         map "backpage-image", to: :backpage_image
         map "coverpage-pdf-portfolio", to: :coverpage_pdf_portfolio
+        map "relaton-render-config", to: :relaton_render_config
       end
     end
   end

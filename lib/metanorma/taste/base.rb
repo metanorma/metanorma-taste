@@ -198,6 +198,7 @@ module Metanorma
           coverpage_image: "coverpage-image",
           backpage_image: "backpage-image",
           coverpage_pdf_portfolio: "coverpage-pdf-portfolio",
+          relaton_render_config: "relaton-render-config",
         }
       end
 
