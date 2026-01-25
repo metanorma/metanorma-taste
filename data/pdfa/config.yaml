@@ -10,6 +10,7 @@ base-override:
     htmlcoverpage: htmlcoverpage.html
     htmlstylesheet-override: htmlstylesheet-override.scss
     pdf-stylesheet-override: pdfa.xsl
+    # relaton-render-config: relaton-render-config.yaml
   value-attributes:
     publisher: PDF Association
     publisher_abbr: PDF Association
