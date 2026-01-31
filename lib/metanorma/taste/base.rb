@@ -2,6 +2,7 @@
 
 require_relative "taste_config"
 require_relative "doctype"
+require_relative "committee"
 
 module Metanorma
   module Taste
@@ -9,7 +10,7 @@ module Metanorma
     #
     # This class handles the processing of AsciiDoc attributes for
     # taste-specific # document generation, including filename-based attributes,
-    # value-based attributes,and doctype-specific transformations.
+    # value-based attributes, and doctype-specific transformations.
     #
     # @example Basic usage
     #   config = TasteConfig.from_yaml(yaml_content)
@@ -133,6 +134,7 @@ module Metanorma
       # - Filename-based attributes (copyright, logo, i18n, stylesheets)
       # - Value-based attributes (publisher, fonts, presentation metadata)
       # - Doctype-specific overrides
+      # - Committee overrides
       #
       # @param attrs [Array<String>] Original attributes array
       # @return [Array<Array<String>, Array<String>>] Tuple of [original_attrs, override_attrs]
@@ -142,6 +144,7 @@ module Metanorma
         add_file_based_overrides(override_attrs)
         add_base_configuration_overrides(override_attrs, attrs)
         apply_doctype_overrides(attrs, override_attrs)
+        apply_committee_overrides(attrs, override_attrs)
         [attrs, override_attrs]
       end
 

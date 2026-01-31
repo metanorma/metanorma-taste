@@ -281,6 +281,12 @@ doctypes:                  # Array of doctypes built over base flavour doctypes
   - taste:                 # taste-specific machine-readable doctype name
     base:                  # Base Metanorma flavor corresponding machine-readable doctype name
     override-attributes:   # Hash of document attributes to override from base flavor for this doctype
+committees:                # Hash of predefined editorial groups for the SDO
+  committee-type:          # Name of editorial group class, will be used as document attribute
+     - name:               # Name of editorial group
+     - abbrev:             # Abbreviation of editorial group
+     - number:             # Untyped identifier of editorial group (the abbrev is assumed prefixed to it)
+     - logo:               # Logo of editorial group
 ----
 
 .Taste configuration example from ICC
@@ -311,6 +317,45 @@ doctypes:
   base: international-standard
   override-attributes:
   - presentation-metadata-color-secondary: '#376795'
+----
+====
+
+.Taste configuration example from MBxIF
+[example]
+====
+[source,yaml]
+----
+flavor: mbxif
+owner: MBx Interoperability Forum
+base-flavor: ribose
+base-override:
+  filename-attributes:
+    copyright-notice: copyright.adoc
+    i18n-dictionary: i18n.yaml
+    publisher-logo: mbxif-logos_mbxif.svg
+    pdf-stylesheet-override: mbxif.xsl
+    coverpage-image: mbxif-front-cover.pdf
+    backpage-image: mbxif-back-cover.pdf
+  value-attributes:
+    publisher: MBx Interoperability Forum
+    publisher_abbr: MBx-IF
+    presentation-metadata-color-secondary: '#007724'
+    presentation-metadata-backcover-text: https://www.mbx-if.org
+    fonts: Nacelle;Nacelle SemiBold;Nacelle Light
+    output-extensions: xml,html,pdf,doc
+doctypes:
+- taste: recommended-practices
+  base: standard
+- taste: general-guidelines
+  base: report
+committees:
+  interoperability-forum:
+    - name: Computer Aided "x" Interoperability Forum
+      abbrev: CAx-IF
+      logo: mbxif-logos_caxif.svg
+    - name: Product Data Management Interoperability Forum
+      abbrev: PDM-IF
+      logo: mbxif-logos_pdmif.svg
 ----
 ====
 

@@ -4,6 +4,7 @@ require "lutaml/model"
 require_relative "base_override"
 require_relative "doctype_config"
 require_relative "stage_config"
+require_relative "committee_config"
 
 module Metanorma
   module Taste
@@ -15,6 +16,7 @@ module Metanorma
       attribute :base_override, BaseOverride
       attribute :doctypes, DoctypeConfig, collection: true
       attribute :stages, StageConfig, collection: true
+      attribute :committees, Committees
       attribute :directory, :string
 
       key_value do
@@ -24,6 +26,7 @@ module Metanorma
         map "base-override", to: :base_override
         map "doctypes", to: :doctypes
         map "stages", to: :stages
+        map "committees", to: :committees
       end
     end
   end
