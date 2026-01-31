@@ -16,21 +16,31 @@ module Metanorma
       # @param attrs [Array<String>] The attributes array (modified in place)
       # @param override_attrs [Array<String>] Array to append override attributes to
       def apply_committee_overrides(attrs, override_attrs)
-        return unless @config.committees&.categories
+        return unless @config.committees&.any?
 
         # Add committee-types attribute with all category keys
         add_committee_types(override_attrs)
 
-        @config.committees.categories.each do |category|
-          process_committee_category(attrs, override_attrs, category)
+        # Group items by category for processing
+        categories = group_committees_by_category
+
+        categories.each do |category_key, items|
+          process_committee_category(attrs, override_attrs, category_key, items)
         end
+      end
+
+      # Group committee items by their category for processing
+      #
+      # @return [Hash<String, Array<CommitteeItem>>] Hash of category keys to items
+      def group_committees_by_category
+        @config.committees.group_by(&:category)
       end
 
       # Add committee-types attribute listing all available committee categories
       #
       # @param override_attrs [Array<String>] Array to append override attributes to
       def add_committee_types(override_attrs)
-        category_keys = @config.committees.categories.map(&:category_key)
+        category_keys = @config.committees.map(&:category).compact.uniq
         return if category_keys.empty?
 
         override_attrs << ":committee-types: #{category_keys.join(',')}"
@@ -40,16 +50,16 @@ module Metanorma
       #
       # @param attrs [Array<String>] The attributes array (modified in place)
       # @param override_attrs [Array<String>] Array to append override attributes to
-      # @param category [CommitteeCategory] The committee category to process
-      def process_committee_category(attrs, override_attrs, category)
-        category_key = category.category_key
+      # @param category_key [String] The category key
+      # @param items [Array<CommitteeItem>] The committee items for this category
+      def process_committee_category(attrs, override_attrs, category_key, items)
         matching_attrs = find_committee_attributes(attrs, category_key)
 
         matching_attrs.each do |index, suffix|
           attr_value = extract_committee_abbrev(attrs[index])
           next unless attr_value
 
-          item = find_committee_item(category, attr_value)
+          item = find_committee_item(items, attr_value)
           next unless item
 
           # Transform the committee attribute in place
@@ -91,11 +101,11 @@ module Metanorma
 
       # Find the committee item for a given abbreviation
       #
-      # @param category [CommitteeCategory] The committee category
+      # @param items [Array<CommitteeItem>] The committee items to search
       # @param abbrev [String] The committee abbreviation
       # @return [CommitteeItem, nil] The committee item, or nil if not found
-      def find_committee_item(category, abbrev)
-        category.items&.detect { |item| item.abbrev == abbrev }
+      def find_committee_item(items, abbrev)
+        items&.detect { |item| item.abbrev == abbrev }
       end
 
       # Transform the committee attribute from abbreviation to full name

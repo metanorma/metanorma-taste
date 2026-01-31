@@ -16,7 +16,7 @@ module Metanorma
       attribute :base_override, BaseOverride
       attribute :doctypes, DoctypeConfig, collection: true
       attribute :stages, StageConfig, collection: true
-      attribute :committees, Committees
+      attribute :committees, CommitteeItem, collection: true
       attribute :directory, :string
 
       key_value do

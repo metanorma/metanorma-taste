@@ -25,22 +25,27 @@ doctypes:
 - taste: test-suite
   base: report
 committees:
-  interoperability-forum:
-    - name: Computer Aided "x" Interoperability Forum
-      abbrev: CAx-IF
-      logo: mbxif-logos_caxif.svg
-    - name: Product Data Management Interoperability Forum
-      abbrev: PDM-IF
-      logo: mbxif-logos_pdmif.svg
-    - name: Electrical Wire Interconnection Systems Interoperability Forum
-      abbrev: EWIS-IF
-      logo: mbxif-logos_ewisif.svg
-    - name: Computer Aided Engineering Interoperability Forum
-      abbrev: CAE-IF
-      logo: mbxif-logos_caeif.svg
-    - name: Long Term Archiving and Retrieval
-      abbrev: LOTAR
-      logo: mbxif-logos_lotar.svg
-    - name: Jupiter Tessilation (JT) Interoperability Forum
-      abbrev: JT-IF
-      logo: mbxif-logos_jtif.svg
+  - name: Computer Aided "x" Interoperability Forum
+    abbrev: CAx-IF
+    logo: mbxif-logos_caxif.svg
+    category: interoperability-forum
+  - name: Product Data Management Interoperability Forum
+    abbrev: PDM-IF
+    logo: mbxif-logos_pdmif.svg
+    category: interoperability-forum
+  - name: Electrical Wire Interconnection Systems Interoperability Forum
+    abbrev: EWIS-IF
+    logo: mbxif-logos_ewisif.svg
+    category: interoperability-forum
+  - name: Computer Aided Engineering Interoperability Forum
+    abbrev: CAE-IF
+    logo: mbxif-logos_caeif.svg
+    category: interoperability-forum
+  - name: Long Term Archiving and Retrieval
+    abbrev: LOTAR
+    logo: mbxif-logos_lotar.svg
+    category: interoperability-forum
+  - name: Jupiter Tessilation (JT) Interoperability Forum
+    abbrev: JT-IF
+    logo: mbxif-logos_jtif.svg
+    category: interoperability-forum
