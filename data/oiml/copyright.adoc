@@ -23,5 +23,5 @@ Bureau International de Métrologie Légale +
 11, rue Turgot – 75009 Paris – France +
 Telephone: 33 (0)1 48 78 12 82 +
 Fax: 33 (0)1 42 82 17 27 +
-E-mail: link:mailto:biml@oiml.org +
+E-mail: mailto:biml@oiml.org[] +
 Internet: https://www.oiml.org[www.oiml.org]
