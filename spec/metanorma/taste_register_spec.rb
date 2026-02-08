@@ -12,16 +12,17 @@ RSpec.describe Metanorma::TasteRegister do
 
   describe "#get_config" do
     it "returns taste information" do
-      info = register.get_config(:icc)
+      info = register.get_config(:pdfa)
       expect(info).to be_a(Metanorma::Taste::TasteConfig)
-      expect(info.flavor).to eq("icc")
-      expect(info.directory).to eq(Pathname.new(File.join(File.dirname(__FILE__), "..", "..", "data", "icc")).cleanpath.to_s)
-      expect(info.owner).to eq("International Color Consortium")
-      expect(info.base_flavor).to eq("iso")
-      expect(info.base_override.value_attributes.publisher).to eq("International Color Consortium")
+      expect(info.flavor).to eq("pdfa")
+      expect(info.directory).to eq(Pathname.new(File.join(File.dirname(__FILE__), "..", "..", "data", "pdfa")).cleanpath.to_s)
+      expect(info.owner).to eq("PDF Association Inc.")
+      expect(info.base_flavor).to eq("ribose")
+      expect(info.base_override.value_attributes.publisher).to eq("PDF Association")
       expect(info.doctypes.first.taste).to eq("specification")
-      expect(info.doctypes.first.base).to eq("international-standard")
-      expect(info.directory).to end_with(File.join("data", "icc"))
+      expect(info.doctypes.first.base).to eq("standard")
+      expect(info.stages.first.taste).to eq("draft")
+      expect(info.directory).to end_with(File.join("data", "pdfa"))
     end
   end
 
@@ -386,10 +387,18 @@ RSpec.describe Metanorma::TasteRegister do
       # Check that the options hash is updated
       expect(options[":boilerplate-authority:"]).to eq(expected_boilerplate_path)
 
-      result2 = taste2.process_input_adoc_overrides(attrs2, options)
+      result2 = taste2.process_input_adoc_overrides(attrs2.dup, options)
       expect(result2).to include(":doctype: report")
       expect(result2).to include(":presentation-metadata-doctype-alias: application-note")
       expect(result2).to include(":doctype-abbrev: AN")
+      expect(result2).to include(":docstage: published")
+      expect(result2).to include(":docstage-published: true")
+
+      result2 = taste2.process_input_adoc_overrides(attrs2.dup + [":docstage: release-candidate"], options)
+      expect(result2).to include(":docstage: draft")
+      expect(result2).to include(":presentation-metadata-stage-alias: release-candidate")
+      expect(result2).to include(":docstage-abbrev: RC")
+      expect(result2).not_to include(":docstage-published: true")
     end
 
     it "generates output with the correct boilerplate path" do

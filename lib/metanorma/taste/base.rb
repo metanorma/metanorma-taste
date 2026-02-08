@@ -2,6 +2,7 @@
 
 require_relative "taste_config"
 require_relative "doctype"
+require_relative "stage"
 require_relative "committee"
 
 module Metanorma
@@ -144,6 +145,7 @@ module Metanorma
         add_file_based_overrides(override_attrs)
         add_base_configuration_overrides(override_attrs, attrs)
         apply_doctype_overrides(attrs, override_attrs)
+        apply_stage_overrides(attrs, override_attrs)
         apply_committee_overrides(attrs, override_attrs)
         [attrs, override_attrs]
       end

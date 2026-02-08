@@ -42,9 +42,14 @@ doctypes:
   override-attributes:
   - presentation-metadata-color-secondary: '#4891af'
 stages:
-  draft:
-  release-candidate:
-  published:
+  - taste: draft
+    base: draft
+    abbreviation: D
+  - taste: release-candidate
+    base: draft
+    abbreviation: RC
+  - taste: published
+    base: published
     default: true
     published: true
 
