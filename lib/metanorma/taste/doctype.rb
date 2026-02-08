@@ -70,6 +70,8 @@ module Metanorma
       def add_doctype_specific_overrides(override_attrs, doctype_config)
         # Add the doctype alias for presentation metadata
         override_attrs << ":presentation-metadata-doctype-alias: #{doctype_config.taste}"
+        doctype_config.abbrev and
+          override_attrs << ":doctype-abbrev: #{doctype_config.abbrev}"
 
         # Add any additional override attributes defined in the doctype configuration
         add_doctype_override_attributes(override_attrs, doctype_config)

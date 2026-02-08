@@ -337,6 +337,8 @@ RSpec.describe Metanorma::TasteRegister do
     let(:attrs) { [":doctype: specification"] }
     let(:options) { {} }
     let(:taste) { described_class.get(:icc) }
+    let(:taste2) { described_class.get(:pdfa) }
+    let(:attrs2) { [":doctype: application-note"] }
 
     let(:expected_boilerplate_path) do
       # Get the actual path from the taste info
@@ -383,6 +385,11 @@ RSpec.describe Metanorma::TasteRegister do
 
       # Check that the options hash is updated
       expect(options[":boilerplate-authority:"]).to eq(expected_boilerplate_path)
+
+      result2 = taste2.process_input_adoc_overrides(attrs2, options)
+      expect(result2).to include(":doctype: report")
+      expect(result2).to include(":presentation-metadata-doctype-alias: application-note")
+      expect(result2).to include(":doctype-abbrev: AN")
     end
 
     it "generates output with the correct boilerplate path" do

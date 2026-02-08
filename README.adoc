@@ -280,6 +280,7 @@ base-override:             # Document attributes to override from base flavor
 doctypes:                  # Array of doctypes built over base flavour doctypes
   - taste:                 # taste-specific machine-readable doctype name
     base:                  # Base Metanorma flavor corresponding machine-readable doctype name
+    abbrev:                # Taste-specific abbreviation of doctype
     override-attributes:   # Hash of document attributes to override from base flavor for this doctype
 committees:                # Hash of predefined editorial groups for the SDO
     - category:            # Name of editorial group class (typically hierarchical, e.g. technical committee, subcommittee, workgroup)

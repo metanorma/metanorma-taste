@@ -28,14 +28,17 @@ doctypes:
   - presentation-metadata-color-secondary: '#d03f4e'
 - taste: application-note # Application Note
   base: report
+  abbrev: AN
   override-attributes:
   - presentation-metadata-color-secondary: '#ca9831'
 - taste: technical-note # Technical Note
   base: report
+  abbrev: TN
   override-attributes:
   - presentation-metadata-color-secondary: '#ca9831'
 - taste: best-practice-guide # Best Practice Guide
   base: report
+  abbrev: BPG
   override-attributes:
   - presentation-metadata-color-secondary: '#4891af'
 stages:
