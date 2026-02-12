@@ -21,6 +21,7 @@ base-override:
     fonts: Source Sans Pro
     output-extensions: xml,html,pdf
     toclevels-html: 6
+    docidentifier:  '{% assign version = edition | split: "." %}PDFa {{ doctype_abbr }} {{ docnumeric }}{% if docyear %}:{{ docyear }}{% endif %} {% if edition %}({{ edition }}{% if version.size == 2 %}.0{% endif %}{% if version.size == 1 %}.0.0{% endif %}{% endif %} {% if stageabbr %}({{ stageabbr }}){% endif %}'
 doctypes:
 - taste: specification # Specification # The name goes into i18n.yaml
   base: standard
