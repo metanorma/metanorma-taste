@@ -23,6 +23,7 @@ module Metanorma
       attribute :presentation_metadata_ol_label_template_roman_upper, :string
       attribute :presentation_metadata_ol_label_template_arabic, :string
       attribute :fonts, :string
+      attribute :docidentifier, :string
       attribute :output_extensions, :string
       attribute :toclevels, :string
       attribute :htmltoclevels, :string
@@ -39,6 +40,7 @@ module Metanorma
         map "header-font", to: :header_font
         map "monospace-font", to: :monospace_font
         map "fonts", to: :fonts
+        map "docidentifier", to: :docidentifier
         map "presentation-metadata-color-secondary",
             to: :presentation_metadata_color_secondary
         map "presentation-metadata-backcover-text",

@@ -276,6 +276,7 @@ base-override:             # Document attributes to override from base flavor
     monospace-font: string   # Monospace font to use in HTML and Word stylesheets
     fonts: string            # Comma-delimited listing of fonts to retrieve for the taste from Fontist
     output-extensions: string         # Comma-delimited listing of output formats to support (subset of base flavor's)
+    docidentifier          # Template for document identifier, populated with document metadata
     presentation-metadata-*: # Template style attributes for presentation
 doctypes:                  # Array of doctypes built over base flavour doctypes
   - taste: string          # Taste-specific machine-readable doctype name
@@ -536,6 +537,9 @@ Comma-delimited list of fonts to retrieve from Fontist
 
 `output-extensions`::
 Comma-delimited list of supported output formats
+
+`docidentifier`::
+Liquid template for document identifier, populated with document metadata values
 
 `presentation-metadata-*`::
 Visual styling attributes for presentation, including:
