@@ -422,11 +422,11 @@ RSpec.describe Metanorma::TasteRegister do
        attrs = [":fonts: #{fonts}"]
        taste = described_class.get(:pdfa)
        result = taste.process_input_adoc_overrides(attrs, {})
-       expect(result).to include(":fonts: Source Sans Pro;#{fonts}")
+       expect(result).to include(":fonts: Source Sans 3;Source Sans 3 SemiBold;Source Sans Pro;#{fonts}")
 
        attrs = []
        result = taste.process_input_adoc_overrides(attrs, {})
-       expect(result).to include(":fonts: Source Sans Pro")
+       expect(result).to include(":fonts: Source Sans 3;Source Sans 3 SemiBold;Source Sans Pro")
     end
   end
 end
