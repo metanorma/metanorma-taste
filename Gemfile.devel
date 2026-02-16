@@ -1,8 +1,0 @@
-gem "metanorma-cli", git: "https://github.com/metanorma/metanorma-cli", branch: "main"
-gem "isodoc-i18n", git: "https://github.com/metanorma/isodoc-i18n", branch: "main"
-gem "relaton-render", git: "https://github.com/relaton/relaton-render", branch: "main"
-gem "metanorma-iso", git: "https://github.com/metanorma/metanorma-iso", branch: "main"
-gem "metanorma-standoc", git: "https://github.com/metanorma/metanorma-standoc", branch: "main"
-gem "isodoc", git: "https://github.com/metanorma/isodoc", branch: "main"
-
-
