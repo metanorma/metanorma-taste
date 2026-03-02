@@ -305,6 +305,10 @@ p.Biblio, p.NormRef, div.Biblio, div.NormRef {
   text-indent: -2em;
 }
 
+.Biblio.note, .Biblio.Note, .NormRef.note, .NormRef.Note {
+  margin-left: 2em;
+}
+
 /*
 3.6 Source Code + figures
 */
@@ -313,7 +317,7 @@ pre {
   @include monospaceBlockStyle()
 }
 
-.figure,
+figure,
 pre,
 .pseudocode {
   @include pseudocodeBlock(#F5F6F6, rgb(91, 94, 95));
@@ -323,7 +327,7 @@ pre,
   margin: 2em 0 2em -1em;
 }
 
-table div.figure {
+table figure {
   padding: 0;
   margin: 0;
 }
@@ -333,7 +337,7 @@ table div.figure {
 @include recommendationBlock();
 @include listBlock();
 
-.FigureTitle,
+figcaption,
 .SourceTitle {
   @include blockTitle()
 }
