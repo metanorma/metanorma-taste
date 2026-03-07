@@ -1,5 +1,5 @@
 :root {
-  --ribose-primary-color: #d03f4e;
+  --ribose-primary-color: #d03f4e; // PDFa logo red. Required for WCAG Level AA colour contrast
 }
 
 .logo {
@@ -8,7 +8,7 @@
 
 .docidentifier {
   text-align: center;
-  font-size: 48pt;
+  font-size: 18pt;
 }
 
 .doctitle-en {
@@ -17,5 +17,21 @@
 }
 
 .coverpage-container {
-  line-height: initial;
+  line-height: 1.5; // WCAG Level AA recommends 1.5 line height as a minimum
+}
+
+#toc li a, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) li a {
+  text-transform: none; // PDF is case-sensitive! Never force uppercase! 
+}
+
+h1, .h1 {
+  text-transform: none; // PDF is case-sensitive! Never force uppercase! 
+}
+
+.example .example-title {
+  text-transform: none; // PDF is case-sensitive! Never force uppercase! 
+}
+
+a {
+  text-decoration: underline; // WCAG - all links must be clearly visible
 }
