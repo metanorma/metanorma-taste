@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "logger", "1.6.6"
   spec.add_development_dependency "metanorma"
   spec.add_development_dependency "metanorma-cli"
-  spec.add_development_dependency "metanorma-generic", ">= 3.2.3"
+  spec.add_development_dependency "metanorma-generic", ">= 3.3.0"
   spec.add_development_dependency "metanorma-ieee", ">= 1.6.3"
   spec.add_development_dependency "metanorma-iso", ">= 3.3.0"
   spec.add_development_dependency "metanorma-ribose", ">= 2.8.0"
