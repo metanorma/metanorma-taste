@@ -8,6 +8,7 @@
 		<xsl:attribute name="font-size">11pt</xsl:attribute>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="color">black</xsl:attribute>
+		<xsl:attribute name="line-height">1.5</xsl:attribute><!-- WCAG Level AA recommends 1.5 line height as a minimum -->
 	</xsl:attribute-set>
 
 	<xsl:template name="layout-master-set">
@@ -32,7 +33,7 @@
 		
 	<xsl:variable name="cover_page_color_box1">rgb(202,152,49)</xsl:variable>
 	<xsl:variable name="cover_page_color_box2">rgb(139,152,91)</xsl:variable>
-	<xsl:variable name="cover_page_color_box3">rgb(208,63,78)</xsl:variable><!-- #d03f4e -->
+	<xsl:variable name="cover_page_color_box3">rgb(208,63,78)</xsl:variable><!-- #d03f4e PDFa logo red - good contrast for WCAG Level AA -->
 	<xsl:variable name="cover_page_color_box4">rgb(72,145,175)</xsl:variable>
 	<xsl:variable name="cover_page_color_box_border_width">2.5pt</xsl:variable>
 	<xsl:variable name="cover_page_color_box_height">57mm</xsl:variable>
@@ -66,7 +67,7 @@
 					<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) != '']"/>
 				</fo:block>
 				
-				<fo:block-container width="112mm" height="98mm" line-height="1.2" margin-top="4mm" fox:shrink-to-fit="true">
+				<fo:block-container width="112mm" height="98mm" line-height="1.5" margin-top="4mm" fox:shrink-to-fit="true"> <!-- line-height needs to be 1.5 for WCAG Level AA -->
 				
 					<xsl:call-template name="insertCoverPageTitles"/>
 					
@@ -184,7 +185,7 @@
 												</fo:inline>
 											</fo:block>
 											<fo:block font-size="8pt" margin-bottom="2mm">
-												<xsl:text>This work is licensed under CC-BY-4.0 </xsl:text>
+												<xsl:text>This work is licensed under CC-BY-4.0.</xsl:text>
 												<!-- Note: the error occurs [Fatal Error] :1621:113: Character reference "&#55356" is an invalid XML character. -->
 												<!-- Circled CC -->
 												<!-- <fo:inline font-size="10pt"><xsl:call-template name="getCharByCodePoint"><xsl:with-param name="codepoint">1f16d</xsl:with-param></xsl:call-template></fo:inline>
@@ -236,7 +237,9 @@
 
 	<xsl:variable name="circledChars">
 		<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-			 viewBox="0 0 16 6.6" style="enable-background:new 0 0 16 6.6;" xml:space="preserve">
+			 viewBox="0 0 16 6.6" style="enable-background:new 0 0 16 6.6;" xml:space="preserve" aria-hidden="true" >
+			<title>Creative Common icons</title>
+  		<desc>Creative Common graphic icons for CC-BY-4.0.</desc>
 			<style type="text/css">
 				.st0{fill:#010101;}
 			</style>
@@ -264,7 +267,7 @@
 	
 	
 	<xsl:attribute-set name="link-style">
-		<xsl:attribute name="color">rgb(14,85,117)</xsl:attribute>
+		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute><!-- #d03f4e PDFa logo red -->
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="text-decoration">underline</xsl:attribute>
 	</xsl:attribute-set>
@@ -334,13 +337,13 @@
 	</xsl:template>
 	
 	<xsl:attribute-set name="note-style"><?extend?>
-		<xsl:attribute name="background-color">rgb(236,242,246)</xsl:attribute>
+		<xsl:attribute name="background-color">rgb(245,235,206)</xsl:attribute> <!-- PDF Association "logo yellow" converted to HSL and lightened to 88% (L) -->
 		<xsl:attribute name="margin-left">0.5mm</xsl:attribute>
 		<xsl:attribute name="margin-right">0.5mm</xsl:attribute>
 		<xsl:attribute name="padding">1mm</xsl:attribute>
 		<xsl:attribute name="padding-left">1.5mm</xsl:attribute>
 		<xsl:attribute name="padding-right">1.5mm</xsl:attribute>
-		<xsl:attribute name="font-size">85%</xsl:attribute>
+		<xsl:attribute name="font-size">88%</xsl:attribute>
 	</xsl:attribute-set>
 	
 	<xsl:attribute-set name="note-name-style"><?extend?>

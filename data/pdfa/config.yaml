@@ -14,7 +14,7 @@ base-override:
   value-attributes:
     publisher: PDF Association
     publisher_abbr: PDF Association
-    presentation-metadata-color-secondary: '#d03f4e'
+    presentation-metadata-color-secondary: '#d03f4e'  # PDFa logo red - good contrast for WCAG Level AA
     presentation-metadata-backcover-text: pdfa.org
     body-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
     header-font: "'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif"
@@ -26,22 +26,22 @@ doctypes:
 - taste: specification # Specification # The name goes into i18n.yaml
   base: standard
   override-attributes:
-  - presentation-metadata-color-secondary: '#d03f4e'
+  - presentation-metadata-color-secondary: '#d03f4e' # PDFa logo red - good contrast for WCAG Level AA
 - taste: application-note # Application Note
   base: report
   abbrev: AN
   override-attributes:
-  - presentation-metadata-color-secondary: '#ca9831'
+  - presentation-metadata-color-secondary: '#ca9831' # PDFa logo yellow - insufficient contrast for WCAG Level AA
 - taste: technical-note # Technical Note
   base: report
   abbrev: TN
   override-attributes:
-  - presentation-metadata-color-secondary: '#ca9831'
+  - presentation-metadata-color-secondary: '#ca9831' # PDFa logo yellow - insufficient contrast for WCAG Level AA
 - taste: best-practice-guide # Best Practice Guide
   base: report
   abbrev: BPG
   override-attributes:
-  - presentation-metadata-color-secondary: '#4891af'
+  - presentation-metadata-color-secondary: '#4891af' # PDFa logo blue - insufficient contrast for WCAG Level AA
 stages:
   - taste: draft
     base: draft
