@@ -33,7 +33,6 @@ information, services, products, or providers.
 === {blank}
 
 // [align=center]
-// **International Color Consortium**:
-// Standardizing [css color:blue]#color# fidelity since 1993.
+// **PDF Association**:
 
-// (c) ICC {{ docyear }} - All rights reserved
+// (c) PDF Association {{ docyear }} - All rights reserved
