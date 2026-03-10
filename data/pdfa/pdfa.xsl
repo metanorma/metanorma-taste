@@ -144,7 +144,7 @@
 								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell>
 								<fo:table-cell text-align="center" display-align="center" xsl:use-attribute-sets="cover_page_box">
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box2}">
-										<fo:block font-size="0pt">
+										<fo:block font-size="0pt" role="SKIP">
 											<!-- set context node to the cover page image -->
 											<xsl:for-each select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:coverpage-image[1]/mn:image[1]">
 												<xsl:call-template name="insertPageImage">
@@ -220,17 +220,19 @@
 		<xsl:param name="curr_lang" select="$lang"/>
 		<xsl:param name="font_size">32</xsl:param>
 		<xsl:param name="font_style">normal</xsl:param>
-		<!-- Main title of doc -->
-		<fo:block font-size="{$font_size}pt" font-weight="bold" font-style="{$font_style}">
-			<fo:block role="H1"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'intro' and @language = $curr_lang]/node()"/></fo:block>
-		</fo:block>
-		<!-- Subtitle of doc -->
-		<fo:block font-size="{$font_size - 2}pt" font-style="{$font_style}">
-			<fo:block role="H1"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'main' and @language = $curr_lang][last()]/node()"/></fo:block>
-		</fo:block>
-		<!-- Part title -->
-		<fo:block font-size="{$font_size - 8}pt" font-style="{$font_style}">
-			<fo:block role="H1"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'part' and @language = $curr_lang]/node()"/></fo:block>
+		<fo:block role="P/Title">
+			<!-- Main title of doc -->
+			<fo:block font-size="{$font_size}pt" font-weight="bold" font-style="{$font_style}" role="SKIP">
+				<fo:block role="SKIP"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'intro' and @language = $curr_lang]/node()"/></fo:block> <!-- role="H1" -->
+			</fo:block>
+			<!-- Subtitle of doc -->
+			<fo:block font-size="{$font_size - 2}pt" font-style="{$font_style}" role="SKIP">
+				<fo:block role="SKIP"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'main' and @language = $curr_lang][last()]/node()"/></fo:block> <!-- role="H1" -->
+			</fo:block>
+			<!-- Part title -->
+			<fo:block font-size="{$font_size - 8}pt" font-style="{$font_style}" role="SKIP">
+				<fo:block role="SKIP"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'part' and @language = $curr_lang]/node()"/></fo:block> <!-- role="H1" -->
+			</fo:block>
 		</fo:block>
 	</xsl:template>
 	
