@@ -25,6 +25,10 @@ doctypes:
 - taste: test-suite
   base: report
 committees:
+  - name: Model-Based "x" Interoperability Forum
+    abbrev: MBx-IF
+    logo: mbxif-logos_mbxif.svg
+    category: interoperability-forum
   - name: Computer Aided "x" Interoperability Forum
     abbrev: CAx-IF
     logo: mbxif-logos_caxif.svg
