@@ -98,10 +98,10 @@
 				<fo:block-container margin-left="19mm" margin-right="-20mm">
 					<fo:block-container margin-left="0mm" margin-right="0mm">
 					<xsl:variable name="logos">
-						<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'author']/mn:organization[mn:logo/mn:image]">
+						<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'author'][mn:role/mn:description = 'committee']/mn:organization/mn:subdivision[mn:logo/mn:image]">
 							<xsl:variable name="logo_width">
 								<xsl:choose>
-									<xsl:when test="mn:abbreviation = 'JT-IF'">43mm</xsl:when>
+									<xsl:when test="mn:abbreviation = 'JT-IF' or contains(mn:name, 'Jupiter Tessilation')">43mm</xsl:when>
 									<xsl:otherwise>71mm</xsl:otherwise>
 								</xsl:choose>
 							</xsl:variable>
