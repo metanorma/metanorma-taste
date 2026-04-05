@@ -39,7 +39,8 @@
 	</xsl:template>
 	
 	<xsl:template name="cover-page">
-		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" color="white">
+		<xsl:param name="num"/>
+		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" color="white" initial-page-number="1">
 			<fo:static-content flow-name="cover-page-header">
 				<fo:block-container position="absolute" left="0mm" top="0mm" width="197mm" height="43.4mm" display-align="center" role="SKIP">
 					<fo:table table-layout="fixed" width="100%">
@@ -112,6 +113,7 @@
 				</fo:table>
 			</fo:static-content>
 			<fo:flow flow-name="xsl-region-body">
+				<xsl:call-template name="insert_firstpage_id"><xsl:with-param name="num" select="$num"/></xsl:call-template>
 				<!-- background image -->
 				<fo:block-container absolute-position="fixed" left="0mm" top="0mm" font-size="0">
 					<fo:block>
