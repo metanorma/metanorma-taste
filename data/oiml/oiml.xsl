@@ -32,7 +32,7 @@
 	
 	<xsl:template name="cover-page">
 		<xsl:param name="num"/>
-		<fo:page-sequence master-reference="cover-page" force-page-count="end-on-even" font-family="Futura PT Book" color="rgb(34,30,31)"> <!-- Futura Bk -->
+		<fo:page-sequence master-reference="cover-page" force-page-count="end-on-even" font-family="Futura PT Book" color="rgb(34,30,31)" initial-page-number="1"> <!-- Futura Bk -->
 			<xsl:variable name="curr_lang"><xsl:call-template name="getLang"/></xsl:variable>
 			<xsl:variable name="docidentifier"><xsl:call-template name="get_docidentifier"/></xsl:variable>
 			<xsl:variable name="title_complementary"><xsl:call-template name="get_title_complementary"/></xsl:variable>
