@@ -48,8 +48,10 @@
 	</xsl:attribute-set>
 	
 	<xsl:template name="cover-page">
-		<fo:page-sequence master-reference="cover-page" force-page-count="no-force">
+		<xsl:param name="num"/>
+		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" initial-page-number="1">
 			<fo:flow flow-name="xsl-region-body" font-family="Source Sans 3">
+				<xsl:call-template name="insert_firstpage_id"><xsl:with-param name="num" select="$num"/></xsl:call-template>
 				
 				<fo:block margin-top="-3mm" role="SKIP"> <!-- -3mm because there is a space before image in the source SVG -->
 					<fo:inline-container width="47mm" role="SKIP">
@@ -279,10 +281,14 @@
 	</xsl:template>
 	
 	<xsl:template name="insertHeaderFooter">
-		<xsl:call-template name="insertFooter"/>
+		<xsl:param name="num"/>
+		<xsl:call-template name="insertFooter">
+			<xsl:with-param name="num" select="$num"/>
+		</xsl:call-template>
 	</xsl:template>
 
 	<xsl:template name="insertFooter">
+		<xsl:param name="num"/>
 		<!-- <xsl:param name="invert"/> -->
 		<xsl:variable name="footerText"> 
 			<!-- <xsl:text>PDF Association</xsl:text>
@@ -301,9 +307,11 @@
 			</xsl:call-template>
 		</xsl:variable>
 		<xsl:call-template name="insertFooterOdd">
+			<xsl:with-param name="num" select="$num"/>
 			<xsl:with-param name="footerText" select="$footerText"/>
 		</xsl:call-template>
 		<xsl:call-template name="insertFooterEven">
+			<xsl:with-param name="num" select="$num"/>
 			<xsl:with-param name="footerText" select="$footerText"/>
 		</xsl:call-template>
 	</xsl:template>
