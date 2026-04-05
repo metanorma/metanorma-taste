@@ -73,13 +73,11 @@
 	</xsl:template>
 
 
-	<xsl:variable name="copyright_year" select="/mn:metanorma/mn:bibdata/mn:copyright/mn:from"/>
-	<xsl:variable name="copyright_holder" select="normalize-space(/mn:metanorma/mn:bibdata/mn:copyright/mn:owner/mn:organization/mn:name)"/>
-	<xsl:variable name="copyrightText">
+	<xsl:template name="getCopyrightText">
 		<xsl:text>© </xsl:text>
-		<xsl:value-of select="$copyright_year"/>
+		<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:copyright/mn:from"/>
 		<xsl:text>. The </xsl:text>
-		<xsl:value-of select="$copyright_holder"/>
+		<xsl:value-of select="normalize-space(/mn:metanorma/mn:bibdata/mn:copyright/mn:owner/mn:organization/mn:name)"/>
 		<xsl:text>, Inc. </xsl:text>
 		<xsl:variable name="all_rights_reserved">
 			<xsl:call-template name="getLocalizedString">
@@ -88,10 +86,11 @@
 		</xsl:variable>
 		<xsl:value-of select="$all_rights_reserved"/>
 		<xsl:text>.</xsl:text>
-	</xsl:variable>
+	</xsl:template>
 
 	<xsl:template name="cover-page">
-		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" font-family="Nacelle" >
+		<xsl:param name="num"/>
+		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" font-family="Nacelle" initial-page-number="1">
 			<fo:static-content flow-name="header">
 				<xsl:call-template name="insertBackgroundPageImage"/>
 				
@@ -150,12 +149,13 @@
 			<fo:static-content flow-name="footer">
 				<fo:block-container height="20mm" display-align="center">
 					<fo:block font-size="12pt" font-weight="300" color="white" margin-right="6mm" text-align="right">
-						<xsl:value-of select="$copyrightText"/>
+						<xsl:call-template name="getCopyrightText"/>
 					</fo:block>
 				</fo:block-container>
 			</fo:static-content>
 
 			<fo:flow flow-name="xsl-region-body" color="{$color_black}">
+				<xsl:call-template name="insert_firstpage_id"><xsl:with-param name="num" select="$num"/></xsl:call-template>
 
 				<fo:block-container margin-right="0mm">
 					<fo:block-container margin-right="0mm">
@@ -227,7 +227,7 @@
 			<fo:static-content flow-name="footer">
 				<fo:block-container height="20mm" display-align="center">
 					<fo:block font-size="12pt" font-weight="300" color="white" margin-left="11.3mm">
-						<xsl:value-of select="$copyrightText"/>
+						<xsl:call-template name="getCopyrightText"/>
 					</fo:block>
 				</fo:block-container>
 			</fo:static-content>
