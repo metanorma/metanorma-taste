@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.bindir = "bin"
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "lutaml-model", "~>0.7"
+  spec.add_dependency "lutaml-model", ">= 0.7"
 
   spec.add_development_dependency "debug"
   spec.add_development_dependency "equivalent-xml", "~> 0.6"
