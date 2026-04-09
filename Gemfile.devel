@@ -1,0 +1,2 @@
+gem "metanorma-ribose", git: "https://github.com/metanorma/metanorma-ribose", branch: "main"
+
