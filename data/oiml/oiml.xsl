@@ -371,7 +371,7 @@
 	<xsl:template name="insertHeaderEven">
 		<xsl:param name="text_align">left</xsl:param>
 		<xsl:param name="flow_name">header-even</xsl:param>
-		<fo:static-content flow-name="{$flow_name}" > <!-- role="artifact" commented, because <fo:retrieve-marker occurs the FOP error -->
+		<fo:static-content flow-name="{$flow_name}" role="artifact" > <!-- role="artifact" commented?, because <fo:retrieve-marker occurs the FOP error -->
 			<fo:block font-family="Arial" font-size="9pt" margin-top="13mm" border-bottom="0.5pt solid black" text-align="{$text_align}">
 				<xsl:variable name="title_complementary">
 					<xsl:call-template name="get_title_complementary"/>
