@@ -365,13 +365,13 @@
 	<xsl:template name="back-page">
 	</xsl:template>
 	
-	<xsl:template name="insertHeaderFirst2">
+	<xsl:template name="insertHeaderFirst">
 	</xsl:template>
 	
 	<xsl:template name="insertHeaderEven">
 		<xsl:param name="text_align">left</xsl:param>
 		<xsl:param name="flow_name">header-even</xsl:param>
-		<fo:static-content flow-name="{$flow_name}" role="artifact" > <!-- role="artifact" commented?, because <fo:retrieve-marker occurs the FOP error -->
+		<fo:static-content flow-name="{$flow_name}" role="artifact">
 			<fo:block font-family="Arial" font-size="9pt" margin-top="13mm" border-bottom="0.5pt solid black" text-align="{$text_align}">
 				<xsl:variable name="title_complementary">
 					<xsl:call-template name="get_title_complementary"/>
@@ -383,7 +383,12 @@
 				<xsl:call-template name="get_edition"/>
 				<xsl:choose>
 					<xsl:when test="mn:annex">
-						<fo:retrieve-marker retrieve-class-name="annex_number" retrieve-boundary="document" /> <!-- retrieve-position="first-starting-within-page" -->
+						<!-- commented, https://github.com/metanorma/metanorma-oiml/issues/10 -->
+						<!-- <fo:retrieve-marker retrieve-class-name="annex_number" retrieve-boundary="document" /> -->
+						<!-- use annex number directly via variable instead of marker -->
+						<xsl:variable name="annex_number" select="normalize-space(mn:annex/mn:fmt-title/*[1])"/>
+						<xsl:if test="normalize-space($annex_number) != ''"><xsl:text>&#xa0;–&#xa0;</xsl:text></xsl:if>
+						<xsl:value-of select="$annex_number"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:if test="normalize-space($title_complementary) != ''">
@@ -694,7 +699,8 @@
 	<xsl:template match="mn:annex/mn:fmt-title//mn:br[preceding-sibling::node()[1][self::mn:br]]" priority="3" mode="update_xml_step1"/>
 	
 	<!-- copyed from iso.internation-standard.iso, added <fo:marker marker-class-name="annex_number"> -->
-	<xsl:template match="mn:annex[normalize-space() != '']">
+	<!-- not using, see https://github.com/metanorma/metanorma-oiml/issues/10#issuecomment-4246831568 -->
+	<xsl:template match="mn:annex2[normalize-space() != '']">
 		<xsl:choose>
 			<xsl:when test="@continue = 'true'"> <!-- it's using for figure/table on top level for block span -->
 				<fo:block>
@@ -712,12 +718,13 @@
 					
 					<xsl:call-template name="setBlockSpanAll"/>
 					
-					<fo:marker marker-class-name="annex_number">
-						<!-- Example: Annex A -->
+					<!-- Example: Annex A -->
+					<!-- commented, https://github.com/metanorma/metanorma-oiml/issues/10 -->
+					<!-- <fo:marker marker-class-name="annex_number">
 						<xsl:variable name="annex_number" select="normalize-space(mn:fmt-title/*[1])"/>
 						<xsl:if test="normalize-space($annex_number) != ''"><xsl:text>&#xa0;–&#xa0;</xsl:text></xsl:if>
 						<xsl:value-of select="$annex_number"/>
-					</fo:marker>
+					</fo:marker> -->
 					
 					<xsl:call-template name="refine_annex_style"/>
 					
@@ -736,5 +743,26 @@
 		<fo:block font-size="1pt" margin-top="2mm">&#xa0;</fo:block>
 	</xsl:template>
 
+	<xsl:template name="insertMainSectionsPageSequences">
+		<xsl:call-template name="insertSectionsInPageSequence"/>
+	
+		<!-- <xsl:element name="page_sequence" namespace="{$namespace_full}">
+			<xsl:for-each select="/*/mn:annex">
+				<xsl:sort select="@displayorder" data-type="number"/>
+				<xsl:apply-templates select="." mode="update_xml_step_move_pagebreak"/>
+			</xsl:for-each>
+		</xsl:element> -->
+		<xsl:call-template name="insertAnnexInSeparatePageSequences"/>
+		
+		<xsl:element name="page_sequence" namespace="{$namespace_full}">
+			<xsl:element name="bibliography" namespace="{$namespace_full}"> <!-- save context element -->
+				<xsl:for-each select="/*/mn:bibliography/*[not(@normative='true')] | 
+										/*/mn:bibliography/mn:clause[mn:references[not(@normative='true')]]">
+					<xsl:sort select="@displayorder" data-type="number"/>
+					<xsl:apply-templates select="." mode="update_xml_step_move_pagebreak"/>
+				</xsl:for-each>
+			</xsl:element>
+		</xsl:element>
+	</xsl:template>
 	
 </xsl:stylesheet>
