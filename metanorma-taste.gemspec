@@ -33,24 +33,4 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "lutaml-model", ">= 0.7"
-
-  spec.add_development_dependency "debug"
-  spec.add_development_dependency "equivalent-xml", "~> 0.6"
-  spec.add_development_dependency "logger", "1.6.6"
-  spec.add_development_dependency "metanorma"
-  spec.add_development_dependency "metanorma-cli"
-  spec.add_development_dependency "metanorma-generic", ">= 3.3.3"
-  spec.add_development_dependency "metanorma-ieee", ">= 1.6.8"
-  spec.add_development_dependency "metanorma-iso", ">= 3.4.0"
-  spec.add_development_dependency "metanorma-ribose", ">= 2.8.4"
-  spec.add_development_dependency "mnconvert"
-  spec.add_development_dependency "pry"
-  spec.add_development_dependency "rake", "~> 13.0"
-  spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "rspec-command", "~> 1.0"
-  spec.add_development_dependency "rubocop", "~> 1"
-  spec.add_development_dependency "rubocop-performance"
-  spec.add_development_dependency "sassc-embedded", "~> 1"
-  spec.add_development_dependency "simplecov", "~> 0.15"
-  spec.add_development_dependency "canon"
 end
