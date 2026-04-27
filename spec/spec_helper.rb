@@ -2,6 +2,7 @@
 $LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 
 require "metanorma-taste"
+require "canon"
 
 Canon::Config.instance.profile = :metanorma
 

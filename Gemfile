@@ -7,7 +7,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}" }
 gemspec
 
 group :development do
-  gem "canon"
+  gem "canon", "= 0.2.3"
   gem "debug"
   gem "equivalent-xml", "~> 0.6"
   gem "logger", "1.6.6"
