@@ -56,7 +56,7 @@ RSpec.describe "Metanorma Taste Compilation" do
       generated: generated_files,
       missing: missing_files,
       empty: empty_files,
-      valid: missing_files.empty?
+      valid: missing_files.empty?,
     }
   end
 
@@ -73,9 +73,9 @@ RSpec.describe "Metanorma Taste Compilation" do
       result = validate_output(compile, base_name, base_dir)
 
       unless result[:valid]
-        fail "#{taste} compilation failed:\n" \
-             "  Missing files: #{result[:missing].join(', ')}\n" \
-             "  Generated files: #{result[:generated].join(', ')}"
+        fail "#{taste} compilation failed:\n  " \
+             "Missing files: #{result[:missing].join(', ')}\n  " \
+             "Generated files: #{result[:generated].join(', ')}"
       end
 
       expect(result[:valid]).to be true

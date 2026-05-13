@@ -7,15 +7,15 @@ git_source(:github) { |repo| "https://github.com/#{repo}" }
 gemspec
 
 group :development do
-  gem "canon", "= 0.2.3"
+  gem "canon"
   gem "debug"
   gem "equivalent-xml", "~> 0.6"
   gem "logger", "1.6.6"
   gem "metanorma"
   gem "metanorma-cli"
-  gem "metanorma-generic", ">= 3.3.3"
+  gem "metanorma-generic", ">= 3.4.0"
   gem "metanorma-ieee", ">= 1.6.8"
-  gem "metanorma-iso", ">= 3.4.0"
+  gem "metanorma-iso", ">= 3.4.2"
   gem "metanorma-ribose", ">= 2.8.4"
   gem "mnconvert"
   gem "pry"

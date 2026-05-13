@@ -32,5 +32,5 @@ Gem::Specification.new do |spec|
   spec.bindir = "bin"
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "lutaml-model", ">= 0.7"
+  spec.add_dependency "lutaml-model", ">= 0.8"
 end
