@@ -10,7 +10,6 @@ group :development do
   gem "canon"
   gem "debug"
   gem "equivalent-xml", "~> 0.6"
-  gem "logger", "1.6.6"
   gem "metanorma"
   gem "metanorma-cli"
   gem "metanorma-generic", ">= 3.4.0"
