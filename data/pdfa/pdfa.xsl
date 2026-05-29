@@ -106,7 +106,7 @@
 								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell>
 								<fo:table-cell text-align="right" display-align="after" xsl:use-attribute-sets="cover_page_box"> <!-- padding-left="5mm" padding-right="5mm" -->
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box1}">
-										<fo:block margin-left="5mm" margin-right="5mm">
+										<fo:block font-size="18pt" margin-left="5mm" margin-right="5mm">
 											<fo:block>
 												<!-- Status / Version.
 														e.g. "Draft Release Candidate 1.2", or just a version -->
@@ -137,6 +137,9 @@
 											</fo:block>
 											<fo:block margin-bottom="2mm">
 												<xsl:value-of select="substring(/mn:metanorma/mn:bibdata/mn:version/mn:revision-date, 1, 7)"/>
+											</fo:block>
+											<fo:block margin-bottom="2mm">
+												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
 											</fo:block>
 										</fo:block>
 									</fo:block-container>
