@@ -398,6 +398,12 @@
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:attribute-set>
 	
+	<xsl:template name="display_term_kind">
+		<xsl:if test="not(self::mn:fmt-preferred)">
+			<xsl:call-template name="term_kind"/>
+		</xsl:if>
+	</xsl:template>
+	
 	<xsl:attribute-set name="example-body-style">
 		<xsl:attribute name="margin-left">7mm</xsl:attribute>
 		<xsl:attribute name="margin-right">7mm</xsl:attribute>
