@@ -357,6 +357,9 @@
 		<xsl:attribute name="font-size">85%</xsl:attribute>
 	</xsl:template>
 	
+	<!-- Notes related to bibliographic entries are not indented in PDFa flavor PDFa with PDF output. -->
+	<xsl:template match="mn:bibitem/mn:formattedref/mn:note" mode="update_xml_step1"/>
+	
 	<xsl:template match="mn:ul/mn:li/mn:fmt-name[normalize-space() = 'o']" priority="3" mode="update_xml_step1">
 		<xsl:attribute name="label">■</xsl:attribute>
 	</xsl:template>
