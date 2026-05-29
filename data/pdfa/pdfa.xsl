@@ -386,4 +386,12 @@
 	<xsl:attribute-set name="term-kind-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:attribute-set>
+	
+	<xsl:attribute-set name="example-body-style">
+		<xsl:attribute name="margin-left">7mm</xsl:attribute>
+		<xsl:attribute name="margin-right">7mm</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:variable name="example_display_in">block</xsl:variable>
+	
 </xsl:stylesheet>
