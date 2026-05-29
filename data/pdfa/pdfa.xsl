@@ -263,6 +263,17 @@
 		</svg>
 	</xsl:variable>
 
+	<xsl:template name="toc_and_boilerplate">
+		<xsl:param name="num"/>
+		<fo:block margin-bottom="12pt" role="SKIP"><fo:wrapper role="artifact">&#xA0;</fo:wrapper></fo:block>
+		<xsl:apply-templates select="/mn:metanorma/mn:boilerplate/*"/>
+		<fo:block break-after="page"/>
+		
+		<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'toc']">
+			<xsl:with-param name="num" select="$num"/>
+		</xsl:apply-templates>
+	</xsl:template>
+
 	<!-- empty back-page to omit back cover -->
 	<xsl:template name="back-page">
 		<!-- put the back page layout -->
