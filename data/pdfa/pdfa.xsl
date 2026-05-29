@@ -106,7 +106,7 @@
 								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell>
 								<fo:table-cell text-align="right" display-align="after" xsl:use-attribute-sets="cover_page_box"> <!-- padding-left="5mm" padding-right="5mm" -->
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box1}">
-										<fo:block margin-left="5mm" margin-right="5mm">
+										<fo:block font-size="18pt" margin-left="5mm" margin-right="5mm">
 											<fo:block>
 												<!-- Status / Version.
 														e.g. "Draft Release Candidate 1.2", or just a version -->
@@ -137,6 +137,9 @@
 											</fo:block>
 											<fo:block margin-bottom="2mm">
 												<xsl:value-of select="substring(/mn:metanorma/mn:bibdata/mn:version/mn:revision-date, 1, 7)"/>
+											</fo:block>
+											<fo:block margin-bottom="2mm">
+												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
 											</fo:block>
 										</fo:block>
 									</fo:block-container>
@@ -260,6 +263,17 @@
 		</svg>
 	</xsl:variable>
 
+	<xsl:template name="toc_and_boilerplate">
+		<xsl:param name="num"/>
+		<fo:block margin-bottom="12pt" role="SKIP"><fo:wrapper role="artifact">&#xA0;</fo:wrapper></fo:block>
+		<xsl:apply-templates select="/mn:metanorma/mn:boilerplate/*"/>
+		<fo:block break-after="page"/>
+		
+		<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'toc']">
+			<xsl:with-param name="num" select="$num"/>
+		</xsl:apply-templates>
+	</xsl:template>
+
 	<!-- empty back-page to omit back cover -->
 	<xsl:template name="back-page">
 		<!-- put the back page layout -->
@@ -330,6 +344,7 @@
 	
 	<xsl:template name="refine_title-style"><?extend?>
 		<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:template>
 	
 	<xsl:template name="refine_list-item-label-style"><?extend?>
@@ -341,6 +356,9 @@
 	<xsl:template name="refine_sourcecode-style"><?extend?>
 		<xsl:attribute name="font-size">85%</xsl:attribute>
 	</xsl:template>
+	
+	<!-- Notes related to bibliographic entries are not indented in PDFa flavor PDFa with PDF output. -->
+	<xsl:template match="mn:bibitem/mn:formattedref/mn:note" mode="update_xml_step1"/>
 	
 	<xsl:template match="mn:ul/mn:li/mn:fmt-name[normalize-space() = 'o']" priority="3" mode="update_xml_step1">
 		<xsl:attribute name="label">■</xsl:attribute>
@@ -382,4 +400,18 @@
 	<xsl:attribute-set name="term-kind-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:attribute-set>
+	
+	<xsl:template name="display_term_kind">
+		<xsl:if test="not(self::mn:fmt-preferred)">
+			<xsl:call-template name="term_kind"/>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:attribute-set name="example-body-style">
+		<xsl:attribute name="margin-left">7mm</xsl:attribute>
+		<xsl:attribute name="margin-right">7mm</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:variable name="example_display_in">block</xsl:variable>
+	
 </xsl:stylesheet>
