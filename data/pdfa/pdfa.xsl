@@ -414,4 +414,8 @@
 	
 	<xsl:variable name="example_display_in">block</xsl:variable>
 	
+	<xsl:attribute-set name="fn-body-style"><?extend?>
+		<xsl:attribute name="color">black</xsl:attribute>
+	</xsl:attribute-set>
+	
 </xsl:stylesheet>
