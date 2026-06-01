@@ -356,23 +356,30 @@
 	<xsl:template name="refine_sourcecode-style"><?extend?>
 		<xsl:attribute name="font-size">85%</xsl:attribute>
 	</xsl:template>
-	
-	<!-- Notes related to bibliographic entries are not indented in PDFa flavor PDFa with PDF output. -->
-	<xsl:template match="mn:bibitem/mn:formattedref/mn:note" mode="update_xml_step1"/>
-	
+		
 	<xsl:template match="mn:ul/mn:li/mn:fmt-name[normalize-space() = 'o']" priority="3" mode="update_xml_step1">
 		<xsl:attribute name="label">■</xsl:attribute>
 	</xsl:template>
 	
 	<xsl:attribute-set name="note-style"><?extend?>
 		<xsl:attribute name="background-color">rgb(245,235,206)</xsl:attribute> <!-- PDF Association "logo yellow" converted to HSL and lightened to 88% (L) -->
-		<xsl:attribute name="margin-left">0.5mm</xsl:attribute>
+		<xsl:attribute name="margin-left">8.5mm</xsl:attribute>
 		<xsl:attribute name="margin-right">0.5mm</xsl:attribute>
 		<xsl:attribute name="padding">1mm</xsl:attribute>
 		<xsl:attribute name="padding-left">1.5mm</xsl:attribute>
 		<xsl:attribute name="padding-right">1.5mm</xsl:attribute>
 		<xsl:attribute name="font-size">88%</xsl:attribute>
 	</xsl:attribute-set>
+	
+	<xsl:template name="refine_note-style"><?extend?>
+		<xsl:if test="ancestor::mn:bibitem">
+			<xsl:attribute name="margin-top">6pt</xsl:attribute>
+			<xsl:attribute name="margin-bottom">10pt</xsl:attribute>
+			<xsl:if test="not(following-sibling::*[1][self::mn:note])">
+				<xsl:attribute name="margin-bottom">6pt</xsl:attribute>
+			</xsl:if>
+		</xsl:if>
+	</xsl:template>
 	
 	<xsl:attribute-set name="note-name-style"><?extend?>
 		<xsl:attribute name="padding-right">3mm</xsl:attribute>
