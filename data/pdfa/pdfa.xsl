@@ -349,6 +349,63 @@
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:template>
 	
+	<xsl:template match="mn:fmt-title" name="title">
+		
+		<xsl:variable name="level">
+			<xsl:call-template name="getLevel"/>
+		</xsl:variable>
+		
+		<xsl:variable name="element-name">
+			<xsl:choose>
+				<xsl:when test="../@inline-header = 'true'">fo:inline</xsl:when>
+				<xsl:otherwise>fo:block</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<xsl:variable name="title_styles">
+			<styles xsl:use-attribute-sets="title-style"><xsl:call-template name="refine_title-style"/></styles>
+		</xsl:variable>
+		
+		<xsl:element name="{$element-name}">
+			<xsl:copy-of select="xalan:nodeset($title_styles)/styles/@*"/>
+			
+			<!-- <xsl:choose>
+				<xsl:when test="$level = 1"> -->
+					<fo:block-container margin-left="-15mm" role="SKIP">
+						<fo:block-container xsl:use-attribute-sets="reset-margins-style">
+							<fo:table width="100%" table-layout="fixed" role="SKIP">
+								<fo:table-column column-width="15mm"/>
+								<fo:table-column column-width="150mm"/>				
+								<fo:table-body role="SKIP">
+									<fo:table-row role="SKIP">
+										<fo:table-cell text-align="left" role="SKIP">
+											<fo:block role="SKIP">
+												<xsl:call-template name="setIDforNamedDestinationInline"/>
+												<xsl:call-template name="extractSection"/><!-- section number 1 2 3  ... -->
+											</fo:block>
+										</fo:table-cell>
+										<fo:table-cell role="SKIP">
+											<fo:block role="SKIP">
+													<xsl:call-template name="extractTitle"/> <!-- section title -->
+													<xsl:apply-templates select="following-sibling::*[1][self::mn:variant-title][@type = 'sub']" mode="subtitle"/>
+												</fo:block>
+										</fo:table-cell>
+									</fo:table-row>
+								</fo:table-body>
+							</fo:table>
+						</fo:block-container>
+					</fo:block-container>
+				<!-- </xsl:when>
+				<xsl:otherwise>
+						<xsl:call-template name="setIDforNamedDestinationInline"/>
+						<xsl:apply-templates />
+						<xsl:apply-templates select="following-sibling::*[1][self::mn:variant-title][@type = 'sub']" mode="subtitle"/>
+				</xsl:otherwise>
+			</xsl:choose> -->
+			
+		</xsl:element>
+	</xsl:template>
+	
 	<xsl:template name="refine_list-item-label-style"><?extend?>
 		<xsl:if test="parent::mn:ul">
 			<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
