@@ -138,7 +138,7 @@
 											<fo:block margin-bottom="2mm">
 												<xsl:value-of select="substring(/mn:metanorma/mn:bibdata/mn:version/mn:revision-date, 1, 7)"/>
 											</fo:block>
-											<fo:block margin-bottom="2mm">
+											<fo:block margin-bottom="2mm" font-size="9pt">
 												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
 											</fo:block>
 										</fo:block>
