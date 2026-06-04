@@ -266,7 +266,9 @@
 	<xsl:template name="toc_and_boilerplate">
 		<xsl:param name="num"/>
 		<fo:block margin-bottom="12pt" role="SKIP"><fo:wrapper role="artifact">&#xA0;</fo:wrapper></fo:block>
-		<xsl:apply-templates select="/mn:metanorma/mn:boilerplate/*"/>
+		<fo:block-container height="{$pageHeight - $marginTop - $marginBottom - 20}mm" display-align="after">
+			<xsl:apply-templates select="/mn:metanorma/mn:boilerplate/*"/>
+		</fo:block-container>
 		<fo:block break-after="page"/>
 		
 		<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'toc']">
