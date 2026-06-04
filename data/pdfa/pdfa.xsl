@@ -292,7 +292,7 @@
 		<xsl:attribute name="text-decoration">underline</xsl:attribute>
 	</xsl:attribute-set>
 	
-	<xsl:template name="refine_link-style"><?extend?>
+	<xsl:template name="refine_link-style">
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:template>
 	
