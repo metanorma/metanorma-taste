@@ -263,6 +263,10 @@
 		</svg>
 	</xsl:variable>
 
+	<xsl:attribute-set name="toc-style"><?extend?>
+		<xsl:attribute name="margin-left">-6mm</xsl:attribute>
+	</xsl:attribute-set>
+
 	<xsl:template name="toc_and_boilerplate">
 		<xsl:param name="num"/>
 		<fo:block margin-bottom="12pt" role="SKIP"><fo:wrapper role="artifact">&#xA0;</fo:wrapper></fo:block>
@@ -284,7 +288,6 @@
 	<xsl:template match="mn:copyright-statement" priority="2">
 		<xsl:apply-templates />
 	</xsl:template>
-	
 	
 	<xsl:attribute-set name="link-style">
 		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute><!-- #d03f4e PDFa logo red -->
