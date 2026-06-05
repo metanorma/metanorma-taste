@@ -2,6 +2,7 @@
 
 	<xsl:variable name="pageWidth">210</xsl:variable>
 	<xsl:variable name="pageHeight">297</xsl:variable>
+	<xsl:variable name="marginTop">24</xsl:variable>
 
 	<xsl:attribute-set name="root-style"><?extend?>
 		<xsl:attribute name="font-family">Source Sans 3, STIX Two Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
@@ -22,12 +23,58 @@
 			</fo:simple-page-master>
 			
 			<fo:simple-page-master master-name="first" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
-				<fo:region-body margin-top="14mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
-				<fo:region-before region-name="header-LB-yellow" extent="14mm"/> 
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
 				<fo:region-after region-name="footer-even" extent="12.5mm"/>
 				<fo:region-start region-name="left-region" extent="13mm"/>
 				<fo:region-end region-name="right-region" extent="12mm"/>
 			</fo:simple-page-master>
+			
+			<fo:simple-page-master master-name="page-odd" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
+				<fo:region-after region-name="footer-odd" extent="{$extent_footer}"/>
+				<fo:region-start region-name="left-region" extent="{$extent_left}"/>
+				<fo:region-end region-name="right-region" extent="{$extent_right}"/>
+			</fo:simple-page-master>
+			<fo:simple-page-master master-name="page-even" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
+				<fo:region-after region-name="footer-even" extent="{$extent_footer}"/>
+				<fo:region-start region-name="left-region" extent="{$extent_left}"/>
+				<fo:region-end region-name="right-region" extent="{$extent_right}"/>
+			</fo:simple-page-master>
+			
+			<fo:page-sequence-master master-name="document">
+				<fo:single-page-master-reference master-reference="first"/>
+				<fo:repeatable-page-master-alternatives>
+					<fo:conditional-page-master-reference master-reference="page-odd" odd-or-even="odd"/>
+					<fo:conditional-page-master-reference master-reference="page-even" odd-or-even="even"/>
+				</fo:repeatable-page-master-alternatives>
+			</fo:page-sequence-master>
+			
+			<fo:simple-page-master master-name="page-odd-landscape" page-width="{$pageHeight}mm" page-height="{$pageWidth}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
+				<fo:region-after region-name="footer-odd" extent="{$extent_footer}"/>
+				<fo:region-start region-name="left-region" extent="{$extent_left}"/>
+				<fo:region-end region-name="right-region" extent="{$extent_right}"/>
+			</fo:simple-page-master>
+			<fo:simple-page-master master-name="page-even-landscape" page-width="{$pageHeight}mm" page-height="{$pageWidth}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
+				<fo:region-after region-name="footer-even" extent="{$extent_footer}"/>
+				<fo:region-start region-name="left-region" extent="{$extent_left}"/>
+				<fo:region-end region-name="right-region" extent="{$extent_right}"/>
+			</fo:simple-page-master>
+			
+			<fo:page-sequence-master master-name="document-landscape">
+				<fo:repeatable-page-master-alternatives>
+					<fo:conditional-page-master-reference master-reference="page-odd-landscape" odd-or-even="odd"/>
+					<fo:conditional-page-master-reference master-reference="page-even-landscape" odd-or-even="even"/>
+				</fo:repeatable-page-master-alternatives>
+			</fo:page-sequence-master>
+			
 		</fo:layout-master-set>
 	</xsl:template>
 		
@@ -299,11 +346,43 @@
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:template>
 	
+	<xsl:variable name="variables_pdfa_">
+		<xsl:for-each select="//mn:metanorma">
+			<xsl:variable name="num"><xsl:number level="any" count="mn:metanorma"/></xsl:variable>
+
+			<xsl:variable name="current_document">
+				<xsl:copy-of select="."/>
+			</xsl:variable>
+			
+			<xsl:for-each select="xalan:nodeset($current_document)">
+				<mnx:doc num="{$num}">
+					<title><xsl:apply-templates select="mn:metanorma/mn:bibdata/mn:title[@type = 'main'][last()]/node()"/></title>
+				</mnx:doc>
+			</xsl:for-each>
+		</xsl:for-each>
+	</xsl:variable>
+	<xsl:variable name="variables_pdfa" select="xalan:nodeset($variables_pdfa_)"/>
+	
 	<xsl:template name="insertHeaderFooter">
 		<xsl:param name="num"/>
+		<xsl:param name="section"/>
+		<xsl:call-template name="insertHeader">
+			<xsl:with-param name="num" select="$num"/>
+			<xsl:with-param name="section" select="$section"/>
+		</xsl:call-template>
 		<xsl:call-template name="insertFooter">
 			<xsl:with-param name="num" select="$num"/>
 		</xsl:call-template>
+	</xsl:template>
+
+	<xsl:template name="insertHeader">
+		<xsl:param name="num"/>
+		<xsl:param name="section"/>
+		<fo:static-content flow-name="header" role="artifact">
+			<fo:block-container margin-top="10mm" border-bottom="0.5pt solid black" text-align="center" font-size="8pt">
+				<fo:block><xsl:copy-of select="$variables_pdfa/mnx:doc[@num = $num]/title/node()"/></fo:block>
+			</fo:block-container>
+		</fo:static-content>
 	</xsl:template>
 
 	<xsl:template name="insertFooter">
