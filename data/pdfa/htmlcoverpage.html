@@ -10,9 +10,34 @@
     <p class="doctitle-en">{{ doctitle }}</p>
   </div>
 
+  <div style="display: none;">
+    <!-- p>document.docid.id = {{ document.docid.id }}</p -->
+    <!-- p>document.docstatus.stage = {{ document.docstatus.stage }}</p -->
+    <p>doctype = {{ doctype }}</p>
+    <p>doctype_display = {{ doctype_display }}</p>
+    <p>doctype_abbr = {{ doctype_abbr }}</p>
+    <p>docidentifier = {{ docidentifier }}</p>
+    <p>docnumber = {{ docnumber }}</p>
+    <p>docnumeric = {{ docnumeric }}</p>
+    <p>docyear = {{ docyear }}</p> 
+    <p>edition = {{ edition }}</p>
+    <p>edition_display = {{ edition_display }}</p>
+    <p>version = {{ version }}</p>
+    <p>version_display = {{ version_display }}</p>
+    <p>iteration = {{ iteration }}</p>
+    <p>draft = {{ draft }}</p>
+    <p>status = {{ status }}</p>
+    <p>stage = {{ stage }}</p>
+    <p>stage_display = {{ stage_display }}</p>
+    <p>stage_abbr = {{ stage_abbr }}</p>
+    <p>stageabbr = {{ stageabbr }}</p>
+    <!-- p>doctype_abbreviated = {{ doctype_abbreviated }}</p -->
+    <!-- p>document.docstatus.stage.abbreviation = {{ document.docstatus.stage.abbreviation }}</p -->
+</div>
+
   <div class="docidentifier">
     <p><b>
-    {{doctype_display}} - {{docnumber}} - {%if edition %} v{{edition}} {% endif %} {%if stage %}<span style="color:red">{{stage}}</span>{% endif %}
+    {{doctype_display}} : {{ docnumber }} {%if stage_display %} - <span style="color:red">{{stage_display}}</span>{% endif %}
     </b></p>
   </div>
   <hr/>
