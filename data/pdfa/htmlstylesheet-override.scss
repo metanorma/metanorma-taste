@@ -2,26 +2,64 @@
   --ribose-primary-color: #d03f4e; /* PDFa logo red. Required for WCAG Level AA colour contrast */
 }
 
-.logo {
+a {
+  text-decoration: underline; /* WCAG - all links must be clearly visible */
+  color: #d03f4e; /* PDFa logo red */
+}
+
+img { /* Make images more responsive */
+  max-width: 100%;
+  height: auto;
+}
+
+body {
+  line-height: 1.5em; /* WCAG level AA requires minimum line height of 1.5 */
+}
+
+figure, pre, .pseudocode { /* incl. source code */
+  line-height: 1.5em; /* WCAG level AA requires minimum line height of 1.5 */
+  font-size: 0.9em; /* monospaced fonts appear visually "larger" */
+  margin-top: 0cm; 
+  padding-top: 0.1em;
+  margin-bottom: 0cm; 
+  padding-bottom: 0.1em;
+}
+
+table > caption {
+  font-weight: bold;
+}
+
+th {
+  color: white;
+  background-color: blue;
+}
+
+tbody tr:nth-child(even) {
+    background-color: LightGray; /* Light grey for even rows - not header */
+}
+
+ul li::before { /* existing CSS used li::before rather than li::marker so need to override */
+  content: "\25A0";  /* Source Sans Pro does not include a CSS "square" marker - its more of a dash */
+  color: #d03f4e; /* Changes the bullet color to PDFa logo red */
+}
+
+.logo { /* cover page logo */
   text-align: center;
 }
 
-.docidentifier {
+.docidentifier { /* cover page doc type, version and status */
+  line-height: 1.5em; /* WCAG level AA requires minimum line height of 1.5 */
   text-align: center;
-  font-size: 18pt;
+  font-size: 20pt;
 }
 
-.doctitle-en {
-  font-size: 36pt;
+.doctitle-en { /* cover page primary title */
   text-align: center;
-}
-
-.coverpage-container {
-  line-height: 1.5; /* WCAG Level AA recommends 1.5 line height as a minimum */
+  font-size: 32pt;
 }
 
 #toc li a, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) li a {
-  text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
+  text-transform: none; /* PDF is case-sensitive! Never force nav bookmark text uppercase! */
 }
 
 h1, .h1 {
@@ -32,10 +70,78 @@ h1, .h1 {
   text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
 }
 
-a {
-  text-decoration: underline; /* WCAG - all links must be clearly visible */
+.example {
+  text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
+  font-size: 0.9em; 
+  background-color: #D6FFFE; /* Very pale blue */
+}
+
+.sourcecode {
+  font-size: 0.9em; 
+  background-color: white;
+}
+
+figcaption .SourceTitle { /* Revert the title back from monospaced font */
+  font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif;
 }
 
 span.TermNum {
-  font-weight: 100;
+  font-weight: normal;
+}
+
+.requirement {
+  color: Red; 
+  font-weight: bold;
+  text-transform: uppercase; /* Uppercase "SHALL" a-la RFCs */
+}
+
+.recommendation {
+  color: DarkOrange;
+  font-weight: bold;
+  text-transform: uppercase; /* Uppercase "SHOULD" a-la RFCs */
+}
+
+.pdf-version { 
+  font-style: italic; 
+  font-weight: lighter; 
+  color: blue; 
+}
+.pdf-version::before { content: "(PDF "; }
+.pdf-version::after { content: ")"; }
+
+.Note, .note, .Admonition  { /* all types of admonitions */
+  font-size: small; 
+  background-color: #fffcc9; /* baby yellow */
+}
+
+.note_label {
+    font-weight: bold; /* the "NOTE 1" text before the body of a note */
+}
+
+.AdmonitionTitle { /* titles of all admonitions - DOES NOT WORK! HTML includes hard-coded text-align center */
+  text-align: left;
+  text-transform: none; /* PDF is case sensitive! */
+}
+
+.AdmonitionImportant {
+  background-color: #e8c8ec; /* very pale purple */
+}
+
+.AdmonitionWarning {
+  background-color: #f9bfc0; /* very pale pink */
+}
+
+.AdmonitionTip {
+  background-color: #C7E6D7; /* very pale green */
+}
+
+.AdmonitionCaution {
+  color: Red; 
+}
+
+.AdmonitionBox:not(.AdmonitionTitle)  { /* Box the entire admonition, but not also the title */
+  border-width: 2px; 
+  border-style: solid; 
+  border-color: black; 
+  border-radius: 5px;
 }
