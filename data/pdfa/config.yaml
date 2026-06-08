@@ -45,7 +45,7 @@ doctypes:
 stages:
   - taste: draft
     base: draft
-    abbreviation: D
+    abbreviation: DRAFT
   - taste: release-candidate
     base: draft
     abbreviation: RC
