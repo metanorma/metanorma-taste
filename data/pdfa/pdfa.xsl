@@ -21,7 +21,7 @@
 			<fo:simple-page-master master-name="copyright-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
 				<fo:region-body margin-top="20mm" margin-bottom="35mm" margin-left="18mm" margin-right="18mm"/>
 			</fo:simple-page-master>
-			
+
 			<fo:simple-page-master master-name="first" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
 				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
 				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
@@ -29,7 +29,7 @@
 				<fo:region-start region-name="left-region" extent="13mm"/>
 				<fo:region-end region-name="right-region" extent="12mm"/>
 			</fo:simple-page-master>
-			
+
 			<fo:simple-page-master master-name="page-odd" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
 				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
 				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
@@ -37,6 +37,7 @@
 				<fo:region-start region-name="left-region" extent="{$extent_left}"/>
 				<fo:region-end region-name="right-region" extent="{$extent_right}"/>
 			</fo:simple-page-master>
+
 			<fo:simple-page-master master-name="page-even" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
 				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
 				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
@@ -44,7 +45,7 @@
 				<fo:region-start region-name="left-region" extent="{$extent_left}"/>
 				<fo:region-end region-name="right-region" extent="{$extent_right}"/>
 			</fo:simple-page-master>
-			
+
 			<fo:page-sequence-master master-name="document">
 				<fo:single-page-master-reference master-reference="first"/>
 				<fo:repeatable-page-master-alternatives>
@@ -52,7 +53,7 @@
 					<fo:conditional-page-master-reference master-reference="page-even" odd-or-even="even"/>
 				</fo:repeatable-page-master-alternatives>
 			</fo:page-sequence-master>
-			
+
 			<fo:simple-page-master master-name="page-odd-landscape" page-width="{$pageHeight}mm" page-height="{$pageWidth}mm">
 				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
 				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
@@ -60,6 +61,7 @@
 				<fo:region-start region-name="left-region" extent="{$extent_left}"/>
 				<fo:region-end region-name="right-region" extent="{$extent_right}"/>
 			</fo:simple-page-master>
+
 			<fo:simple-page-master master-name="page-even-landscape" page-width="{$pageHeight}mm" page-height="{$pageWidth}mm">
 				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
 				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
@@ -67,33 +69,32 @@
 				<fo:region-start region-name="left-region" extent="{$extent_left}"/>
 				<fo:region-end region-name="right-region" extent="{$extent_right}"/>
 			</fo:simple-page-master>
-			
+
 			<fo:page-sequence-master master-name="document-landscape">
 				<fo:repeatable-page-master-alternatives>
 					<fo:conditional-page-master-reference master-reference="page-odd-landscape" odd-or-even="odd"/>
 					<fo:conditional-page-master-reference master-reference="page-even-landscape" odd-or-even="even"/>
 				</fo:repeatable-page-master-alternatives>
 			</fo:page-sequence-master>
-			
 		</fo:layout-master-set>
 	</xsl:template>
-		
+
 	<xsl:variable name="cover_page_color_box1">rgb(202,152,49)</xsl:variable>
 	<xsl:variable name="cover_page_color_box2">rgb(139,152,91)</xsl:variable>
 	<xsl:variable name="cover_page_color_box3">rgb(208,63,78)</xsl:variable><!-- #d03f4e PDFa logo red - good contrast for WCAG Level AA -->
 	<xsl:variable name="cover_page_color_box4">rgb(72,145,175)</xsl:variable>
 	<xsl:variable name="cover_page_color_box_border_width">2.5pt</xsl:variable>
 	<xsl:variable name="cover_page_color_box_height">57mm</xsl:variable>
-	
+
 	<xsl:variable name="color_secondary" select="$cover_page_color_box3"/>
-	
+
 	<xsl:attribute-set name="cover_page_box">
 		<xsl:attribute name="padding-left">0.5mm</xsl:attribute>
 		<xsl:attribute name="padding-right">0.5mm</xsl:attribute>
 		<xsl:attribute name="padding-top">-0.5mm</xsl:attribute>
 		<xsl:attribute name="padding-bottom">-0.5mm</xsl:attribute>
 	</xsl:attribute-set>
-	
+
 	<xsl:template name="cover-page">
 		<xsl:param name="num"/>
 		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" initial-page-number="1">
@@ -109,17 +110,17 @@
 						</fo:block>
 					</fo:inline-container>
 				</fo:block>
-				
+
 				<!-- Type of document:
 					Specification, Best Practice Guide, Application Note, Technical Note, Extension -->
 				<fo:block font-size="29pt" font-weight="bold" text-align="right" margin-top="4mm">
 					<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) != '']"/>
 				</fo:block>
-				
+
 				<fo:block-container width="112mm" height="98mm" line-height="1.5" margin-top="4mm" fox:shrink-to-fit="true"> <!-- line-height needs to be 1.5 for WCAG Level AA -->
-				
+
 					<xsl:call-template name="insertCoverPageTitles"/>
-					
+
 					<!-- Example: title-intro fr -->
 					<!-- <xsl:variable name="lang_other">
 						<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:title[@language != $lang]">
@@ -139,9 +140,9 @@
 							</xsl:call-template>
 						</fo:block>
 					</xsl:for-each> -->
-					
+
 				</fo:block-container>
-				
+
 				<fo:block-container absolute-position="fixed" top="95mm" left="17.5mm" font-size="20pt">
 					<fo:table table-layout="fixed" width="174mm">
 						<fo:table-column column-width="proportional-column-width(1)"/>
@@ -287,7 +288,6 @@
 			</fo:block>
 		</fo:block>
 	</xsl:template>
-	
 
 	<xsl:variable name="circledChars">
 		<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -321,7 +321,7 @@
 			<xsl:apply-templates select="/mn:metanorma/mn:boilerplate/*"/>
 		</fo:block-container>
 		<fo:block break-after="page"/>
-		
+
 		<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'toc']">
 			<xsl:with-param name="num" select="$num"/>
 		</xsl:apply-templates>
@@ -335,25 +335,23 @@
 	<xsl:template match="mn:copyright-statement" priority="2">
 		<xsl:apply-templates />
 	</xsl:template>
-	
+
 	<xsl:attribute-set name="link-style">
 		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute><!-- #d03f4e PDFa logo red -->
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="text-decoration">underline</xsl:attribute>
 	</xsl:attribute-set>
-	
+
 	<xsl:template name="refine_link-style">
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:template>
-	
+
 	<xsl:variable name="variables_pdfa_">
 		<xsl:for-each select="//mn:metanorma">
 			<xsl:variable name="num"><xsl:number level="any" count="mn:metanorma"/></xsl:variable>
-
 			<xsl:variable name="current_document">
 				<xsl:copy-of select="."/>
 			</xsl:variable>
-			
 			<xsl:for-each select="xalan:nodeset($current_document)">
 				<mnx:doc num="{$num}">
 					<title><xsl:apply-templates select="mn:metanorma/mn:bibdata/mn:title[@type = 'main'][last()]/node()"/></title>
@@ -362,7 +360,6 @@
 		</xsl:for-each>
 	</xsl:variable>
 	<xsl:variable name="variables_pdfa" select="xalan:nodeset($variables_pdfa_)"/>
-	
 	<xsl:template name="insertHeaderFooter">
 		<xsl:param name="num"/>
 		<xsl:param name="section"/>
@@ -374,7 +371,6 @@
 			<xsl:with-param name="num" select="$num"/>
 		</xsl:call-template>
 	</xsl:template>
-
 	<xsl:template name="insertHeader">
 		<xsl:param name="num"/>
 		<xsl:param name="section"/>
@@ -566,4 +562,36 @@
 		<xsl:attribute name="color">black</xsl:attribute>
 	</xsl:attribute-set>
 	
+	<xsl:template match="mn:span[@class = 'requirement' or @class = 'recommendation' or @class = 'pdf-version']" mode="update_xml_step1" priority="2">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<xsl:apply-templates mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+
+	<xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'" />
+	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
+	
+	<xsl:template match="mn:span[@class = 'requirement']">
+		<fo:inline color="#FF0000" font-weight="bold"> <!-- Red -->
+			<xsl:value-of select="translate(., $lowercase, $uppercase)"/> <!-- convert to uppercase -->
+		</fo:inline>
+	</xsl:template>
+
+	<xsl:template match="mn:span[@class = 'recommendation']">
+		<fo:inline color="#FF8C00" font-weight="bold"> <!-- DarkOrange -->
+			<xsl:value-of select="translate(., $lowercase, $uppercase)"/>  <!-- convert to uppercase -->
+		</fo:inline>
+	</xsl:template>
+
+	<xsl:template match="mn:span[@class = 'pdf-version']">
+		<fo:inline color="#0000FF" font-weight="lighter" font-style="italic"> <!-- Blue -->
+			<xsl:value-of select="concat('(PDF ', ., ')')"/> <!-- italic blue "(PDF x.y)"-->
+		</fo:inline>
+	</xsl:template>
+
+	<xsl:attribute-set name="refine_table-cell-style"><?extend?>
+		<xsl:attribute name="border">1pt solid blue</xsl:attribute>
+	</xsl:attribute-set>
+
 </xsl:stylesheet>
