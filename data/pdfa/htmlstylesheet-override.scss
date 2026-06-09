@@ -18,11 +18,15 @@ body {
 
 figure, pre, .pseudocode { /* incl. source code */
   line-height: 1.5; /* WCAG level AA requires minimum line height of 1.5 */
-  font-size: 0.9em; /* monospaced fonts appear visually "larger" */
+  font-size: 90%;   /* monospaced fonts appear visually "larger" */
   margin-top: 0cm; 
   padding-top: 0.1em;
   margin-bottom: 0cm; 
   padding-bottom: 0.1em;
+}
+
+tt {
+  font-size: 90%;   /* monospaced fonts appear visually "larger" */
 }
 
 table > caption {
@@ -72,17 +76,16 @@ h1, .h1 {
 
 .example {
   text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
-  font-size: 0.9em; 
+  font-size: 90%; 
   background-color: #D6FFFE; /* Very pale blue */
 }
 
 .sourcecode {
-  font-size: 0.9em; 
-  background-color: white;
+  font-size: 90%; 
 }
 
 figcaption .SourceTitle { /* Revert the title back from monospaced font */
-  font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, sans-serif;
+  font-family: 'Source Sans 3', 'Helvetica Neue', Helvetica, sans-serif;
 }
 
 span.TermNum {
@@ -107,10 +110,10 @@ span.TermNum {
   color: blue; 
 }
 .pdf-version::before { content: "(PDF "; }
-.pdf-version::after { content: ")"; }
+.pdf-version::after  { content: ")"; }
 
 .Note, .note, .Admonition  { /* all types of admonitions */
-  font-size: small; 
+  font-size: 90%; 
   background-color: #fffcc9; /* baby yellow */
 }
 
@@ -136,7 +139,7 @@ span.TermNum {
 }
 
 .AdmonitionCaution {
-  color: Red; 
+  color: #d03f4e; /* PDFa logo red */
 }
 
 .AdmonitionBox:not(.AdmonitionTitle)  { /* Box the entire admonition, but not also the title */
