@@ -28,7 +28,7 @@ doctypes:
   base: standard
   abbrev: SPEC
   override-attributes:
-  - presentation-metadata-color-secondary: '#d03f4e' # PDFa logo red - good contrast for WCAG Level AA
+  - presentation-metadata-color-secondary: '#4891af' # PDFa logo blue - insufficient contrast for WCAG Level AA
 - taste: application-note # Application Note
   base: report
   abbrev: AN
@@ -55,4 +55,3 @@ stages:
     base: published
     default: true
     published: true
-
