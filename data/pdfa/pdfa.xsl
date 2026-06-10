@@ -103,7 +103,7 @@
 				
 				<fo:block margin-top="-3mm" role="SKIP"> <!-- -3mm because there is a space before image in the source SVG -->
 					<fo:inline-container width="47mm" role="SKIP">
-						<fo:block font-size="0pt">
+						<fo:block font-size="0pt" fox:alt-text="PDF Association logo">
 							<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:copyright/mn:owner/mn:organization">
 								<xsl:apply-templates select="mn:logo/mn:image"/>
 							</xsl:for-each>
@@ -118,7 +118,6 @@
 				</fo:block>
 
 				<fo:block-container width="112mm" height="98mm" line-height="1.5" margin-top="4mm" fox:shrink-to-fit="true"> <!-- line-height needs to be 1.5 for WCAG Level AA -->
-
 					<xsl:call-template name="insertCoverPageTitles"/>
 
 					<!-- Example: title-intro fr -->
@@ -140,7 +139,6 @@
 							</xsl:call-template>
 						</fo:block>
 					</xsl:for-each> -->
-
 				</fo:block-container>
 
 				<fo:block-container absolute-position="fixed" top="95mm" left="17.5mm" font-size="20pt">
@@ -150,43 +148,40 @@
 						<fo:table-column column-width="proportional-column-width(1)"/>
 						<fo:table-body>
 							<fo:table-row>
-								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell>
-								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
+								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
 								<fo:table-cell text-align="right" display-align="after" xsl:use-attribute-sets="cover_page_box"> <!-- padding-left="5mm" padding-right="5mm" -->
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box1}">
 										<fo:block font-size="18pt" margin-left="5mm" margin-right="5mm">
 											<fo:block>
-												<!-- Status / Version.
-														e.g. "Draft Release Candidate 1.2", or just a version -->
 												<!-- <xsl:variable name="status" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:status"/> -->
 												<xsl:variable name="status">
 													<xsl:call-template name="capitalize">
 														<xsl:with-param name="str" select="/mn:metanorma/mn:bibdata/mn:status/mn:stage"/>
 													</xsl:call-template>
 												</xsl:variable>
-												<!-- <xsl:choose> -->
-													<xsl:if test="normalize-space($status) != '' and $status != 'Published'">
-														<fo:block color="{$color_secondary}">
-															<xsl:value-of select="$status"/>
-														</fo:block>
-													</xsl:if>
-													<!-- </xsl:when>
-													<xsl:otherwise>  --><!-- just a version -->
-														<xsl:variable name="i18n_version"><xsl:call-template name="getLocalizedString"><xsl:with-param name="key">version</xsl:with-param></xsl:call-template></xsl:variable>
-														<xsl:call-template name="capitalize">
-															<xsl:with-param name="str" select="$i18n_version"/>
-														</xsl:call-template>
-														<xsl:text> </xsl:text>
-														<xsl:variable name="edition" select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) = '']"/>
-														<xsl:value-of select="$edition"/>
-														<xsl:if test="not(contains($edition, '.'))">.0</xsl:if>
-													<!-- </xsl:otherwise>
-												</xsl:choose> -->
+												<xsl:if test="normalize-space($status) != '' and $status != 'Published'">
+													<fo:block color="{$color_secondary}">
+														<xsl:value-of select="$status"/>
+													</fo:block>
+												</xsl:if>
+												<xsl:variable name="i18n_version">
+													<xsl:call-template name="getLocalizedString">
+														<xsl:with-param name="key">edition </xsl:with-param>
+													</xsl:call-template>
+												</xsl:variable>
+												<xsl:call-template name="capitalize">
+													<xsl:with-param name="str" select="$i18n_version"/>
+												</xsl:call-template>
+												<xsl:text></xsl:text>
+												<xsl:variable name="edition" select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) = '']"/>
+												<xsl:value-of select="$edition"/>
+												<xsl:if test="not(contains($edition, '.'))">.0</xsl:if>
 											</fo:block>
 											<fo:block margin-bottom="2mm">
 												<xsl:value-of select="substring(/mn:metanorma/mn:bibdata/mn:version/mn:revision-date, 1, 7)"/>
 											</fo:block>
-											<fo:block margin-bottom="2mm" font-size="9pt">
+											<fo:block margin-bottom="2mm" font-size="9pt"><!-- small size full document identifier -->
 												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
 											</fo:block>
 										</fo:block>
@@ -194,7 +189,7 @@
 								</fo:table-cell>
 							</fo:table-row>
 							<fo:table-row>
-								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
 								<fo:table-cell text-align="center" display-align="center" xsl:use-attribute-sets="cover_page_box">
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box2}">
 										<fo:block font-size="0pt" role="SKIP">
@@ -208,7 +203,7 @@
 										</fo:block>
 									</fo:block-container>
 								</fo:table-cell>
-								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
 							</fo:table-row>
 							<fo:table-row>
 								<fo:table-cell display-align="after" xsl:use-attribute-sets="cover_page_box">
@@ -222,7 +217,7 @@
 										</fo:block>
 									</fo:block-container>
 								</fo:table-cell>
-								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
 								<fo:table-cell display-align="after" xsl:use-attribute-sets="cover_page_box">
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box4}">
 										<fo:block margin-left="2mm">
@@ -234,7 +229,7 @@
 												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:copyright/mn:owner/mn:organization/mn:name"/>
 												<xsl:text> – </xsl:text>
 												<fo:inline text-decoration="underline">
-													<fo:basic-link fox:alt-text="PDF association" external-destination="https://pdfa.org/">pdfa.org</fo:basic-link>
+													<fo:basic-link fox:alt-text="PDF Association" external-destination="https://pdfa.org/">pdfa.org</fo:basic-link>
 												</fo:inline>
 											</fo:block>
 											<fo:block font-size="8pt" margin-bottom="2mm">
@@ -276,15 +271,15 @@
 		<fo:block role="P/Title">
 			<!-- Main title of doc -->
 			<fo:block font-size="{$font_size}pt" font-weight="bold" font-style="{$font_style}" role="SKIP">
-				<fo:block role="SKIP"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'intro' and @language = $curr_lang]/node()"/></fo:block> <!-- role="H1" -->
+				<fo:block role="SKIP"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'intro' and @language = $curr_lang]/node()"/></fo:block>
 			</fo:block>
 			<!-- Subtitle of doc -->
 			<fo:block font-size="{$font_size - 2}pt" font-style="{$font_style}" role="SKIP">
-				<fo:block role="SKIP"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'main' and @language = $curr_lang][last()]/node()"/></fo:block> <!-- role="H1" -->
+				<fo:block role="SKIP"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'main' and @language = $curr_lang][last()]/node()"/></fo:block>
 			</fo:block>
 			<!-- Part title -->
 			<fo:block font-size="{$font_size - 8}pt" font-style="{$font_style}" role="SKIP">
-				<fo:block role="SKIP"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'part' and @language = $curr_lang]/node()"/></fo:block> <!-- role="H1" -->
+				<fo:block role="SKIP"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'part' and @language = $curr_lang]/node()"/></fo:block>
 			</fo:block>
 		</fo:block>
 	</xsl:template>
@@ -453,7 +448,7 @@
 						<fo:block-container xsl:use-attribute-sets="reset-margins-style">
 							<fo:table width="100%" table-layout="fixed" role="SKIP">
 								<fo:table-column column-width="15mm"/>
-								<fo:table-column column-width="150mm"/>				
+								<fo:table-column column-width="150mm"/>
 								<fo:table-body role="SKIP">
 									<fo:table-row role="SKIP">
 										<fo:table-cell text-align="left" role="SKIP">
@@ -589,9 +584,5 @@
 			<xsl:value-of select="concat('(PDF ', ., ')')"/> <!-- italic blue "(PDF x.y)"-->
 		</fo:inline>
 	</xsl:template>
-
-	<xsl:attribute-set name="refine_table-cell-style"><?extend?>
-		<xsl:attribute name="border">1pt solid blue</xsl:attribute>
-	</xsl:attribute-set>
 
 </xsl:stylesheet>
