@@ -16,17 +16,16 @@ body {
   line-height: 1.5; /* WCAG level AA requires minimum line height of 1.5 */
 }
 
+tt, td tt, p tt { /* override 0.8em formatting elsewhere */
+  font-size: 100%;
+}
+
 figure, pre, .pseudocode { /* incl. source code */
   line-height: 1.5; /* WCAG level AA requires minimum line height of 1.5 */
-  font-size: 90%;   /* monospaced fonts appear visually "larger" */
   margin-top: 0cm; 
   padding-top: 0.1em;
   margin-bottom: 0cm; 
   padding-bottom: 0.1em;
-}
-
-tt {
-  font-size: 90%;   /* monospaced fonts appear visually "larger" */
 }
 
 table > caption {
