@@ -1,6 +1,6 @@
 <div id='toggle'> <span>•</span> </div>
 
-<div class="coverpage-container">
+<div class="coverpage-container" style="padding-left: 22px"> <!-- padding-left required to avoid submarining left edge text below "toggle" div -->
 
   <div class="logo">
     <img src="{{ copublisher_logos[0] }}" alt="PDF Association logo"/>
@@ -13,6 +13,7 @@
   <div style="display: none;">
     <!-- p>document.docid.id = {{ document.docid.id }}</p -->
     <!-- p>document.docstatus.stage = {{ document.docstatus.stage }}</p -->
+    <!-- https://www.metanorma.org/develop/topics/metadata-and-boilerplate/#default-metadata -->
     <p>doctype = {{ doctype }}</p>
     <p>doctype_display = {{ doctype_display }}</p>
     <p>doctype_abbr = {{ doctype_abbr }}</p>
@@ -31,6 +32,7 @@
     <p>stage_display = {{ stage_display }}</p>
     <p>stage_abbr = {{ stage_abbr }}</p>
     <p>stageabbr = {{ stageabbr }}</p>
+    <p>statusabbr = {{ statusabbr }}</p>
     <!-- p>doctype_abbreviated = {{ doctype_abbreviated }}</p -->
     <!-- p>document.docstatus.stage.abbreviation = {{ document.docstatus.stage.abbreviation }}</p -->
 </div>
