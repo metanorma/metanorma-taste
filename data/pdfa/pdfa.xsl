@@ -539,8 +539,10 @@
 	<xsl:attribute-set name="list-name-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:attribute-set>
-	<xsl:attribute-set name="sourcecode-name-style"><?extend?>
+	<xsl:attribute-set name="sourcecode-name-style">
+		<xsl:attribute name="keep-with-next">always</xsl:attribute>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
 	</xsl:attribute-set>
 	<xsl:attribute-set name="table-name-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
