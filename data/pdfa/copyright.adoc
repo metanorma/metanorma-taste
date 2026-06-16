@@ -2,7 +2,8 @@
 
 // This is authorized by the PDF Association.
 
-=== Copyright notice
+// Avoid heading tag
+=== {blank}
 
 Copyright (c) {{ docyear }} PDF Association
 
@@ -36,7 +37,3 @@ any of the mentioned information, services, products, or providers.
 === {blank}
 
 
-// [align=center]
-// **PDF Association**:
-
-// (c) PDF Association {{ docyear }} - All rights reserved
