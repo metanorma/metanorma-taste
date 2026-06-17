@@ -103,6 +103,20 @@ span.TermNum {
   text-transform: uppercase; /* Uppercase "SHOULD" a-la RFCs */
 }
 
+.pdf-keyword {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #e2e29f;
+  color: Blue; 
+  font-weight: bold;
+}
+
+.pdf-operator {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #e2e29f;
+  color: Red; 
+  font-weight: bold;
+}
+
 .pdf-version { 
   font-style: italic; 
   font-weight: lighter; 
