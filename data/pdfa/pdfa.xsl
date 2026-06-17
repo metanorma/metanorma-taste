@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?><xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:mn="https://www.metanorma.org/ns/standoc" xmlns:mnx="https://www.metanorma.org/ns/xslt" xmlns:mathml="http://www.w3.org/1998/Math/MathML" xmlns:xalan="http://xml.apache.org/xalan" xmlns:fox="http://xmlgraphics.apache.org/fop/extensions" xmlns:pdf="http://xmlgraphics.apache.org/fop/extensions/pdf" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:java="http://xml.apache.org/xalan/java" xmlns:barcode="http://barcode4j.krysalis.org/ns" xmlns:redirect="http://xml.apache.org/xalan/redirect" exclude-result-prefixes="java" extension-element-prefixes="redirect" version="1.0">
 
-	<xsl:variable name="pageWidth">210</xsl:variable>
-	<xsl:variable name="pageHeight">297</xsl:variable>
-	<xsl:variable name="marginTop">24</xsl:variable>
+	<xsl:variable name="pageWidth">210</xsl:variable><!-- no units! in mm -->
+	<xsl:variable name="pageHeight">297</xsl:variable><!-- no units! in mm -->
+	<xsl:variable name="marginTop">24</xsl:variable><!-- no units! in mm. Allows for page header -->
+
+	<xsl:variable name="marginLeftRight1">15</xsl:variable><!-- margin-left below, no units, in mm -->
+	<xsl:variable name="marginLeftRight2">15</xsl:variable><!-- margin-right below, no units, in mm -->
+	<xsl:variable name="toc_item_indent">4</xsl:variable><!-- ToC indentation level for each level. No units. In mm -->
 
 	<xsl:attribute-set name="root-style"><?extend?>
 		<xsl:attribute name="font-family">Source Sans 3, STIX Two Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
@@ -21,6 +25,28 @@
 			<fo:simple-page-master master-name="copyright-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
 				<fo:region-body margin-top="20mm" margin-bottom="35mm" margin-left="18mm" margin-right="18mm"/>
 			</fo:simple-page-master>
+
+			<!-- ToC -->
+			<fo:simple-page-master master-name="toc-odd" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header-toc-odd" extent="{$extent_header}"/>
+				<fo:region-after region-name="footer-odd" extent="{$extent_footer}"/>
+				<fo:region-start region-name="left-region" extent="{$extent_left}"/>
+				<fo:region-end region-name="right-region" extent="{$extent_right}"/>
+			</fo:simple-page-master>
+			<fo:simple-page-master master-name="toc-even" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header-toc-even" extent="{$extent_header}"/>
+				<fo:region-after region-name="footer-even" extent="{$extent_footer}"/>
+				<fo:region-start region-name="left-region" extent="{$extent_left}"/>
+				<fo:region-end region-name="right-region" extent="{$extent_right}"/>
+			</fo:simple-page-master>
+			<fo:page-sequence-master master-name="toc">
+				<fo:repeatable-page-master-alternatives>
+					<fo:conditional-page-master-reference odd-or-even="odd"  master-reference="toc-odd"/>
+					<fo:conditional-page-master-reference odd-or-even="even" master-reference="toc-even"/>
+				</fo:repeatable-page-master-alternatives>
+			</fo:page-sequence-master>
 
 			<fo:simple-page-master master-name="first" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
 				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
@@ -81,7 +107,7 @@
 
 	<xsl:variable name="cover_page_color_box1">rgb(202,152,49)</xsl:variable>
 	<xsl:variable name="cover_page_color_box2">rgb(139,152,91)</xsl:variable>
-	<xsl:variable name="cover_page_color_box3">rgb(208,63,78)</xsl:variable><!-- #d03f4e PDFa logo red - good contrast for WCAG Level AA -->
+	<xsl:variable name="cover_page_color_box3">rgb(208,63,78)</xsl:variable><!-- PDFa logo red - good contrast for WCAG Level AA -->
 	<xsl:variable name="cover_page_color_box4">rgb(72,145,175)</xsl:variable>
 	<xsl:variable name="cover_page_color_box_border_width">2.5pt</xsl:variable>
 	<xsl:variable name="cover_page_color_box_height">57mm</xsl:variable>
@@ -209,7 +235,6 @@
 								<fo:table-cell display-align="after" xsl:use-attribute-sets="cover_page_box">
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box3}">
 										<!-- the group that authored the doc -->
-										<!-- Example: EA-PDF LWG -->
 										<fo:block margin-left="5mm" margin-right="5mm" margin-bottom="3mm">
 											<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role[@type = 'author' and 
 											(mn:description[normalize-space(@language) = ''] = 'Technical committee' or mn:description[normalize-space(@language) = ''] = 'committee')]]/
@@ -221,7 +246,7 @@
 								<fo:table-cell display-align="after" xsl:use-attribute-sets="cover_page_box">
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box4}">
 										<fo:block margin-left="2mm">
-											<!-- Example: © 2025 PDF Association – pdfa.org -->
+											<!-- Example: © 2025 PDF Association - pdfa.org -->
 											<fo:block font-size="9.9pt">
 												<xsl:text>© </xsl:text>
 												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:copyright/mn:from"/>
@@ -290,7 +315,7 @@
 			<title>Creative Common icons</title>
   		<desc>Creative Common graphic icons for CC-BY-4.0.</desc>
 			<style type="text/css">
-				.st0{fill:#010101;}
+				.st0 { fill: #010101; }
 			</style>
 			<path class="st0" d="M0,3.3C0,1.3,1.5,0,3.2,0C5,0,6.5,1.3,6.5,3.3c0,2-1.5,3.3-3.2,3.3C1.5,6.6,0,5.3,0,3.3z M6,3.3
 				c0-1.7-1.2-2.8-2.7-2.8c-1.5,0-2.7,1.1-2.7,2.8c0,1.7,1.2,2.9,2.7,2.9C4.7,6.2,6,5,6,3.3z M1,3.3c0-1.2,0.6-1.8,1.3-1.8
@@ -306,8 +331,23 @@
 	</xsl:variable>
 
 	<xsl:attribute-set name="toc-style"><?extend?>
-		<xsl:attribute name="margin-left">-6mm</xsl:attribute>
+		<xsl:attribute name="margin-left">1mm</xsl:attribute>
+		<xsl:attribute name="margin-right">5mm</xsl:attribute>
 	</xsl:attribute-set>
+
+	<xsl:template name="refine_toc-listof-title-style"><?extend?>
+		<xsl:attribute name="margin-left">5mm</xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
+	</xsl:template>
+
+	<xsl:template name="refine_clause-style"><?extend?>
+		<xsl:variable name="level">
+			<xsl:call-template name="getLevel"/>
+		</xsl:variable>
+		<xsl:if test="$level = 0 or $level = 1 and not(ancestor-or-self::mn:annex)">
+			<xsl:attribute name="break-before">page</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
 
 	<xsl:template name="toc_and_boilerplate">
 		<xsl:param name="num"/>
@@ -316,7 +356,6 @@
 			<xsl:apply-templates select="/mn:metanorma/mn:boilerplate/*"/>
 		</fo:block-container>
 		<fo:block break-after="page"/>
-
 		<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'toc']">
 			<xsl:with-param name="num" select="$num"/>
 		</xsl:apply-templates>
@@ -331,22 +370,16 @@
 		<xsl:apply-templates />
 	</xsl:template>
 
-	<xsl:attribute-set name="link-style">
-		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute><!-- #d03f4e PDFa logo red -->
+	<xsl:template name="refine_link-style"><?extend?>
+		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute><!-- PDFa logo red -->
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="text-decoration">underline</xsl:attribute>
-	</xsl:attribute-set>
-
-	<xsl:template name="refine_link-style">
-		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:template>
 
 	<xsl:variable name="variables_pdfa_">
 		<xsl:for-each select="//mn:metanorma">
 			<xsl:variable name="num"><xsl:number level="any" count="mn:metanorma"/></xsl:variable>
-			<xsl:variable name="current_document">
-				<xsl:copy-of select="."/>
-			</xsl:variable>
+			<xsl:variable name="current_document"><xsl:copy-of select="."/></xsl:variable>
 			<xsl:for-each select="xalan:nodeset($current_document)">
 				<mnx:doc num="{$num}">
 					<title><xsl:apply-templates select="mn:metanorma/mn:bibdata/mn:title[@type = 'main'][last()]/node()"/></title>
@@ -354,7 +387,9 @@
 			</xsl:for-each>
 		</xsl:for-each>
 	</xsl:variable>
+
 	<xsl:variable name="variables_pdfa" select="xalan:nodeset($variables_pdfa_)"/>
+
 	<xsl:template name="insertHeaderFooter">
 		<xsl:param name="num"/>
 		<xsl:param name="section"/>
@@ -366,6 +401,7 @@
 			<xsl:with-param name="num" select="$num"/>
 		</xsl:call-template>
 	</xsl:template>
+
 	<xsl:template name="insertHeader">
 		<xsl:param name="num"/>
 		<xsl:param name="section"/>
@@ -378,10 +414,7 @@
 
 	<xsl:template name="insertFooter">
 		<xsl:param name="num"/>
-		<!-- <xsl:param name="invert"/> -->
 		<xsl:variable name="footerText"> 
-			<!-- <xsl:text>PDF Association</xsl:text>
-			<xsl:text>&#xA0;</xsl:text> -->
 			<xsl:call-template name="capitalizeWords">
 				<xsl:with-param name="str">
 					<xsl:choose>
@@ -395,17 +428,54 @@
 				</xsl:with-param>
 			</xsl:call-template>
 		</xsl:variable>
+
 		<xsl:call-template name="insertFooterOdd">
 			<xsl:with-param name="num" select="$num"/>
 			<xsl:with-param name="footerText" select="$footerText"/>
 		</xsl:call-template>
+		
 		<xsl:call-template name="insertFooterEven">
 			<xsl:with-param name="num" select="$num"/>
 			<xsl:with-param name="footerText" select="$footerText"/>
 		</xsl:call-template>
 	</xsl:template>
 
-	<xsl:template name="refine_strong_style">
+	<!-- Page numbering: roman numerals for ToC/boilerplate, arabic for main body -->
+	<!-- The ToC/boilerplate fo:page-sequence uses this attribute-set directly (no refine_ call),
+	     so format="i" and initial-page-number="1" apply only there. -->
+	<xsl:attribute-set name="page-sequence-main"><?extend?>
+		<xsl:attribute name="format">i</xsl:attribute>
+		<xsl:attribute name="initial-page-number">1</xsl:attribute>
+	</xsl:attribute-set>
+
+	<!-- Overrides base refine_page-sequence-main to switch to Arabic numerals for body content.
+	     Preface page sequences inherit format="i" from the attribute-set and override
+	     initial-page-number to "auto" so they continue the roman count from the ToC.
+	     The first main-body sequence restarts at Arabic 1; subsequent ones continue via "auto". -->
+	<xsl:template name="refine_page-sequence-main">
+		<xsl:param name="layoutVersion"/>
+		<xsl:param name="doctype"/>
+		<xsl:attribute name="master-reference">document<xsl:call-template name="getPageSequenceOrientation"/></xsl:attribute>
+		<xsl:choose>
+			<xsl:when test=".//mn:sections or .//mn:annex or .//mn:bibliography">
+				<xsl:attribute name="format">1</xsl:attribute>
+				<xsl:choose>
+					<xsl:when test="not(preceding-sibling::mn:page_sequence[.//mn:sections or .//mn:annex or .//mn:bibliography])">
+						<xsl:attribute name="initial-page-number">1</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name="initial-page-number">auto</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- Preface sequences: continue roman numeral count from the ToC/boilerplate sequence -->
+				<xsl:attribute name="initial-page-number">auto</xsl:attribute>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="refine_strong_style"><?extend?>
 		<xsl:if test="ancestor::*['preferred']">
 			<xsl:attribute name="role">SKIP</xsl:attribute>
 		</xsl:if>
@@ -418,12 +488,21 @@
 	</xsl:template>
 	
 	<xsl:template name="refine_title-style"><?extend?>
-		<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
-		<xsl:attribute name="font-weight">normal</xsl:attribute>
+		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute><!-- PDFa logo red -->
+		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
 	</xsl:template>
-	
+
+	<xsl:template name="refine_bibliography-title-style"><?extend?>
+		<xsl:attribute name="margin-left">0mm</xsl:attribute>
+		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute><!-- PDFa logo red -->
+	</xsl:template>
+
+	<xsl:template name="refine_annex-title-style"><?extend?>
+		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute><!-- PDFa logo red -->
+		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
+	</xsl:template>
+
 	<xsl:template match="mn:fmt-title" name="title">
-		
 		<xsl:variable name="level">
 			<xsl:call-template name="getLevel"/>
 		</xsl:variable>
@@ -436,46 +515,27 @@
 		</xsl:variable>
 		
 		<xsl:variable name="title_styles">
-			<styles xsl:use-attribute-sets="title-style"><xsl:call-template name="refine_title-style"/></styles>
+			<styles xsl:use-attribute-sets="title-style">
+				<xsl:call-template name="refine_title-style"/>
+			</styles>
 		</xsl:variable>
 		
 		<xsl:element name="{$element-name}">
 			<xsl:copy-of select="xalan:nodeset($title_styles)/styles/@*"/>
-			
-			<!-- <xsl:choose>
-				<xsl:when test="$level = 1"> -->
-					<fo:block-container margin-left="-15mm" role="SKIP">
-						<fo:block-container xsl:use-attribute-sets="reset-margins-style">
-							<fo:table width="100%" table-layout="fixed" role="SKIP">
-								<fo:table-column column-width="15mm"/>
-								<fo:table-column column-width="150mm"/>
-								<fo:table-body role="SKIP">
-									<fo:table-row role="SKIP">
-										<fo:table-cell text-align="left" role="SKIP">
-											<fo:block role="SKIP">
-												<xsl:call-template name="setIDforNamedDestinationInline"/>
-												<xsl:call-template name="extractSection"/><!-- section number 1 2 3  ... -->
-											</fo:block>
-										</fo:table-cell>
-										<fo:table-cell role="SKIP">
-											<fo:block role="SKIP">
-													<xsl:call-template name="extractTitle"/> <!-- section title -->
-													<xsl:apply-templates select="following-sibling::*[1][self::mn:variant-title][@type = 'sub']" mode="subtitle"/>
-												</fo:block>
-										</fo:table-cell>
-									</fo:table-row>
-								</fo:table-body>
-							</fo:table>
-						</fo:block-container>
-					</fo:block-container>
-				<!-- </xsl:when>
-				<xsl:otherwise>
-						<xsl:call-template name="setIDforNamedDestinationInline"/>
-						<xsl:apply-templates />
-						<xsl:apply-templates select="following-sibling::*[1][self::mn:variant-title][@type = 'sub']" mode="subtitle"/>
-				</xsl:otherwise>
-			</xsl:choose> -->
-			
+			<xsl:if test="$level = 1">
+				<xsl:attribute name="break-before">page</xsl:attribute><!-- ensure every H1 starts on a new page -->
+			</xsl:if>
+			<fo:block-container xsl:use-attribute-sets="reset-margins-style">
+				<fo:block role="SKIP">
+					<xsl:call-template name="setIDforNamedDestinationInline"/>
+					<xsl:variable name="section-number" select="normalize-space(mn:tab[1]/preceding-sibling::node())"/>
+					<xsl:if test="$section-number != ''">
+						<xsl:value-of select="$section-number"/>&#x2003; <!-- em space (wider than NBSP) -->
+					</xsl:if>
+					<xsl:call-template name="extractTitle"/> <!-- section title -->
+					<xsl:apply-templates select="following-sibling::*[1][self::mn:variant-title][@type = 'sub']" mode="subtitle"/>
+				</fo:block>
+			</fo:block-container>
 		</xsl:element>
 	</xsl:template>
 	
@@ -490,11 +550,16 @@
 	</xsl:template>
 		
 	<xsl:template match="mn:ul/mn:li/mn:fmt-name[normalize-space() = 'o']" priority="3" mode="update_xml_step1">
-		<xsl:attribute name="label">■</xsl:attribute>
+		<xsl:attribute name="label">■</xsl:attribute><!-- use square block for unorder list label -->
 	</xsl:template>
-	
+
+	<xsl:attribute-set name="note-name-style"><?extend?>
+		<xsl:attribute name="padding-right">3mm</xsl:attribute>
+	</xsl:attribute-set>
+
 	<xsl:attribute-set name="note-style"><?extend?>
-		<xsl:attribute name="background-color">rgb(245,235,206)</xsl:attribute> <!-- PDF Association "logo yellow" converted to HSL and lightened to 88% (L) -->
+		<xsl:attribute name="background-color">rgb(233, 220, 182)</xsl:attribute>
+		<xsl:attribute name="border-left">4pt solid rgb(224, 185, 66)</xsl:attribute>
 		<xsl:attribute name="margin-left">8.5mm</xsl:attribute>
 		<xsl:attribute name="margin-right">0.5mm</xsl:attribute>
 		<xsl:attribute name="padding">1mm</xsl:attribute>
@@ -512,32 +577,68 @@
 			</xsl:if>
 		</xsl:if>
 	</xsl:template>
-	
-	<xsl:attribute-set name="note-name-style"><?extend?>
-		<xsl:attribute name="padding-right">3mm</xsl:attribute>
-	</xsl:attribute-set>
-	
+
+	<xsl:template match="mn:admonition">
+		<fo:block margin-left="8.5mm" margin-right="0.5mm" padding="1mm" padding-left="1.5mm" padding-right="1.5mm" font-size="88%">
+			<xsl:if test="@type = 'tip'">
+				<xsl:attribute name="background-color">rgb(245,235,206)</xsl:attribute> <!-- yellow -->
+				<xsl:attribute name="border-left">4pt solid rgb(208,63,78)</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="@type = 'warning'">
+				<xsl:attribute name="background-color">rgb(255,245,230)</xsl:attribute> <!-- light orange -->
+				<xsl:attribute name="border-left">4pt solid rgb(255,140,0)</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="@type = 'caution'">
+				<xsl:attribute name="background-color">rgb(255,250,205)</xsl:attribute> <!-- light amber -->
+				<xsl:attribute name="border-left">4pt solid rgb(184,134,11)</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="@type = 'important'">
+				<xsl:attribute name="background-color">rgb(255,230,230)</xsl:attribute> <!-- light red -->
+				<xsl:attribute name="border-left">4pt solid rgb(255,0,0)</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="@type = 'safety-precaution'">
+				<xsl:attribute name="background-color">rgb(230,245,230)</xsl:attribute> <!-- light green -->
+				<xsl:attribute name="border-left">4pt solid rgb(0,128,0)</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="@type = 'editorial'">
+				<xsl:attribute name="background-color">rgb(240,240,240)</xsl:attribute> <!-- light gray -->
+				<xsl:attribute name="border-left">4pt solid rgb(128,128,128)</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="@type = 'box'">
+				<xsl:attribute name="background-color">rgb(154, 221, 218)</xsl:attribute> <!-- light blue/gray -->
+				<xsl:attribute name="border">2pt solid black</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="not(@type) or @type = ''">
+				<xsl:attribute name="background-color">rgb(240,240,240)</xsl:attribute> <!-- default gray -->
+				<xsl:attribute name="border-left">4pt solid rgb(128,128,128)</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates/>
+		</fo:block>
+	</xsl:template>
+
 	<xsl:template match="mn:note/mn:fmt-name/mn:tab" mode="tab">
 		<xsl:attribute name="padding-right">1mm</xsl:attribute>
 	</xsl:template>
 	
 	<xsl:attribute-set name="dl-name-style"><?extend?>
-		<xsl:attribute name="font-weight">normal</xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
 	</xsl:attribute-set>
+
 	<xsl:attribute-set name="figure-name-style"><?extend?>
-		<xsl:attribute name="font-weight">normal</xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
 	</xsl:attribute-set>
+	
 	<xsl:attribute-set name="list-name-style"><?extend?>
-		<xsl:attribute name="font-weight">normal</xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
 	</xsl:attribute-set>
+	
 	<xsl:attribute-set name="sourcecode-name-style">
 		<xsl:attribute name="keep-with-next">always</xsl:attribute>
-		<xsl:attribute name="font-weight">normal</xsl:attribute>
+		<xsl:attribute name="padding-bottom">10pt</xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
 		<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
 	</xsl:attribute-set>
-	<xsl:attribute-set name="table-name-style"><?extend?>
-		<xsl:attribute name="font-weight">normal</xsl:attribute>
-	</xsl:attribute-set>
+	
 	<xsl:attribute-set name="term-kind-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:attribute-set>
@@ -548,9 +649,9 @@
 		</xsl:if>
 	</xsl:template>
 	
-	<xsl:attribute-set name="example-body-style">
-		<xsl:attribute name="margin-left">7mm</xsl:attribute>
-		<xsl:attribute name="margin-right">7mm</xsl:attribute>
+	<xsl:attribute-set name="example-body-style"><!-- reduce margins within examples so can be wider -->
+		<xsl:attribute name="margin-left">3mm</xsl:attribute>
+		<xsl:attribute name="margin-right">3mm</xsl:attribute>
 	</xsl:attribute-set>
 	
 	<xsl:variable name="example_display_in">block</xsl:variable>
@@ -559,7 +660,7 @@
 		<xsl:attribute name="color">black</xsl:attribute>
 	</xsl:attribute-set>
 	
-	<xsl:template match="mn:span[@class = 'requirement' or @class = 'recommendation' or @class = 'pdf-version']" mode="update_xml_step1" priority="2">
+	<xsl:template match="mn:span[@class = 'requirement' or @class = 'recommendation' or @class = 'pdf-version' or @class = 'pdf-operator' or @class = 'pdf-keyword']" mode="update_xml_step1" priority="2">
 		<xsl:copy>
 			<xsl:copy-of select="@*"/>
 			<xsl:apply-templates mode="update_xml_step1"/>
@@ -577,14 +678,53 @@
 
 	<xsl:template match="mn:span[@class = 'recommendation']">
 		<fo:inline color="#FF8C00" font-weight="bold"> <!-- DarkOrange -->
-			<xsl:value-of select="translate(., $lowercase, $uppercase)"/>  <!-- convert to uppercase -->
+			<xsl:value-of select="translate(., $lowercase, $uppercase)"/> <!-- convert to uppercase -->
 		</fo:inline>
 	</xsl:template>
 
-	<xsl:template match="mn:span[@class = 'pdf-version']">
+	<xsl:template match="mn:span[@class = 'pdf-version']"><!-- italic blue "(PDF x.y)"-->
 		<fo:inline color="#0000FF" font-weight="lighter" font-style="italic"> <!-- Blue -->
-			<xsl:value-of select="concat('(PDF ', ., ')')"/> <!-- italic blue "(PDF x.y)"-->
+			<xsl:value-of select="concat('(PDF ', ., ')')"/>
 		</fo:inline>
+	</xsl:template>
+
+	<xsl:template match="mn:span[@class = 'pdf-operator']">
+		<fo:inline font-family="monospace" background-color="#e2e29f" color="#ff0000" font-weight="bold" font-size="85%">
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+
+	<xsl:template match="mn:span[@class = 'pdf-keyword']">
+		<fo:inline font-family="monospace" background-color="#e2e29f" color="#0000ff" font-weight="bold" font-size="85%">
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+
+	<xsl:attribute-set name="table-name-style"><?extend?>
+		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
+	</xsl:attribute-set>
+
+	<xsl:template name="refine_table-body-row-style"><?extend?>
+		<xsl:variable name="number"><xsl:number/></xsl:variable>
+		<xsl:if test="$number mod 2 = 0">
+			<xsl:attribute name="background-color">#f7f7f7</xsl:attribute> <!-- very pale grey zebra stripes -->
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="refine_toc-item-style"><?extend?><!-- compress space around ToC entries -->
+		<xsl:if test="@level = 1">
+			<xsl:if test="preceding-sibling::mnx:item[@display = 'true' and @level = 1]">
+				<xsl:attribute name="space-before">8pt</xsl:attribute>
+			</xsl:if>
+			<xsl:attribute name="space-after">2pt</xsl:attribute>
+			<xsl:attribute name="font-weight">bold</xsl:attribute>
+			<xsl:attribute name="keep-with-next">always</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="@level &gt;= 2">
+			<xsl:attribute name="margin-left"><xsl:value-of select="(@level - 1) * $toc_item_indent"/>mm</xsl:attribute>
+			<xsl:attribute name="space-before">2pt</xsl:attribute>
+			<xsl:attribute name="space-after">2pt</xsl:attribute>
+		</xsl:if>
 	</xsl:template>
 
 </xsl:stylesheet>
