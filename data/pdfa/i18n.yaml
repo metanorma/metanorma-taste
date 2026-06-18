@@ -21,17 +21,24 @@ stage_dict:
   published: Published
 
 admonition:  # see https://github.com/metanorma/isodoc/issues/760
+  tip: Tip
   danger: DANGER
   warning: Warning
   caution: Caution
   important: IMPORTANT!
-  safety precautions: Safety Precautions
-  editorial: Editorial Note
+  safety precautions: SECURITY!
+  editorial: Editor Note
 
-admonition-icon: # see https://github.com/metanorma/isodoc/issues/760
-  tip: 💡
-  danger: 🔥
-  warning: 🛑
-  important: ℹ️
-  safety precautions: ⚠️
-  editorial: 🖊️
+abstract: Summary
+foreword: Preface
+clause: Section
+formula: Equation
+subclause: sub-section
+section: Section
+annex: Appendix
+table_of_contents: Table of Contents
+annex_subclause: sub-section
+termsdef: Definitions
+termsdefsymbolsabbrev: Definitions, acronyms and abbreviations
+termsdefsymbols: Definitions, acronyms and abbreviations
+termsdefabbrev: Definitions, acronyms and abbreviations
