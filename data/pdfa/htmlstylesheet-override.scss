@@ -41,9 +41,25 @@ tbody tr:nth-child(even) {
     background-color: LightGray; /* Light grey for even rows - not header */
 }
 
-ul li::before { /* existing CSS used li::before rather than li::marker so need to override */
-  content: "\25A0";  /* Source Sans 3 does not include a CSS "square" marker - its more of a dash */
-  color: #d03f4e; /* Changes the bullet color to PDFa logo red */
+/* Level 1: Square bullet, red */
+ul > li::before {
+  content: "\25A0";  /* Black square */
+  color: #d03f4e;    /* PDFa logo red */
+  font-size: 90%;
+}
+
+/* Level 2: Diamond bullet, blue */
+ul ul > li::before {
+  content: "\25C6";  /* Diamond */
+  color: #489aaf;    /* PDFa logo blue */
+  font-size: 100%;
+}
+
+/* Level 3: Circle bullet, green */
+ul ul ul > li::before {
+  content: "\25CF";  /* Filled circle */
+  color: #8b9856;    /* PDFa logo green */
+  font-size: 110%;
 }
 
 .logo { /* cover page logo */
@@ -125,39 +141,102 @@ span.TermNum {
 .pdf-version::before { content: "(PDF "; }
 .pdf-version::after  { content: ")"; }
 
-.Note, .note, .Admonition  { /* all types of admonitions */
-  font-size: 90%; 
-  background-color: #fffcc9; /* baby yellow */
+/* Base admonition styling */
+.Note, .note, .Admonition  {
+  font-size: 86%;
+  margin-left: 8.5mm;
+  margin-right: 0.5mm;
+  margin-top: 6pt;
+  margin-bottom: 6pt;
+  padding: 1mm;
+  padding-left: 1.5mm;
+  padding-right: 1.5mm;
+  border-left: 4pt solid;
 }
 
 .note_label {
-    font-weight: bold; /* the "NOTE 1" text before the body of a note */
+  font-weight: bold; /* the "NOTE 1" text before the body of a note */
 }
 
-.AdmonitionTitle { /* titles of all admonitions - DOES NOT WORK! HTML includes hard-coded text-align center */
+.AdmonitionTitle { /* titles of all admonitions */
   text-align: left;
   text-transform: none; /* PDF is case sensitive! */
+  font-weight: bold;
 }
 
-.AdmonitionImportant {
-  background-color: #e8c8ec; /* very pale purple */
-}
-
-.AdmonitionWarning {
-  background-color: #f9bfc0; /* very pale pink */
-}
-
+/* Tip admonition */
 .AdmonitionTip {
-  background-color: #C7E6D7; /* very pale green */
+  background-color: #f5ebce; /* rgb(245,235,206) */
+  border-left-width: 4pt;
+  border-left-color: #d03f4e; /* rgb(208,63,78) - PDFa red */
 }
 
+.AdmonitionTip .AdmonitionTitle {
+  color: #d03f4e;
+}
+
+/* Warning admonition */
+.AdmonitionWarning {
+  background-color: #fff5e6; /* rgb(255,245,230) */
+  border-left-width: 4pt;
+  border-left-color: #ff8c00; /* rgb(255,140,0) - dark orange */
+}
+
+.AdmonitionWarning .AdmonitionTitle {
+  color: #ff8c00;
+}
+
+/* Caution admonition */
 .AdmonitionCaution {
-  color: #d03f4e; /* PDFa logo red */
+  background-color: #fffacd; /* rgb(255,250,205) */
+  border-left-width: 4pt;
+  border-left-color: #b8860b; /* rgb(184,134,11) - dark goldenrod */
 }
 
-.AdmonitionBox:not(.AdmonitionTitle)  { /* Box the entire admonition, but not also the title */
-  border-width: 2px; 
-  border-style: solid; 
-  border-color: black; 
-  border-radius: 5px;
+.AdmonitionCaution .AdmonitionTitle {
+  color: #b8860b;
+}
+
+/* Important admonition */
+.AdmonitionImportant {
+  background-color: #ffe6e6; /* rgb(255,230,230) */
+  border-left-width: 4pt;
+  border-left-color: #ff0000; /* rgb(255,0,0) - red */
+}
+
+.AdmonitionImportant .AdmonitionTitle {
+  color: #ff0000;
+}
+
+/* Safety-precaution admonition */
+.AdmonitionSafetyPrecaution {
+  background-color: #e6f5e6; /* rgb(230,245,230) */
+  border-left-width: 4pt;
+  border-left-color: #008000; /* rgb(0,128,0) - green */
+}
+
+.AdmonitionSafetyPrecaution .AdmonitionTitle {
+  color: #008000;
+}
+
+/* Editorial admonition */
+.AdmonitionEditorial {
+  background-color: #f0f0f0; /* rgb(240,240,240) */
+  border-left-width: 4pt;
+  border-left-color: #808080; /* rgb(128,128,128) - gray */
+}
+
+.AdmonitionEditorial .AdmonitionTitle {
+  color: #808080;
+}
+
+/* Box admonition */
+.AdmonitionBox {
+  background-color: #9addda; /* rgb(154, 221, 218) */
+  border: 2pt solid black;
+  border-left: none;
+}
+
+.AdmonitionBox.AdmonitionTitle {
+  border: none;
 }
