@@ -3,13 +3,24 @@
 	<xsl:variable name="pageWidth">210</xsl:variable><!-- no units! in mm -->
 	<xsl:variable name="pageHeight">297</xsl:variable><!-- no units! in mm -->
 	<xsl:variable name="marginTop">24</xsl:variable><!-- no units! in mm. Allows for page header -->
-
 	<xsl:variable name="marginLeftRight1">15</xsl:variable><!-- margin-left below, no units, in mm -->
 	<xsl:variable name="marginLeftRight2">15</xsl:variable><!-- margin-right below, no units, in mm -->
+
 	<xsl:variable name="toc_item_indent">4</xsl:variable><!-- ToC indentation level for each level. No units. In mm -->
 
+	<!-- PDF Association logo colors -->
+	<xsl:variable name="logo_yellow">rgb(202,152,49)</xsl:variable>
+	<xsl:variable name="logo_green">rgb(139,152,91)</xsl:variable>
+	<xsl:variable name="logo_red">rgb(208,63,78)</xsl:variable><!-- only logo color with sufficient contrast for WCAG Level AA -->
+	<xsl:variable name="logo_blue">rgb(72,145,175)</xsl:variable>
+
+	<!-- PDF Association preferred typefaces -->
+	<xsl:variable name="proportional_font">Source Sans 3, STIX Two Math, <xsl:value-of select="$font_noto_sans"/>, sans-serif</xsl:variable>
+	<xsl:variable name="monospaced_font">Google Sans Code, Courier, monospace</xsl:variable>
+	<xsl:variable name="mono_font-reduction">86%</xsl:variable><!-- percentage of default typeface for monospaced text to reduce visual size -->
+
 	<xsl:attribute-set name="root-style"><?extend?>
-		<xsl:attribute name="font-family">Source Sans 3, STIX Two Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
+		<xsl:attribute name="font-family"><xsl:value-of select="$proportional_font"/></xsl:attribute>
 		<xsl:attribute name="font-size">11pt</xsl:attribute>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="color">black</xsl:attribute>
@@ -105,14 +116,8 @@
 		</fo:layout-master-set>
 	</xsl:template>
 
-	<xsl:variable name="cover_page_color_box1">rgb(202,152,49)</xsl:variable>
-	<xsl:variable name="cover_page_color_box2">rgb(139,152,91)</xsl:variable>
-	<xsl:variable name="cover_page_color_box3">rgb(208,63,78)</xsl:variable><!-- PDFa logo red - good contrast for WCAG Level AA -->
-	<xsl:variable name="cover_page_color_box4">rgb(72,145,175)</xsl:variable>
 	<xsl:variable name="cover_page_color_box_border_width">2.5pt</xsl:variable>
 	<xsl:variable name="cover_page_color_box_height">57mm</xsl:variable>
-
-	<xsl:variable name="color_secondary" select="$cover_page_color_box3"/>
 
 	<xsl:attribute-set name="cover_page_box">
 		<xsl:attribute name="padding-left">0.5mm</xsl:attribute>
@@ -137,8 +142,7 @@
 					</fo:inline-container>
 				</fo:block>
 
-				<!-- Type of document:
-					Specification, Best Practice Guide, Application Note, Technical Note, Extension -->
+				<!-- Type of document: Specification, Best Practice Guide, Application Note, Technical Note, Extension -->
 				<fo:block font-size="29pt" font-weight="bold" text-align="right" margin-top="4mm">
 					<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) != '']"/>
 				</fo:block>
@@ -177,7 +181,7 @@
 								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
 								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
 								<fo:table-cell text-align="right" display-align="after" xsl:use-attribute-sets="cover_page_box"> <!-- padding-left="5mm" padding-right="5mm" -->
-									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box1}">
+									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_yellow}">
 										<fo:block font-size="18pt" margin-left="5mm" margin-right="5mm">
 											<fo:block>
 												<!-- <xsl:variable name="status" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:status"/> -->
@@ -187,7 +191,7 @@
 													</xsl:call-template>
 												</xsl:variable>
 												<xsl:if test="normalize-space($status) != '' and $status != 'Published'">
-													<fo:block color="{$color_secondary}">
+													<fo:block color="{$logo_red}">
 														<xsl:value-of select="$status"/>
 													</fo:block>
 												</xsl:if>
@@ -217,7 +221,7 @@
 							<fo:table-row>
 								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
 								<fo:table-cell text-align="center" display-align="center" xsl:use-attribute-sets="cover_page_box">
-									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box2}">
+									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_green}">
 										<fo:block font-size="0pt" role="SKIP">
 											<!-- set context node to the cover page image -->
 											<xsl:for-each select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:coverpage-image[1]/mn:image[1]">
@@ -233,7 +237,7 @@
 							</fo:table-row>
 							<fo:table-row>
 								<fo:table-cell display-align="after" xsl:use-attribute-sets="cover_page_box">
-									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box3}">
+									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_red}">
 										<!-- the group that authored the doc -->
 										<fo:block margin-left="5mm" margin-right="5mm" margin-bottom="3mm">
 											<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role[@type = 'author' and 
@@ -244,7 +248,7 @@
 								</fo:table-cell>
 								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
 								<fo:table-cell display-align="after" xsl:use-attribute-sets="cover_page_box">
-									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$cover_page_color_box4}">
+									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_blue}">
 										<fo:block margin-left="2mm">
 											<!-- Example: © 2025 PDF Association - pdfa.org -->
 											<fo:block font-size="9.9pt">
@@ -252,7 +256,7 @@
 												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:copyright/mn:from"/>
 												<xsl:text> </xsl:text>
 												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:copyright/mn:owner/mn:organization/mn:name"/>
-												<xsl:text> – </xsl:text>
+												<xsl:text> - </xsl:text>
 												<fo:inline text-decoration="underline">
 													<fo:basic-link fox:alt-text="PDF Association" external-destination="https://pdfa.org/">pdfa.org</fo:basic-link>
 												</fo:inline>
@@ -272,7 +276,7 @@
 														message=The Font dictionary of all fonts shall define the map of all used character codes to Unicode values, either via a ToUnicode entry, or other mechanisms as defined in ISO 14289-1, 7.21.7,
 														location=Location [level=CosDocument, context=root/document[0]/pages[0](919 0 obj PDPage)/contentStream[0](947 0 obj PDSemanticContentStream)/operators[1391]/usedGlyphs[0](EAAAAB+SourceSans3-Regular EAAAAB+SourceSans3-Regular 43 0 2124645278 0 true)], locationContext=null, errorMessage=null]], isCompliant=false]
 												-->
-												<fo:inline baseline-shift="-50%" padding-left="0.5mm">
+												<fo:inline baseline-shift="-60%" padding-left="0.5mm">
 												<fo:instream-foreign-object content-width="5.6mm" fox:alt-text="Circled Chars">
 													<xsl:copy-of select="$circledChars"/>
 												</fo:instream-foreign-object>
@@ -315,9 +319,9 @@
 			<title>Creative Common icons</title>
   		<desc>Creative Common graphic icons for CC-BY-4.0.</desc>
 			<style type="text/css">
-				.st0 { fill: #010101; }
+				.ccst0 { fill: black; }
 			</style>
-			<path class="st0" d="M0,3.3C0,1.3,1.5,0,3.2,0C5,0,6.5,1.3,6.5,3.3c0,2-1.5,3.3-3.2,3.3C1.5,6.6,0,5.3,0,3.3z M6,3.3
+			<path class="ccst0" d="M0,3.3C0,1.3,1.5,0,3.2,0C5,0,6.5,1.3,6.5,3.3c0,2-1.5,3.3-3.2,3.3C1.5,6.6,0,5.3,0,3.3z M6,3.3
 				c0-1.7-1.2-2.8-2.7-2.8c-1.5,0-2.7,1.1-2.7,2.8c0,1.7,1.2,2.9,2.7,2.9C4.7,6.2,6,5,6,3.3z M1,3.3c0-1.2,0.6-1.8,1.3-1.8
 				c0.4,0,0.6,0.2,0.8,0.4L2.7,2.3C2.6,2.2,2.5,2.1,2.4,2.1C2,2.1,1.7,2.6,1.7,3.3c0,0.8,0.2,1.2,0.6,1.2c0.2,0,0.3-0.1,0.5-0.2
 				l0.3,0.4C2.9,4.9,2.7,5.1,2.3,5.1C1.6,5.1,1,4.5,1,3.3z M3.1,3.3c0-1.2,0.6-1.8,1.3-1.8c0.4,0,0.6,0.2,0.8,0.4L4.8,2.3
@@ -337,7 +341,7 @@
 
 	<xsl:template name="refine_toc-listof-title-style"><?extend?>
 		<xsl:attribute name="margin-left">5mm</xsl:attribute>
-		<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
 	</xsl:template>
 
 	<xsl:template name="refine_clause-style"><?extend?>
@@ -371,8 +375,7 @@
 	</xsl:template>
 
 	<xsl:template name="refine_link-style"><?extend?>
-		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute><!-- PDFa logo red -->
-		<xsl:attribute name="font-weight">normal</xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
 		<xsl:attribute name="text-decoration">underline</xsl:attribute>
 	</xsl:template>
 
@@ -441,8 +444,6 @@
 	</xsl:template>
 
 	<!-- Page numbering: roman numerals for ToC/boilerplate, arabic for main body -->
-	<!-- The ToC/boilerplate fo:page-sequence uses this attribute-set directly (no refine_ call),
-	     so format="i" and initial-page-number="1" apply only there. -->
 	<xsl:attribute-set name="page-sequence-main"><?extend?>
 		<xsl:attribute name="format">i</xsl:attribute>
 		<xsl:attribute name="initial-page-number">1</xsl:attribute>
@@ -475,56 +476,57 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<!-- All titles (headings) are NOT bold to preserve PDF notation formatting -->
+	<xsl:template name="refine_title-style"><?extend?>
+		<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow char-based PDF notation to be visible -->
+	</xsl:template>
+
+	<xsl:template match="mn:strong[ancestor::mn:fmt-title]" priority="2">
+		<fo:inline font-weight="bold"><!-- ensure that bold char formatting within titles is retained -->
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+
 	<xsl:template name="refine_strong_style"><?extend?>
-		<xsl:if test="ancestor::*['preferred']">
+		<xsl:if test="ancestor::*['preferred']"><!-- TODO: using 'admitted' here doesn't work-->
 			<xsl:attribute name="role">SKIP</xsl:attribute>
 		</xsl:if>
-	</xsl:template>
-	
-	<xsl:template name="refine_list-item-label-style"><?extend?>
-		<xsl:if test="parent::mn:ul">
-			<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
-		</xsl:if>
-	</xsl:template>
-	
-	<xsl:template name="refine_title-style"><?extend?>
-		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute><!-- PDFa logo red -->
-		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
 	</xsl:template>
 
 	<xsl:template name="refine_bibliography-title-style"><?extend?>
 		<xsl:attribute name="margin-left">0mm</xsl:attribute>
-		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute><!-- PDFa logo red -->
+		<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
 	</xsl:template>
 
 	<xsl:template name="refine_annex-title-style"><?extend?>
-		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute><!-- PDFa logo red -->
-		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
+		<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
 	</xsl:template>
 
 	<xsl:template match="mn:fmt-title" name="title">
 		<xsl:variable name="level">
 			<xsl:call-template name="getLevel"/>
 		</xsl:variable>
-		
+
 		<xsl:variable name="element-name">
 			<xsl:choose>
 				<xsl:when test="../@inline-header = 'true'">fo:inline</xsl:when>
 				<xsl:otherwise>fo:block</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		
+
 		<xsl:variable name="title_styles">
 			<styles xsl:use-attribute-sets="title-style">
 				<xsl:call-template name="refine_title-style"/>
 			</styles>
 		</xsl:variable>
-		
+
 		<xsl:element name="{$element-name}">
 			<xsl:copy-of select="xalan:nodeset($title_styles)/styles/@*"/>
 			<xsl:if test="$level = 1">
 				<xsl:attribute name="break-before">page</xsl:attribute><!-- ensure every H1 starts on a new page -->
 			</xsl:if>
+			<xsl:call-template name="apply-heading-font-size"/>
 			<fo:block-container xsl:use-attribute-sets="reset-margins-style">
 				<fo:block role="SKIP">
 					<xsl:call-template name="setIDforNamedDestinationInline"/>
@@ -538,19 +540,13 @@
 			</fo:block-container>
 		</xsl:element>
 	</xsl:template>
-	
-	<xsl:template name="refine_list-item-label-style"><?extend?>
-		<xsl:if test="parent::mn:ul">
-			<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
-		</xsl:if>
+
+	<xsl:template name="refine_tt-style"><?extend?>
+		<xsl:attribute name="font-size"><xsl:value-of select="$mono_font-reduction"/></xsl:attribute>
 	</xsl:template>
-	
+
 	<xsl:template name="refine_sourcecode-style"><?extend?>
-		<xsl:attribute name="font-size">85%</xsl:attribute>
-	</xsl:template>
-		
-	<xsl:template match="mn:ul/mn:li/mn:fmt-name[normalize-space() = 'o']" priority="3" mode="update_xml_step1">
-		<xsl:attribute name="label">■</xsl:attribute><!-- use square block for unorder list label -->
+		<xsl:attribute name="font-size"><xsl:value-of select="$mono_font-reduction"/></xsl:attribute>
 	</xsl:template>
 
 	<xsl:attribute-set name="note-name-style"><?extend?>
@@ -561,105 +557,162 @@
 		<xsl:attribute name="background-color">rgb(233, 220, 182)</xsl:attribute>
 		<xsl:attribute name="border-left">4pt solid rgb(224, 185, 66)</xsl:attribute>
 		<xsl:attribute name="margin-left">8.5mm</xsl:attribute>
-		<xsl:attribute name="margin-right">0.5mm</xsl:attribute>
 		<xsl:attribute name="padding">1mm</xsl:attribute>
 		<xsl:attribute name="padding-left">1.5mm</xsl:attribute>
 		<xsl:attribute name="padding-right">1.5mm</xsl:attribute>
-		<xsl:attribute name="font-size">88%</xsl:attribute>
+		<xsl:attribute name="font-size"><xsl:value-of select="$mono_font-reduction"/></xsl:attribute>
 	</xsl:attribute-set>
-	
+
 	<xsl:template name="refine_note-style"><?extend?>
 		<xsl:if test="ancestor::mn:bibitem">
-			<xsl:attribute name="margin-top">6pt</xsl:attribute>
-			<xsl:attribute name="margin-bottom">10pt</xsl:attribute>
+			<xsl:attribute name="margin-top">2mm</xsl:attribute>
+			<xsl:attribute name="margin-bottom">4mm</xsl:attribute>
 			<xsl:if test="not(following-sibling::*[1][self::mn:note])">
-				<xsl:attribute name="margin-bottom">6pt</xsl:attribute>
+				<xsl:attribute name="margin-bottom">2mm</xsl:attribute>
 			</xsl:if>
 		</xsl:if>
 	</xsl:template>
 
 	<xsl:template match="mn:admonition">
-		<fo:block margin-left="8.5mm" margin-right="0.5mm" padding="1mm" padding-left="1.5mm" padding-right="1.5mm" font-size="88%">
+		<fo:block margin-left="8.5mm" margin-right="0.5mm" padding="1mm" margin-top="6pt" margin-bottom="6pt" padding-left="1.5mm" padding-right="1.5mm" font-size="{$mono_font-reduction}">
 			<xsl:if test="@type = 'tip'">
-				<xsl:attribute name="background-color">rgb(245,235,206)</xsl:attribute> <!-- yellow -->
+				<xsl:attribute name="background-color">rgb(245,235,206)</xsl:attribute>
 				<xsl:attribute name="border-left">4pt solid rgb(208,63,78)</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="@type = 'warning'">
-				<xsl:attribute name="background-color">rgb(255,245,230)</xsl:attribute> <!-- light orange -->
+				<xsl:attribute name="background-color">rgb(255,245,230)</xsl:attribute>
 				<xsl:attribute name="border-left">4pt solid rgb(255,140,0)</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="@type = 'caution'">
-				<xsl:attribute name="background-color">rgb(255,250,205)</xsl:attribute> <!-- light amber -->
+				<xsl:attribute name="background-color">rgb(255,250,205)</xsl:attribute>
 				<xsl:attribute name="border-left">4pt solid rgb(184,134,11)</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="@type = 'important'">
-				<xsl:attribute name="background-color">rgb(255,230,230)</xsl:attribute> <!-- light red -->
+				<xsl:attribute name="background-color">rgb(255,230,230)</xsl:attribute>
 				<xsl:attribute name="border-left">4pt solid rgb(255,0,0)</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="@type = 'safety-precaution'">
-				<xsl:attribute name="background-color">rgb(230,245,230)</xsl:attribute> <!-- light green -->
+				<xsl:attribute name="background-color">rgb(230,245,230)</xsl:attribute>
 				<xsl:attribute name="border-left">4pt solid rgb(0,128,0)</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="@type = 'editorial'">
-				<xsl:attribute name="background-color">rgb(240,240,240)</xsl:attribute> <!-- light gray -->
+				<xsl:attribute name="background-color">rgb(240,240,240)</xsl:attribute>
 				<xsl:attribute name="border-left">4pt solid rgb(128,128,128)</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="@type = 'box'">
-				<xsl:attribute name="background-color">rgb(154, 221, 218)</xsl:attribute> <!-- light blue/gray -->
+				<xsl:attribute name="background-color">rgb(154, 221, 218)</xsl:attribute>
 				<xsl:attribute name="border">2pt solid black</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="not(@type) or @type = ''">
-				<xsl:attribute name="background-color">rgb(240,240,240)</xsl:attribute> <!-- default gray -->
+				<xsl:attribute name="background-color">rgb(240,240,240)</xsl:attribute>
 				<xsl:attribute name="border-left">4pt solid rgb(128,128,128)</xsl:attribute>
 			</xsl:if>
 			<xsl:apply-templates/>
 		</fo:block>
 	</xsl:template>
 
-	<xsl:template match="mn:note/mn:fmt-name/mn:tab" mode="tab">
-		<xsl:attribute name="padding-right">1mm</xsl:attribute>
+	<!-- Style mn:name elements within admonitions to match border color -->
+	<xsl:template match="mn:name[ancestor::mn:admonition[@type='tip']]" priority="2">
+		<fo:inline color="rgb(208,63,78)" font-weight="bold">
+			<xsl:apply-templates/>
+		</fo:inline>
 	</xsl:template>
-	
+
+	<xsl:template match="mn:name[ancestor::mn:admonition[@type='warning']]" priority="2">
+		<fo:inline color="rgb(255,140,0)" font-weight="bold">
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+
+	<xsl:template match="mn:name[ancestor::mn:admonition[@type='caution']]" priority="2">
+		<fo:inline color="rgb(184,134,11)" font-weight="bold">
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+
+	<xsl:template match="mn:name[ancestor::mn:admonition[@type='important']]" priority="2">
+		<fo:inline color="rgb(255,0,0)" font-weight="bold">
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+
+	<xsl:template match="mn:name[ancestor::mn:admonition[@type='safety-precaution']]" priority="2">
+		<fo:inline color="rgb(0,128,0)" font-weight="bold">
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+
+	<xsl:template match="mn:name[ancestor::mn:admonition[@type='editorial']]" priority="2">
+		<fo:inline color="rgb(128,128,128)" font-weight="bold">
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+
+	<xsl:template match="mn:name[ancestor::mn:admonition[not(@type) or @type = '']]" priority="2">
+		<fo:inline color="rgb(128,128,128)" font-weight="bold">
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+
 	<xsl:attribute-set name="dl-name-style"><?extend?>
-		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:attribute-set>
 
 	<xsl:attribute-set name="figure-name-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
 	</xsl:attribute-set>
-	
+
 	<xsl:attribute-set name="list-name-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
 	</xsl:attribute-set>
-	
-	<xsl:attribute-set name="sourcecode-name-style">
+
+	<!-- Source code blocks -->
+	<xsl:attribute-set name="sourcecode-name-style"><?extend?>
 		<xsl:attribute name="keep-with-next">always</xsl:attribute>
-		<xsl:attribute name="padding-bottom">10pt</xsl:attribute>
-		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
+		<xsl:attribute name="margin-top">2mm</xsl:attribute>
+		<xsl:attribute name="margin-bottom">2mm</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
 	</xsl:attribute-set>
-	
+
+	<xsl:template name="refine_sourcecode-container-style"><?extend?>
+		<xsl:attribute name="margin-left">5mm</xsl:attribute>
+		<xsl:attribute name="margin-top">3mm</xsl:attribute>
+		<xsl:attribute name="margin-bottom">3mm</xsl:attribute>
+	</xsl:template>
+
+	<xsl:template name="refine_sourcecode-style"><?extend?>
+		<xsl:attribute name="font-size"><xsl:value-of select="$mono_font-reduction"/></xsl:attribute>
+	</xsl:template>
+
 	<xsl:attribute-set name="term-kind-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:attribute-set>
-	
+
 	<xsl:template name="display_term_kind">
 		<xsl:if test="not(self::mn:fmt-preferred)">
 			<xsl:call-template name="term_kind"/>
 		</xsl:if>
 	</xsl:template>
-	
-	<xsl:attribute-set name="example-body-style"><!-- reduce margins within examples so can be wider -->
-		<xsl:attribute name="margin-left">3mm</xsl:attribute>
-		<xsl:attribute name="margin-right">3mm</xsl:attribute>
+
+	<!-- Example blocks -->
+	<xsl:attribute-set name="example-body-style"><?extend?>
+		<xsl:attribute name="margin-left">5mm</xsl:attribute>
 	</xsl:attribute-set>
-	
+
+	<xsl:attribute-set name="example-name-style">
+		<xsl:attribute name="keep-with-next">always</xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
+		<xsl:attribute name="font-weight">bold</xsl:attribute><!-- TODO: inteferes with PDF notation char formatting! -->
+	</xsl:attribute-set>
+
 	<xsl:variable name="example_display_in">block</xsl:variable>
-	
+
+	<!-- Footnote text to be black -->
 	<xsl:attribute-set name="fn-body-style"><?extend?>
 		<xsl:attribute name="color">black</xsl:attribute>
 	</xsl:attribute-set>
-	
+
+	<!-- PDF Association semantic span formatting -->
 	<xsl:template match="mn:span[@class = 'requirement' or @class = 'recommendation' or @class = 'pdf-version' or @class = 'pdf-operator' or @class = 'pdf-keyword']" mode="update_xml_step1" priority="2">
 		<xsl:copy>
 			<xsl:copy-of select="@*"/>
@@ -669,7 +722,7 @@
 
 	<xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
-	
+
 	<xsl:template match="mn:span[@class = 'requirement']">
 		<fo:inline color="#FF0000" font-weight="bold"> <!-- Red -->
 			<xsl:value-of select="translate(., $lowercase, $uppercase)"/> <!-- convert to uppercase -->
@@ -683,48 +736,99 @@
 	</xsl:template>
 
 	<xsl:template match="mn:span[@class = 'pdf-version']"><!-- italic blue "(PDF x.y)"-->
-		<fo:inline color="#0000FF" font-weight="lighter" font-style="italic"> <!-- Blue -->
+		<fo:inline color="#0000FF" font-weight="lighter" font-style="italic">
 			<xsl:value-of select="concat('(PDF ', ., ')')"/>
 		</fo:inline>
 	</xsl:template>
 
 	<xsl:template match="mn:span[@class = 'pdf-operator']">
-		<fo:inline font-family="monospace" background-color="#e2e29f" color="#ff0000" font-weight="bold" font-size="85%">
+		<fo:inline font-family="monospace" background-color="#e2e29f" color="#ff0000" font-weight="bold" font-size="{$mono_font-reduction}">
 			<xsl:apply-templates/>
 		</fo:inline>
 	</xsl:template>
 
 	<xsl:template match="mn:span[@class = 'pdf-keyword']">
-		<fo:inline font-family="monospace" background-color="#e2e29f" color="#0000ff" font-weight="bold" font-size="85%">
+		<fo:inline font-family="monospace" background-color="#e2e29f" color="#0000ff" font-weight="bold" font-size="{$mono_font-reduction}">
 			<xsl:apply-templates/>
 		</fo:inline>
 	</xsl:template>
 
+	<!-- Table formatting -->
 	<xsl:attribute-set name="table-name-style"><?extend?>
-		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
+		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible in table headings -->
 	</xsl:attribute-set>
+
+	<xsl:template name="refine_table-style"><?extend?>
+		<xsl:attribute name="border">1.5pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- outer border -->
+	</xsl:template>
 
 	<xsl:template name="refine_table-body-row-style"><?extend?>
 		<xsl:variable name="number"><xsl:number/></xsl:variable>
+		<xsl:attribute name="border-bottom">0.5pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- horizontal row borders -->
 		<xsl:if test="$number mod 2 = 0">
 			<xsl:attribute name="background-color">#f7f7f7</xsl:attribute> <!-- very pale grey zebra stripes -->
 		</xsl:if>
 	</xsl:template>
-	
-	<xsl:template name="refine_toc-item-style"><?extend?><!-- compress space around ToC entries -->
+
+	<!-- Compress space around ToC entries -->
+	<xsl:template name="refine_toc-item-style"><?extend?>
 		<xsl:if test="@level = 1">
 			<xsl:if test="preceding-sibling::mnx:item[@display = 'true' and @level = 1]">
-				<xsl:attribute name="space-before">8pt</xsl:attribute>
+				<xsl:attribute name="space-before">3mm</xsl:attribute>
 			</xsl:if>
-			<xsl:attribute name="space-after">2pt</xsl:attribute>
+			<xsl:attribute name="space-after">1.5mm</xsl:attribute>
 			<xsl:attribute name="font-weight">bold</xsl:attribute>
 			<xsl:attribute name="keep-with-next">always</xsl:attribute>
 		</xsl:if>
 		<xsl:if test="@level &gt;= 2">
 			<xsl:attribute name="margin-left"><xsl:value-of select="(@level - 1) * $toc_item_indent"/>mm</xsl:attribute>
-			<xsl:attribute name="space-before">2pt</xsl:attribute>
-			<xsl:attribute name="space-after">2pt</xsl:attribute>
+			<xsl:attribute name="space-before">1.5mm</xsl:attribute>
+			<xsl:attribute name="space-after">1.5mm</xsl:attribute>
 		</xsl:if>
+	</xsl:template>
+
+	<!-- Control font size of headings -->
+	<xsl:template name="apply-heading-font-size">
+		<xsl:variable name="level">
+			<xsl:call-template name="getLevel"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$level = 2">
+				<xsl:attribute name="font-size">20pt</xsl:attribute>
+			</xsl:when>
+			<xsl:when test="$level = 3">
+				<xsl:attribute name="font-size">18pt</xsl:attribute>
+			</xsl:when>
+			<xsl:when test="$level = 4">
+				<xsl:attribute name="font-size">16pt</xsl:attribute>
+			</xsl:when>
+			<xsl:when test="$level > 4">
+				<xsl:attribute name="font-size">14pt</xsl:attribute>
+			</xsl:when>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- Bullet styles -->
+	<xsl:template match="mn:ul/mn:li/mn:fmt-name" priority="3" mode="update_xml_step1">
+		<xsl:choose>
+			<xsl:when test="normalize-space() = 'o'">
+				<xsl:attribute name="label">■</xsl:attribute>
+				<xsl:attribute name="font-size">90%</xsl:attribute>
+				<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute><!-- TODO: not obeyed!?! -->
+			</xsl:when>
+			<xsl:when test="normalize-space() = '—'">
+				<xsl:attribute name="label">◆</xsl:attribute>
+				<xsl:attribute name="color"><xsl:value-of select="$logo_blue"/></xsl:attribute><!-- TODO: not obeyed!?! -->
+			</xsl:when>
+			<xsl:when test="normalize-space() = '•'">
+				<xsl:attribute name="label">●</xsl:attribute>
+				<xsl:attribute name="font-size">110%</xsl:attribute>
+				<xsl:attribute name="color"><xsl:value-of select="$logo_green"/></xsl:attribute><!-- TODO: not obeyed!?! -->
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute><!-- default --><!-- TODO: not obeyed!?! -->
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 </xsl:stylesheet>
