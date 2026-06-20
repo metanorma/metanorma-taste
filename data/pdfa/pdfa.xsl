@@ -589,10 +589,11 @@
 		<xsl:attribute name="margin-top">2mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">2mm</xsl:attribute>
 		<xsl:if test="ancestor::mn:bibitem">
-			<xsl:attribute name="margin-bottom">5mm</xsl:attribute> <!-- Notes that belong to bibliographic items need larger left indent to align with hanging para -->
+			<xsl:attribute name="margin-left">8.5mm</xsl:attribute> <!-- Notes that belong to bibliographic items need larger left indent to align with hanging para -->
 		</xsl:if>
 	</xsl:template>
 
+	<!-- Admonitions -->
 	<xsl:template match="mn:admonition">
 		<fo:block margin-left="3mm" margin-right="2mm" padding="1.5mm" margin-top="2mm" margin-bottom="2mm" font-size="{$small-text-reduction}">
 			<xsl:if test="@type = 'tip'">
@@ -619,44 +620,45 @@
 				<xsl:attribute name="background-color">rgb(240,240,240)</xsl:attribute>
 				<xsl:attribute name="border-left">4pt solid rgb(128,128,128)</xsl:attribute>
 			</xsl:if>
-			<xsl:if test="@type = 'box'">
-				<xsl:attribute name="background-color">rgb(154, 221, 218)</xsl:attribute>
+			<xsl:if test="@type = 'box'"><!-- "box" is NOT an independent property of other admonition types - it is its own type! -->
+					<xsl:attribute name="background-color">rgb(154, 221, 218)</xsl:attribute>
 				<xsl:attribute name="border">2pt solid black</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="not(@type) or @type = ''">
 				<xsl:attribute name="background-color">rgb(240,240,240)</xsl:attribute>
-				<xsl:attribute name="border-left">4pt solid rgb(128,128,128)</xsl:attribute>
+					<xsl:attribute name="border-left">4pt solid rgb(80,80,80)</xsl:attribute>
 			</xsl:if>
 			<xsl:apply-templates/>
 		</fo:block>
 	</xsl:template>
 
-	<!-- Style mn:fmt-element-name labelling each admonition so as to match border color --> <!-- TODO: none of this works!!! -->
-	<xsl:template match="mn:admonition[@type = 'tip']/*/mn:span[@class = 'fmt-element-name']" mode="update_xml_step1" priority="2">
+	<!-- Style admonition name to match border colors above (except "box") --> <!-- TODO: DOES NOT WORK!!! -->
+	<!-- "refine_admonition-name-style" does not support switching on type -->
+	<xsl:template match="mn:admonition[@type = 'tip']/*/mn:fmt-name">
 		<xsl:attribute name="keep-with-next">always</xsl:attribute>
 		<xsl:attribute name="font-weight">bold</xsl:attribute>
-		<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute>		
-		<xsl:apply-templates mode="update_xml_step1"/>
+			<xsl:attribute name="color">rgb(208,63,78)</xsl:attribute>
+		<xsl:apply-templates/>
 	</xsl:template>
 
-	<xsl:template match="mn:admonition[@type = 'warning']/*/mn:span[@class = 'fmt-element-name']" mode="update_xml_step1" priority="2">
+	<xsl:template match="mn:admonition[@type = 'warning']/*/mn:fmt-name']">
 		<xsl:attribute name="keep-with-next">always</xsl:attribute>
 		<xsl:attribute name="font-weight">bold</xsl:attribute>
-		<xsl:attribute name="color">rgb(255,140,0)</xsl:attribute>		
-		<xsl:apply-templates mode="update_xml_step1"/>
+			<xsl:attribute name="color">rgb(255,140,0)</xsl:attribute>		
+		<xsl:apply-templates/>
 	</xsl:template>
 
-	<xsl:template match="mn:admonition[@type = 'caution']/*/mn:span[@class = 'fmt-element-name']" mode="update_xml_step1" priority="2">
+	<xsl:template match="mn:admonition[@type = 'caution']/*/mn:span[@class = 'fmt-element-name']">
 		<xsl:attribute name="font-weight">bold</xsl:attribute>
 		<fo:inline color="rgb(184,134,11)" font-weight="bold" keep-with-next="always">
-			<xsl:apply-templates mode="update_xml_step1"/>
+			<xsl:apply-templates/>
 		</fo:inline>
 	</xsl:template>
 
-	<xsl:template match="mn:fmt-element-name[ancestor::mn:admonition[@type = 'important']]" mode="update_xml_step1" priority="2">
+	<xsl:template match="mn:fmt-element-name[ancestor::mn:admonition[@type = 'important']]">
 		<xsl:attribute name="font-weight">bold</xsl:attribute>
 		<fo:inline color="rgb(255,0,0)" font-weight="bold" keep-with-next="always">
-			<xsl:apply-templates mode="update_xml_step1"/>
+			<xsl:apply-templates/>
 		</fo:inline>
 	</xsl:template>
 
@@ -676,15 +678,17 @@
 
 	<xsl:template match="mn:fmt-element-name[ancestor-or-self::mn:admonition[not(@type) or @type = '']]" mode="update_xml_step1" priority="2">
 		<xsl:attribute name="font-weight">bold</xsl:attribute>
-		<fo:inline color="rgb(128,128,128)" font-weight="bold" keep-with-next="always">
+		<fo:inline color="rgb(80,80,80)" font-weight="bold" keep-with-next="always">
 			<xsl:apply-templates mode="update_xml_step1"/>
 		</fo:inline>
 	</xsl:template>
 
-	<!-- Definition list (incl. Abbreviated terms)-->
+	<!-- Definition list (incl. Abbreviated terms) - center-aligned vertically -->
 	<xsl:attribute-set name="dl-name-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="keep-with-next">always</xsl:attribute>
+		<xsl:attribute name="margin-top">3pt</xsl:attribute>
+		<xsl:attribute name="margin-bottom">3pt</xsl:attribute>
 	</xsl:attribute-set>
 
 	<xsl:attribute-set name="figure-name-style"><?extend?>
@@ -697,7 +701,7 @@
 	</xsl:attribute-set>
 
 	<!-- Source code blocks -->
-	<xsl:template name="refine_sourcecode-container-style"><!-- no ?extend? ! -->
+	<xsl:template name="refine_sourcecode-container-style"><?extend?>
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
 		<xsl:attribute name="margin-right">3mm</xsl:attribute>
 		<xsl:attribute name="margin-top">0mm</xsl:attribute>
@@ -706,14 +710,16 @@
 		<xsl:attribute name="background-color">rgb(240, 240, 240)</xsl:attribute> <!-- check source code background color against table zebra stripes -->
 	</xsl:template>
 
-	<xsl:attribute-set name="sourcecode-name-style"><!-- no ?extend? ! -->
+	<xsl:template name="refine_sourcecode-name-style"><?extend?>
+		<xsl:attribute name="space-before">2pt</xsl:attribute>
+		<xsl:attribute name="space-after">2pt</xsl:attribute>
 		<xsl:attribute name="keep-with-next">always</xsl:attribute>
 		<xsl:attribute name="margin">0mm</xsl:attribute>
 		<xsl:attribute name="padding">0mm</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
-	</xsl:attribute-set>
+	</xsl:template>
 
-	<xsl:template name="refine_sourcecode-style"><!-- no ?extend? ! -->
+	<xsl:template name="refine_sourcecode-style"><?extend?>
 		<xsl:attribute name="font-family"><xsl:value-of select="$monospaced_font"/></xsl:attribute>
 		<xsl:attribute name="font-size"><xsl:value-of select="$mono_font-reduction"/></xsl:attribute>
 		<xsl:attribute name="padding-left">2mm</xsl:attribute>
@@ -724,33 +730,36 @@
 	</xsl:template>
 
 	<!-- Example blocks - mimic notes/admonitions above for margins and padding -->
+	
+	<!-- Separate EXAMPLE caption from first paragraph of example text -->
 	<xsl:variable name="example_display_in">block</xsl:variable>
 
-	<xsl:attribute-set name="example-style"><?extend?>
+	<xsl:template name="refine_example-style"><?extend?>
 		<xsl:attribute name="border-left">2pt solid <xsl:value-of select="$color_blue"/></xsl:attribute>
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
 		<xsl:attribute name="margin-right">2mm</xsl:attribute>
 		<xsl:attribute name="padding">1.5mm</xsl:attribute>
 		<xsl:attribute name="margin-top">2mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">0mm</xsl:attribute>
-	</xsl:attribute-set>
+	</xsl:template>
 
 	<xsl:attribute-set name="example-name-style"><?extend?>
-		<xsl:attribute name="keep-with-next">always</xsl:attribute>
 		<xsl:attribute name="margin-left">0mm</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
 	</xsl:attribute-set>
 
 	<xsl:template name="refine_example-p-style"><?extend?>
 		<xsl:attribute name="margin">0mm</xsl:attribute>
+		<xsl:attribute name="space-before">3pt</xsl:attribute>
+		<xsl:attribute name="space-after">3pt</xsl:attribute>
 	</xsl:template>
 
-	<!-- Footnote text to be pure black -->
+	<!-- Footnote text (incl. reference) to be black to meet WCAG Level AA contrast. Does NOT work if template refine_fn-style! -->
 	<xsl:attribute-set name="fn-body-style"><?extend?>
 		<xsl:attribute name="color">black</xsl:attribute>
 	</xsl:attribute-set>
 
-	<!-- PDF Association semantic span formatting -->
+	<!-- PDF Association custom semantic span formatting -->
 	<xsl:template match="mn:span[@class = 'requirement' or @class = 'recommendation' or @class = 'pdf-version' or @class = 'pdf-operator' or @class = 'pdf-keyword']" mode="update_xml_step1" priority="2">
 		<xsl:copy>
 			<xsl:copy-of select="@*"/>
@@ -780,21 +789,21 @@
 	</xsl:template>
 
 	<xsl:template match="mn:span[@class = 'pdf-operator']">
-		<fo:inline font-family="monospace" background-color="rgb(224, 224, 175)" color="rgb(255, 0, 0)" font-weight="bold" font-size="{$mono_font-reduction}">
+		<fo:inline font-family="monospace" background-color="rgb(224, 224, 175)" color="rgb(255, 0, 0)" font-weight="bold" font-size="{$mono_font-reduction}" padding="1pt">
 			<xsl:apply-templates/>
 		</fo:inline>
 	</xsl:template>
 
 	<xsl:template match="mn:span[@class = 'pdf-keyword']">
-		<fo:inline font-family="monospace" background-color="rgb(224, 224, 175)" color="rgb(0, 0, 255)" font-weight="bold" font-size="{$mono_font-reduction}">
+		<fo:inline font-family="monospace" background-color="rgb(224, 224, 175)" color="rgb(0, 0, 255)" font-weight="bold" font-size="{$mono_font-reduction}" padding="1pt">
 			<xsl:apply-templates/>
 		</fo:inline>
 	</xsl:template>
 
-	<!-- default paragraph formatting. Make equally centred vertically so slim table cells look better -->
+	<!-- default paragraph formatting. Make equally centred vertically so narrow table cells look better -->
 	<xsl:template name="refine_p-style"><?extend?>
-		<xsl:attribute name="margin-top">3pt</xsl:attribute>
-		<xsl:attribute name="margin-bottom">3pt</xsl:attribute>
+		<xsl:attribute name="space-after">3pt</xsl:attribute>
+		<xsl:attribute name="space-before">3pt</xsl:attribute>
 	</xsl:template>
 
 	<!-- Table formatting -->
@@ -807,24 +816,25 @@
 		<xsl:attribute name="border">1.5pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- Thick outer border -->
 	</xsl:template>
 
-	<xsl:attribute-set name="table-header-row-style" use-attribute-sets="table-row-style">
+	<xsl:attribute-set name="table-header-row-style">
 		<xsl:attribute name="font-weight">normal</xsl:attribute> <!-- allow PDF notation to be visible in table headers -->
 		<xsl:attribute name="display-align">center</xsl:attribute>
-		<xsl:attribute name="border">0.5pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- narrow row and column borders -->
+		<xsl:attribute name="border">0.75pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- narrow row and column borders -->
 		<xsl:attribute name="background-color">rgb(197, 237, 255)</xsl:attribute> <!-- Shade heading cells very pale blue -->
-		<xsl:attribute name="border-bottom">1.5pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- Thick outer border -->
+		<xsl:attribute name="border">1.5pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- Thick border -->
 	</xsl:attribute-set>
 
 	<xsl:template name="refine_table-body-row-style"><!-- NO ?extend? ! -->
 		<xsl:variable name="number"><xsl:number/></xsl:variable>
-		<xsl:attribute name="border">0.5pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- narrow row and column borders -->
+		<xsl:attribute name="border">0.75pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- narrow row and column borders -->
 		<xsl:if test="$number mod 2 = 0">
-			<xsl:attribute name="background-color">rgb(221, 221, 221)</xsl:attribute> <!-- very pale zebra stripes. JND from sourcecode. -->
+			<xsl:attribute name="background-color">rgb(221, 221, 221)</xsl:attribute> <!-- very pale zebra stripes. JND from sourcecode blocks. -->
 		</xsl:if>
 	</xsl:template>
 
-	<xsl:template match="mn:span[@class = 'fmt-caption-label' or @class = 'fmt-caption-delim']" mode="contents_item" priority="3">
-		<xsl:attribute name="font-weight">bold</xsl:attribute> <!-- "Table X- ", "Figure X - ", etc., but not caption text -->
+	<!-- Captions "Table X-", "Figure X -", "EXAMPLE -", "Tip", "Caution", etc., up to and including delimiter but NOT caption text itself as conflicts with PDF notation -->
+	<xsl:template match="mn:span[@class = 'fmt-caption-label' or @class = 'fmt-element-name' or @class = 'fmt-caption-delim']" mode="contents_item" priority="3">
+		<xsl:attribute name="font-weight">bold</xsl:attribute> 
 	</xsl:template>
 
 	<!-- Compress space around ToC entries -->
@@ -834,7 +844,8 @@
 				<xsl:attribute name="space-before">3mm</xsl:attribute>
 			</xsl:if>
 			<xsl:attribute name="space-after">1.5mm</xsl:attribute>
-			<xsl:attribute name="font-weight">bold</xsl:attribute> <!-- will impact PDF notation! TODO: change to a color? -->
+			<xsl:attribute name="font-weight">normal</xsl:attribute> <!-- avoid bold as it conflicts with PDF notation - rely on color -->
+			<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
 			<xsl:attribute name="keep-with-next">always</xsl:attribute>
 		</xsl:if>
 		<xsl:if test="@level &gt;= 2">
@@ -859,14 +870,14 @@
 			<xsl:when test="$level = 4">
 				<xsl:attribute name="font-size">16pt</xsl:attribute>
 			</xsl:when>
-			<xsl:when test="$level > 4">
+			<xsl:when test="$level >= 5">
 				<xsl:attribute name="font-size">14pt</xsl:attribute>
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
 
 	<!-- Bullet styles -->
-	<xsl:template match="mn:ul/mn:li/mn:fmt-name" priority="3" mode="update_xml_step1">
+	<xsl:template match="mn:ul/mn:li/mn:fmt-name" mode="update_xml_step1" priority="3">
 		<xsl:choose>
 			<xsl:when test="normalize-space() = 'o'">
 				<xsl:attribute name="label">■</xsl:attribute>
