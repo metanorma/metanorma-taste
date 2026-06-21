@@ -420,12 +420,6 @@
 		</xsl:if>
 	</xsl:template>
 	
-	<xsl:template name="refine_list-item-label-style"><?extend?>
-		<xsl:if test="parent::mn:ul">
-			<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
-		</xsl:if>
-	</xsl:template>
-	
 	<xsl:template name="refine_title-style"><?extend?>
 		<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
@@ -491,6 +485,8 @@
 	<xsl:template name="refine_list-item-label-style"><?extend?>
 		<xsl:if test="parent::mn:ul">
 			<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
+			<xsl:copy-of select="@color"/>
+			<xsl:copy-of select="@font-size"/>
 		</xsl:if>
 	</xsl:template>
 	
