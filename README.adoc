@@ -189,6 +189,11 @@ currently available:
 |`iso`
 |International Organization of Legal Metrology specifications and standards with OIML branding and copyright
 
+|`wmo`
+|World Meteorological Organization
+|`iho`
+|World Meteorological Organization specifications (e.g. S-411) with WMO branding and copyright, built on the IHO document structure
+
 
 |===
 
