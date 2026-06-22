@@ -1,0 +1,12 @@
+== copyright-statement
+=== {blank}
+(c) World Meteorological Organization {{ docyear }}
+
+[align=left]
+World Meteorological Organization +
+7 bis, avenue de la Paix – 1211 Geneva 2 – Switzerland +
+Internet: https://wmo.int[wmo.int]
+
+== feedback-statement
+
+=== {blank}
