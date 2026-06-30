@@ -13,6 +13,7 @@ RSpec.describe Metanorma::Taste do
                  oiml: :iso,
                  pdfa: :ribose,
                  swf: :ribose,
+                 wmo: :iho,
                })
     end
   end
