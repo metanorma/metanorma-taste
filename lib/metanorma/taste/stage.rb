@@ -77,8 +77,8 @@ module Metanorma
       def add_stage_specific_overrides(override_attrs, stage_config)
         # Add the stage alias for presentation metadata
         override_attrs << ":presentation-metadata-stage-alias: #{stage_config.taste}"
-        stage_config.abbreviation and
-          override_attrs << ":docstage-abbrev: #{stage_config.abbreviation}"
+        stage_config.abbrev and
+          override_attrs << ":docstage-abbrev: #{stage_config.abbrev}"
         stage_config.published == "true" and
           override_attrs << ":docstage-published: true"
 

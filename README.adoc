@@ -291,7 +291,7 @@ doctypes:                  # Array of doctypes built over base flavour doctypes
 stages:                    # Array of stages built over base flavour stages
   - taste: string          # Taste-specific machine-readable stage name
     base: string           # Base Metanorma flavor machine-readable stage name
-    abbreviation: string   # Abbreviation of stage
+    abbrev: string         # Abbreviation of stage
     default: boolean       # Whether the stage is the default stage to be applied to a document
     published: boolean     # Whether the stage is to be considered published
 committees:                # Hash of predefined editorial groups for the SDO

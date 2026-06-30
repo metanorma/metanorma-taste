@@ -183,11 +183,11 @@ than one stage). So CSA has the following stage dictionary:
 stages:
   proposal:
   working-draft:
-    abbreviation: wd
+    abbrev: wd
   committee-draft:
-    abbreviation: cd
+    abbrev: cd
   draft-standard:
-    abbreviation: d
+    abbrev: d
   final-draft:
   published:
     default: true
