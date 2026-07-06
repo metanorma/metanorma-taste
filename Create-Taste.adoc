@@ -172,27 +172,34 @@ doctypes:
 
 ===== 5.2 Stage
 
-A limited number of tastes (CSA, PDFA) also provide a dictionary of stage values. Unlike the doctype, this does not map to the base flavor,
-but gives the listing of stages applicable to the taste. The dictionary is formatted as for `metanorma-generic`: it gives a hash
-of stage names, mapping optionally to standard stage abbreviations. Each stage may optionally have a boolean value given for whether it
-is the `default` stage applied to documents (legal for only one stage), and whether it constitutes a `published` stage (may apply to more
-than one stage). So CSA has the following stage dictionary:
+A limited number of tastes (for example, PDFA) also provide a list of stage values. Like the doctype, each stage is a struct: a `taste` value,
+for the taste's label of the stage, and a `base` value, for the corresponding stage in the base flavor to be used in processing. A stage may
+optionally give an `abbrev` (its abbreviation), and the boolean values `default` (whether it is the default stage applied to documents, legal
+for only one stage) and `published` (whether it constitutes a published stage, which may apply to more than one stage). So a taste might
+declare the following stages:
 
 [source,asciidoc]
 ----
 stages:
-  proposal:
-  working-draft:
-    abbreviation: wd
-  committee-draft:
-    abbreviation: cd
-  draft-standard:
-    abbreviation: d
-  final-draft:
-  published:
+  - taste: proposal
+    base: proposal
+  - taste: working-draft
+    base: working-draft
+    abbrev: wd
+  - taste: committee-draft
+    base: committee-draft
+    abbrev: cd
+  - taste: draft-standard
+    base: draft
+    abbrev: d
+  - taste: final-draft
+    base: final-draft
+  - taste: published
+    base: published
     default: true
     published: true
-  withdrawn:
+  - taste: withdrawn
+    base: withdrawn
     published: true
 ----
 

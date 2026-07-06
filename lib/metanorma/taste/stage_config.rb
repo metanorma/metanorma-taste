@@ -10,14 +10,14 @@ module Metanorma
       attribute :base, :string
       attribute :default, :string
       attribute :published, :string
-      attribute :abbreviation, :string
+      attribute :abbrev, :string
 
       key_value do
         map "taste", to: :taste
         map "base", to: :base
         map "default", to: :default
         map "published", to: :published
-        map "abbreviation", to: :abbreviation
+        map "abbrev", to: :abbrev
       end
     end
   end

@@ -2,26 +2,83 @@
   --ribose-primary-color: #d03f4e; /* PDFa logo red. Required for WCAG Level AA colour contrast */
 }
 
-.logo {
+a {
+  text-decoration: underline; /* WCAG - all links must be clearly visible */
+  color: #d03f4e; /* PDFa logo red */
+}
+
+img { /* Make images more responsive */
+  max-width: 100%;
+  height: auto;
+}
+
+body {
+  line-height: 1.5; /* WCAG level AA requires minimum line height of 1.5 */
+}
+
+tt, td tt, p tt { /* override 0.8em formatting elsewhere */
+  font-size: 100%;
+}
+
+figure, pre, .pseudocode { /* incl. source code */
+  line-height: 1.5; /* WCAG level AA requires minimum line height of 1.5 */
+  margin-top: 0cm; 
+  padding-top: 0.1em;
+  margin-bottom: 0cm; 
+  padding-bottom: 0.1em;
+}
+
+table > caption {
+  font-weight: bold;
+}
+
+th {
+  color: white;
+  background-color: blue;
+}
+
+tbody tr:nth-child(even) {
+    background-color: LightGray; /* Light grey for even rows - not header */
+}
+
+/* Level 1: Square bullet, red */
+ul > li::before {
+  content: "\25A0";  /* Black square */
+  color: #d03f4e;    /* PDFa logo red */
+  font-size: 90%;
+}
+
+/* Level 2: Diamond bullet, blue */
+ul ul > li::before {
+  content: "\25C6";  /* Diamond */
+  color: #489aaf;    /* PDFa logo blue */
+  font-size: 100%;
+}
+
+/* Level 3: Circle bullet, green */
+ul ul ul > li::before {
+  content: "\25CF";  /* Filled circle */
+  color: #8b9856;    /* PDFa logo green */
+  font-size: 110%;
+}
+
+.logo { /* cover page logo */
   text-align: center;
 }
 
-.docidentifier {
+.docidentifier { /* cover page doc type, version and status */
+  line-height: 1.5; /* WCAG level AA requires minimum line height of 1.5 */
   text-align: center;
-  font-size: 18pt;
+  font-size: 20pt;
 }
 
-.doctitle-en {
-  font-size: 36pt;
+.doctitle-en { /* cover page primary title */
   text-align: center;
-}
-
-.coverpage-container {
-  line-height: 1.5; /* WCAG Level AA recommends 1.5 line height as a minimum */
+  font-size: 32pt;
 }
 
 #toc li a, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) li a {
-  text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
+  text-transform: none; /* PDF is case-sensitive! Never force nav bookmark text uppercase! */
 }
 
 h1, .h1 {
@@ -32,10 +89,154 @@ h1, .h1 {
   text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
 }
 
-a {
-  text-decoration: underline; /* WCAG - all links must be clearly visible */
+.example {
+  text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
+  font-size: 90%; 
+  background-color: #D6FFFE; /* Very pale blue */
+}
+
+.sourcecode {
+  font-size: 90%; 
+}
+
+figcaption .SourceTitle { /* Revert the title back from monospaced font */
+  font-family: 'Source Sans 3', 'Helvetica Neue', Helvetica, sans-serif;
 }
 
 span.TermNum {
-  font-weight: 100;
+  font-weight: normal;
+}
+
+.requirement {
+  color: Red; 
+  font-weight: bold;
+  text-transform: uppercase; /* Uppercase "SHALL" a-la RFCs */
+}
+
+.recommendation {
+  color: DarkOrange;
+  font-weight: bold;
+  text-transform: uppercase; /* Uppercase "SHOULD" a-la RFCs */
+}
+
+.pdf-keyword {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #e2e29f;
+  color: Blue; 
+  font-weight: bold;
+}
+
+.pdf-operator {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #e2e29f;
+  color: Red; 
+  font-weight: bold;
+}
+
+.pdf-version { 
+  font-style: italic; 
+  font-weight: lighter; 
+  color: blue; 
+}
+.pdf-version::before { content: "(PDF "; }
+.pdf-version::after  { content: ")"; }
+
+/* Base admonition styling */
+.Note, .note, .Admonition  {
+  font-size: 86%;
+  margin-left: 8.5mm;
+  margin-right: 0.5mm;
+  margin-top: 6pt;
+  margin-bottom: 6pt;
+  padding: 1mm;
+  padding-left: 1.5mm;
+  padding-right: 1.5mm;
+  border-left: 4pt solid;
+}
+
+.note_label {
+  font-weight: bold; /* the "NOTE 1" text before the body of a note */
+}
+
+.AdmonitionTitle { /* titles of all admonitions */
+  text-align: left;
+  text-transform: none; /* PDF is case sensitive! */
+  font-weight: bold;
+}
+
+/* Tip admonition */
+.AdmonitionTip {
+  background-color: #f5ebce; /* rgb(245,235,206) */
+  border-left-width: 4pt;
+  border-left-color: #d03f4e; /* rgb(208,63,78) - PDFa red */
+}
+
+.AdmonitionTip .AdmonitionTitle {
+  color: #d03f4e;
+}
+
+/* Warning admonition */
+.AdmonitionWarning {
+  background-color: #fff5e6; /* rgb(255,245,230) */
+  border-left-width: 4pt;
+  border-left-color: #ff8c00; /* rgb(255,140,0) - dark orange */
+}
+
+.AdmonitionWarning .AdmonitionTitle {
+  color: #ff8c00;
+}
+
+/* Caution admonition */
+.AdmonitionCaution {
+  background-color: #fffacd; /* rgb(255,250,205) */
+  border-left-width: 4pt;
+  border-left-color: #b8860b; /* rgb(184,134,11) - dark goldenrod */
+}
+
+.AdmonitionCaution .AdmonitionTitle {
+  color: #b8860b;
+}
+
+/* Important admonition */
+.AdmonitionImportant {
+  background-color: #ffe6e6; /* rgb(255,230,230) */
+  border-left-width: 4pt;
+  border-left-color: #ff0000; /* rgb(255,0,0) - red */
+}
+
+.AdmonitionImportant .AdmonitionTitle {
+  color: #ff0000;
+}
+
+/* Safety-precaution admonition */
+.AdmonitionSafetyPrecaution {
+  background-color: #e6f5e6; /* rgb(230,245,230) */
+  border-left-width: 4pt;
+  border-left-color: #008000; /* rgb(0,128,0) - green */
+}
+
+.AdmonitionSafetyPrecaution .AdmonitionTitle {
+  color: #008000;
+}
+
+/* Editorial admonition */
+.AdmonitionEditorial {
+  background-color: #f0f0f0; /* rgb(240,240,240) */
+  border-left-width: 4pt;
+  border-left-color: #808080; /* rgb(128,128,128) - gray */
+}
+
+.AdmonitionEditorial .AdmonitionTitle {
+  color: #808080;
+}
+
+/* Box admonition */
+.AdmonitionBox {
+  background-color: #9addda; /* rgb(154, 221, 218) */
+  border: 2pt solid black;
+  border-left: none;
+}
+
+.AdmonitionBox.AdmonitionTitle {
+  border: none;
 }
