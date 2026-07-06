@@ -1,10 +1,19 @@
 :root {
-  --ribose-primary-color: #d03f4e; /* PDFa logo red. Required for WCAG Level AA colour contrast */
+  --color_blue: rgb(22, 97, 173); /* copied from ribose.standard.xsl */
+  --logo_yellow: rgb(202,152,49);
+	--logo_green: rgb(139,152,91);
+	--logo_red: rgb(208,63,78); /* only logo color with sufficient contrast for WCAG Level AA */
+	--logo_blue: rgb(72,145,175);
+  --proportional_font: 'Source Sans 3', sans-serif;
+  --small-text-reduction: 85%;
+  --monospaced_font: 'Source Code Pro', monospace;
+  --mono_font-reduction: 90%;
+  --ribose-primary-color: var(--logo_red); /* used by base flavor styling */
 }
 
 a {
   text-decoration: underline; /* WCAG - all links must be clearly visible */
-  color: #d03f4e; /* PDFa logo red */
+  color: var(--logo_red)
 }
 
 img { /* Make images more responsive */
@@ -16,51 +25,113 @@ body {
   line-height: 1.5; /* WCAG level AA requires minimum line height of 1.5 */
 }
 
-tt, td tt, p tt { /* override 0.8em formatting elsewhere */
-  font-size: 100%;
+tt, td tt, p tt, li tt { /* override 0.8em formatting elsewhere */
+  font-size: 1em;
 }
 
-figure, pre, .pseudocode { /* incl. source code */
+/* FIGURES, EXAMPLES, SOURCE CODE, ETC. */
+
+figure { /* incl. source code */
+  display: block;
   line-height: 1.5; /* WCAG level AA requires minimum line height of 1.5 */
-  margin-top: 0cm; 
-  padding-top: 0.1em;
-  margin-bottom: 0cm; 
-  padding-bottom: 0.1em;
+  font-size: 100%;
+  margin-top: 0; 
+  padding: 0;
+  padding-left: 2mm;
+  margin-bottom: 0; 
+}
+
+figure svg { /* avoid excessive up-scaling of SVGs */
+  width: auto;
+  height: auto;
+  max-width:  800px;  /* hard ceiling - never too wide for wide figures */
+  max-height: 500px;  /* hard ceiling - never too tall for tall figures */
+}
+
+figure picture { /* images */
+  display: block;      /* picture must be block for margin: auto to work */
+  width: fit-content;  /* shrink-wrap to the img's natural size */
+}
+
+.figdl dt {
+  color: var(--color_blue);
+  font-weight: bolder; /* may slightly hide some PDF notation */
+}
+
+/* Collapsible examples - title */
+summary {
+  color: var(--color_blue);
+}
+
+.example {
+  margin-left: 3mm;
+  padding: 2mm;
+  margin-top: 2mm;
+  border-left: 2pt solid var(--color_blue);
+  text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
+  background-color: #D6FFFE; /* Very pale blue */
+}
+
+.example .example-title {
+  color: var(--color_blue);
+  margin-left: 0;
+  font-weight: normal;
+  text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
+}
+
+.sourcecode {
+  background-color: rgb(240, 240, 240);
+}
+
+figcaption.SourceTitle { /* Revert the title back from smaller monospaced font */
+  font-family: var(--proportional_font) !important;
+  font-size: 110%;
+  font-weight: normal;
+  text-align: left !important;
+  margin-top: 2mm;
+  margin-bottom: 2mm; 
+  color: var(--color_blue);
+  order: -1; /* move to top */
+}
+
+pre { /* Rouge source code blocks */
+  font-size: var(--mono_font-reduction);
+  line-height: 1.5; /* required by WCAG Level AA minimum, override from elsewhere */
+  margin: 0;
+  margin-left: 2mm;
+  padding: 1mm;
+  padding-left: 2mm;
+}
+
+/* TABLES - need to hard override some explicit style formatting in the HTML */
+
+table {
+  border: 2pt solid var(--color_blue) !important;
 }
 
 table > caption {
-  font-weight: bold;
+  font-weight: normal; /* Retain PDF notation formatting */
+  margin-top: 2mm; /* Close spacing at top */
 }
 
-th {
-  color: white;
-  background-color: blue;
+table th {
+  border: 2pt solid var(--color_blue) !important;
+  font-weight: normal; /* Retain PDF notation formatting */
+  padding: 2pt;
+  background-color: rgb(197, 237, 255);
 }
 
 tbody tr:nth-child(even) {
-    background-color: LightGray; /* Light grey for even rows - not header */
+    background-color: LightGray; /* Light grey zebra stripes in table body */
 }
 
-/* Level 1: Square bullet, red */
-ul > li::before {
-  content: "\25A0";  /* Black square */
-  color: #d03f4e;    /* PDFa logo red */
-  font-size: 90%;
+table td {
+  padding: 0;
+  padding-left: 2mm;
+  border: 0.75pt solid var(--color_blue) !important;
 }
 
-/* Level 2: Diamond bullet, blue */
-ul ul > li::before {
-  content: "\25C6";  /* Diamond */
-  color: #489aaf;    /* PDFa logo blue */
-  font-size: 100%;
-}
-
-/* Level 3: Circle bullet, green */
-ul ul ul > li::before {
-  content: "\25CF";  /* Filled circle */
-  color: #8b9856;    /* PDFa logo green */
-  font-size: 110%;
-}
+/* COVER MATERIAL */
 
 .logo { /* cover page logo */
   text-align: center;
@@ -77,30 +148,105 @@ ul ul ul > li::before {
   font-size: 32pt;
 }
 
-#toc li a, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) li a {
+/* NAVIGATION MENU */
+
+/* Avoid bullets on ToC items */
+#toc li::before, #toc li::marker {
+  content: none;
+  display: inside;
+}
+#toc li a, #toc > ul :is(.h1) li a {
   text-transform: none; /* PDF is case-sensitive! Never force nav bookmark text uppercase! */
+  padding: 1pt;
+}
+
+#toc li a, #toc > ul :is(.h2, .h3, .h4, .h5, .h6) li a {
+  text-transform: none; /* PDF is case-sensitive! Never force nav bookmark text uppercase! */
+  padding-top: 0.25pt;
+  padding-bottom: 0.25pt;
+}
+
+#toc > ul :is(.h1) { /* H1's in bookmarks are bolder blue (not outright bold!) */
+  color: var(--color_blue);
+  font-weight: bolder; /* may slightly hide some PDF notation */
+}
+
+/* HEADINGS */
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  text-transform: none; /* PDF is case-sensitive! Never force headings uppercase! */
+  font-weight: bolder;  /* may slightly hide some PDF notation */
 }
 
 h1, .h1 {
-  text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
+  margin-top: 3mm; /* tighten up spacing */ 
 }
 
-.example .example-title {
-  text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
+/* UNORDERED LIST BULLETS */
+
+/* Null out other CSS that uses legacy ::before */
+ul > li::before {
+  content: none;
+  display: outside;
+  width: auto;
+  margin: 0;
+  padding: 0;
 }
 
-.example {
-  text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
-  font-size: 90%; 
-  background-color: #D6FFFE; /* Very pale blue */
+/* Level 1: Square bullet, logo red followed by EM space (U+2003) */
+ul > li::marker {
+  content: "■\2003";
+  color: var(--logo_red);
 }
 
-.sourcecode {
-  font-size: 90%; 
+/* Level 2: Diamond bullet, logo blue followed by EM space (U+2003) */
+ul ul > li::marker {
+  content: "◆\2003";  
+  color: var(--logo_blue);
 }
 
-figcaption .SourceTitle { /* Revert the title back from monospaced font */
-  font-family: 'Source Sans 3', 'Helvetica Neue', Helvetica, sans-serif;
+/* Level 3: Circle bullet, logo green followed by EM space (U+2003) */
+ul ul ul > li::marker {
+  content: "●\2003";
+  color: var(--logo_green);
+  font-size: 120%;
+}
+
+/* Level 4: Square bullet, logo red followed by EM space (U+2003) */
+ul ul ul ul > li::marker {
+  content: "■\2003";
+  color: var(--logo_yellow);
+}
+
+/* Level 5: Diamond bullet, logo blue followed by EM space (U+2003) */
+ul ul ul ul ul > li::marker {
+  content: "◆\2003";  
+  color: var(--logo_blue);
+}
+
+/* Level 6: Circle bullet, logo green followed by EM space (U+2003) */
+ul ul ul ul ul ul > li::marker {
+  content: "●\2003";
+  color: var(--logo_green);
+  font-size: 120%;
+}
+
+/* Space out unordered list items */
+div.ul_wrap:has(> ul > li) {
+  margin-top: 3mm;
+  margin-bottom: 3mm;
+  margin-left: 4mm;
+}
+
+/* Block quotes */
+.Quote {
+  margin-left: 15mm;
+  margin-top: 0;
+  padding: 2mm;
+}
+
+.QuoteAttribution {
+  text-align: right;
 }
 
 span.TermNum {
@@ -108,135 +254,159 @@ span.TermNum {
 }
 
 .requirement {
-  color: Red; 
+  color: rgb(255, 0, 0); 
   font-weight: bold;
   text-transform: uppercase; /* Uppercase "SHALL" a-la RFCs */
 }
 
 .recommendation {
-  color: DarkOrange;
+  color: rgb(255, 140, 0);
   font-weight: bold;
   text-transform: uppercase; /* Uppercase "SHOULD" a-la RFCs */
 }
 
-.pdf-keyword {
-  font-family: 'Courier New', Courier, monospace;
-  background-color: #e2e29f;
-  color: Blue; 
-  font-weight: bold;
-}
-
-.pdf-operator {
-  font-family: 'Courier New', Courier, monospace;
-  background-color: #e2e29f;
-  color: Red; 
-  font-weight: bold;
-}
-
 .pdf-version { 
+  color: rgb(0, 0, 255); 
   font-style: italic; 
   font-weight: lighter; 
-  color: blue; 
 }
 .pdf-version::before { content: "(PDF "; }
 .pdf-version::after  { content: ")"; }
 
-/* Base admonition styling */
-.Note, .note, .Admonition  {
-  font-size: 86%;
-  margin-left: 8.5mm;
-  margin-right: 0.5mm;
-  margin-top: 6pt;
-  margin-bottom: 6pt;
-  padding: 1mm;
-  padding-left: 1.5mm;
-  padding-right: 1.5mm;
-  border-left: 4pt solid;
+.pdf-operator {
+  font-family: var(--monospaced_font);
+  font-size: var(--mono_font-reduction);
+  padding: 1pt;
+  background-color: rgb(224, 224, 175);
+  color: rgb(255, 0, 0); 
+  font-weight: bold;
 }
 
-.note_label {
-  font-weight: bold; /* the "NOTE 1" text before the body of a note */
+.pdf-keyword {
+  font-family: var(--monospaced_font);
+  font-size: var(--mono_font-reduction);
+  padding: 1pt;
+  background-color: rgb(224, 224, 175);
+  color: rgb(0, 0, 255); 
+  font-weight: bold;
+}
+
+/* Base admonition styling */
+.Note, .Admonition  {
+  font-size: var(--small-text-reduction);
+	background-color: rgb(252, 251, 212);
+	border-left: 4pt solid rgb(255, 200, 36);
+  margin-left: 3mm;
+  margin-right: 2mm;
+  padding: 1.5mm;
+  margin-top: 2mm;
+  margin-bottom: 2mm;
+}
+
+.note_label, .termnote_label {
+  font-weight: bold; /* the "NOTE 1" or "Note to entry" text before the body of a note*/
 }
 
 .AdmonitionTitle { /* titles of all admonitions */
   text-align: left;
   text-transform: none; /* PDF is case sensitive! */
-  font-weight: bold;
+  font-weight: bold; /* may hide some PDF notation */
 }
 
 /* Tip admonition */
 .AdmonitionTip {
-  background-color: #f5ebce; /* rgb(245,235,206) */
-  border-left-width: 4pt;
-  border-left-color: #d03f4e; /* rgb(208,63,78) - PDFa red */
+  background-color: rgb(245,235,206);
+  border-left-color: rgb(208,63,78);
 }
 
-.AdmonitionTip .AdmonitionTitle {
-  color: #d03f4e;
+.AdmonitionTip.AdmonitionTitle {
+  color: rgb(208,63,78);
+  text-align: left !important; /* HTML has hard-coded style to center */
 }
 
 /* Warning admonition */
 .AdmonitionWarning {
-  background-color: #fff5e6; /* rgb(255,245,230) */
-  border-left-width: 4pt;
-  border-left-color: #ff8c00; /* rgb(255,140,0) - dark orange */
+  background-color: rgb(255,245,230);
+  border-left-color: rgb(255,140,0);
 }
 
-.AdmonitionWarning .AdmonitionTitle {
-  color: #ff8c00;
+.AdmonitionWarning.AdmonitionTitle {
+  color: rgb(255,140,0);
+  text-align: left !important; /* HTML has hard-coded style to center */
 }
 
 /* Caution admonition */
 .AdmonitionCaution {
-  background-color: #fffacd; /* rgb(255,250,205) */
-  border-left-width: 4pt;
-  border-left-color: #b8860b; /* rgb(184,134,11) - dark goldenrod */
+  background-color: rgb(255,250,205);
+  border-left-color: rgb(184,134,11);
 }
 
-.AdmonitionCaution .AdmonitionTitle {
-  color: #b8860b;
+.AdmonitionCaution.AdmonitionTitle {
+  color: rgb(184,134,11);
+  text-align: left !important; /* HTML has hard-coded style to center */
 }
 
 /* Important admonition */
 .AdmonitionImportant {
-  background-color: #ffe6e6; /* rgb(255,230,230) */
-  border-left-width: 4pt;
-  border-left-color: #ff0000; /* rgb(255,0,0) - red */
+  background-color: rgb(255,230,230);
+  border-left-color: rgb(255,0,0);
 }
 
-.AdmonitionImportant .AdmonitionTitle {
-  color: #ff0000;
+.AdmonitionImportant.AdmonitionTitle {
+  color: rgb(255,0,0);
+  text-align: left !important; /* HTML has hard-coded style to center */
 }
 
 /* Safety-precaution admonition */
 .AdmonitionSafetyPrecaution {
-  background-color: #e6f5e6; /* rgb(230,245,230) */
-  border-left-width: 4pt;
-  border-left-color: #008000; /* rgb(0,128,0) - green */
+  background-color:rgb(230,245,230);
+  border-left-color: rgb(0,128,0);
 }
 
-.AdmonitionSafetyPrecaution .AdmonitionTitle {
-  color: #008000;
+.AdmonitionSafetyPrecaution.AdmonitionTitle {
+  color: rgb(0,128,0);
+  text-align: left !important; /* HTML has hard-coded style to center */
 }
 
 /* Editorial admonition */
 .AdmonitionEditorial {
-  background-color: #f0f0f0; /* rgb(240,240,240) */
-  border-left-width: 4pt;
-  border-left-color: #808080; /* rgb(128,128,128) - gray */
+  background-color: rgb(240,240,240);
+  border-left-color: rgb(128,128,128);
 }
 
-.AdmonitionEditorial .AdmonitionTitle {
-  color: #808080;
+.AdmonitionEditorial.AdmonitionTitle {
+  color: rgb(128,128,128);
+  text-align: left !important; /* HTML has hard-coded style to center */
 }
 
 /* Box admonition */
 .AdmonitionBox {
-  background-color: #9addda; /* rgb(154, 221, 218) */
+  background-color: rgb(154, 221, 218);
   border: 2pt solid black;
-  border-left: none;
 }
 
 .AdmonitionBox.AdmonitionTitle {
-  border: none;
+  border: none; /* do not additionally border the box admonition title */
+  text-align: left !important; /* HTML has hard-coded style to center */
+}
+
+/* Other admonition */
+.AdmonitionOther {
+  background-color: rgb(240,240,240);
+  border-left-color: rgb(80, 80, 80);
+}
+
+.AdmonitionOther.AdmonitionTitle {
+  color: rgb(80, 80, 80);
+  text-align: left !important; /* HTML has hard-coded style to center */
+}
+
+p.Biblio { /* hanging indent for bibliographic entries */
+  margin-left: 8.5mm;
+  text-indent: -5mm;
+}
+
+.Biblio.note_label {
+  margin-top: 0;
+  margin-left: 5mm;
 }
