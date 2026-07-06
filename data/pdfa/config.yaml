@@ -16,10 +16,10 @@ base-override:
     publisher_abbr: PDF Association
     presentation-metadata-color-secondary: '#d03f4e'  # PDFa logo red - good contrast for WCAG Level AA
     presentation-metadata-backcover-text: https://pdfa.org
-    body-font: "'Source Sans 3', 'Helvetica Neue', Helvetica, sans-serif"
-    header-font: "'Source Sans 3', 'Helvetica Neue', Helvetica, sans-serif"
-    monospace-font: "'Noto Sans Mono', Courier, monospace"
-    fonts: Source Sans 3;Source Sans 3 SemiBold;Source Sans Pro
+    body-font: "'Source Sans 3', sans-serif"
+    header-font: "'Source Sans 3', sans-serif"
+    monospace-font: "'Source Code Pro', monospace"
+    fonts: "Source Sans 3 ExtraLight;Source Sans 3 Light;Source Sans 3;Source Sans 3 Medium;Source Sans 3 SemiBold;Source Sans 3 ExtraBold;Source Sans 3 Black;Source Code Pro ExtraLight;Source Code Pro Light;Source Code Pro;Source Code Pro Medium;Source Code Pro SemiBold;Source Code Pro ExtraBold;Source Code Pro Black;STIX Two Math;Arial;Courier New"
     output-extensions: xml,html,pdf
     toclevels-html: 6
     docidentifier: '{{ doctype_abbr }}-{{ docnumeric | prepend: "000" | slice: -3,3 }} {% if draft %}v{{ draft }}{% endif %} {% if edition %}ed. {{ edition }}{% endif %}'
@@ -48,9 +48,11 @@ stages:
   - taste: draft
     base: draft
     abbrev: DRAFT
+    abbreviation: DRAFT
   - taste: release-candidate
     base: draft
     abbrev: RC
+    abbreviation: RC
   - taste: published
     base: published
     default: true
