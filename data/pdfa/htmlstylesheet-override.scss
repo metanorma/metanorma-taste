@@ -25,6 +25,11 @@ body {
   line-height: 1.5; /* WCAG level AA requires minimum line height of 1.5 */
 }
 
+p { /* Compress whitespace but equally top and bottom */
+  margin-top: 1mm;
+  margin-bottom: 1mm;
+}
+
 tt, td tt, p tt, li tt { /* override 0.8em formatting elsewhere */
   font-size: 1em;
 }
@@ -99,36 +104,39 @@ pre { /* Rouge source code blocks */
   line-height: 1.5; /* required by WCAG Level AA minimum, override from elsewhere */
   margin: 0;
   margin-left: 2mm;
+  margin-right: 2mm;
   padding: 1mm;
   padding-left: 2mm;
 }
 
-/* TABLES - need to hard override some explicit style formatting in the HTML */
+/* TABLES - need to hard override some explicit style formatting on the HTML tags */
+/* Can also use DataTables.js classes - https://datatables.net/manual/styling/classes */
 
 table {
   border: 2pt solid var(--color_blue) !important;
 }
 
+table th { /* Table headers */
+  border: 2pt solid var(--color_blue) !important;
+  color: var(--color_blue);
+}
+
 table > caption {
   font-weight: normal; /* Retain PDF notation formatting */
   margin-top: 2mm; /* Close spacing at top */
-}
-
-table th {
-  border: 2pt solid var(--color_blue) !important;
-  font-weight: normal; /* Retain PDF notation formatting */
-  padding: 2pt;
-  background-color: rgb(197, 237, 255);
-}
-
-tbody tr:nth-child(even) {
-    background-color: LightGray; /* Light grey zebra stripes in table body */
+  padding: 2mm;
+  color: var(--color_blue);
 }
 
 table td {
   padding: 0;
-  padding-left: 2mm;
+  padding-left: 1mm;
   border: 0.75pt solid var(--color_blue) !important;
+  margin-top: 1mm; /* Close up spacing */
+}
+
+table.layout { /* class="layout" implies a invisible table used to influence layout */
+  border: none !important;
 }
 
 /* COVER MATERIAL */
@@ -233,14 +241,16 @@ ul ul ul ul ul ul > li::marker {
 
 /* Space out unordered list items */
 div.ul_wrap:has(> ul > li) {
-  margin-top: 3mm;
-  margin-bottom: 3mm;
+  margin-top: 2mm;
+  margin-bottom: 2mm;
   margin-left: 4mm;
 }
 
 /* Block quotes */
 .Quote {
+  width: 100%;
   margin-left: 15mm;
+  margin-right: 5mm;
   margin-top: 0;
   padding: 2mm;
 }
@@ -296,11 +306,9 @@ span.TermNum {
   font-size: var(--small-text-reduction);
 	background-color: rgb(252, 251, 212);
 	border-left: 4pt solid rgb(255, 200, 36);
+  margin: 2mm;
   margin-left: 3mm;
-  margin-right: 2mm;
   padding: 1.5mm;
-  margin-top: 2mm;
-  margin-bottom: 2mm;
 }
 
 .note_label, .termnote_label {
