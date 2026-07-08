@@ -153,7 +153,7 @@
 				
 				<fo:block margin-top="-3mm" role="SKIP"> <!-- -3mm because there is a space before image in the source SVG -->
 					<fo:inline-container width="47mm" role="SKIP">
-						<fo:block font-size="0pt" fox:alt-text="PDF Association logo">
+						<fo:block font-size="0pt" fox:alt-text="PDF Association logo" role="SKIP">
 							<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:copyright/mn:owner/mn:organization">
 								<xsl:apply-templates select="mn:logo/mn:image"/>
 							</xsl:for-each>
@@ -191,15 +191,15 @@
 				</fo:block-container>
 
 				<fo:block-container absolute-position="fixed" top="95mm" left="17.5mm" font-size="20pt">
-					<fo:table table-layout="fixed" width="174mm">
+					<fo:table table-layout="fixed" width="174mm" role="SKIP">
 						<fo:table-column column-width="proportional-column-width(1)"/>
 						<fo:table-column column-width="proportional-column-width(1)"/>
 						<fo:table-column column-width="proportional-column-width(1)"/>
-						<fo:table-body>
-							<fo:table-row>
-								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
-								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
-								<fo:table-cell text-align="right" display-align="after" xsl:use-attribute-sets="cover_page_box"> <!-- padding-left="5mm" padding-right="5mm" -->
+						<fo:table-body role="SKIP">
+							<fo:table-row role="SKIP">
+								<fo:table-cell role="SKIP"><fo:block role="artifact">&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
+								<fo:table-cell role="SKIP"><fo:block role="artifact">&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
+								<fo:table-cell text-align="right" display-align="after" xsl:use-attribute-sets="cover_page_box" role="SKIP"> <!-- padding-left="5mm" padding-right="5mm" -->
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_yellow}">
 										<fo:block font-size="18pt" margin-left="5mm" margin-right="5mm">
 											<fo:block>
@@ -237,9 +237,9 @@
 									</fo:block-container>
 								</fo:table-cell>
 							</fo:table-row>
-							<fo:table-row>
-								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
-								<fo:table-cell text-align="center" display-align="center" xsl:use-attribute-sets="cover_page_box">
+							<fo:table-row role="SKIP">
+								<fo:table-cell role="SKIP"><fo:block role="artifact">&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
+								<fo:table-cell text-align="center" display-align="center" xsl:use-attribute-sets="cover_page_box" role="SKIP">
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_green}">
 										<fo:block font-size="0pt" role="SKIP">
 											<!-- set context node to the cover page image -->
@@ -252,10 +252,10 @@
 										</fo:block>
 									</fo:block-container>
 								</fo:table-cell>
-								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
+								<fo:table-cell role="SKIP"><fo:block role="artifact">&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
 							</fo:table-row>
-							<fo:table-row>
-								<fo:table-cell display-align="after" xsl:use-attribute-sets="cover_page_box">
+							<fo:table-row role="SKIP">
+								<fo:table-cell display-align="after" xsl:use-attribute-sets="cover_page_box" role="SKIP">
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_red}">
 										<!-- the group that authored the doc -->
 										<fo:block margin-left="5mm" margin-right="5mm" margin-bottom="3mm">
@@ -265,8 +265,8 @@
 										</fo:block>
 									</fo:block-container>
 								</fo:table-cell>
-								<fo:table-cell><fo:block>&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
-								<fo:table-cell display-align="after" xsl:use-attribute-sets="cover_page_box">
+								<fo:table-cell role="SKIP"><fo:block role="artifact">&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
+								<fo:table-cell display-align="after" xsl:use-attribute-sets="cover_page_box" role="SKIP">
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_blue}">
 										<fo:block margin-left="2mm">
 											<!-- Example: © 2025 PDF Association - pdfa.org -->
@@ -282,19 +282,6 @@
 											</fo:block>
 											<fo:block font-size="8pt" margin-bottom="2mm">
 												<xsl:text>This work is licensed under CC-BY-4.0.</xsl:text>
-												<!-- Note: the error occurs [Fatal Error] :1621:113: Character reference "&#55356" is an invalid XML character. -->
-												<!-- Circled CC -->
-												<!-- <fo:inline font-size="10pt"><xsl:call-template name="getCharByCodePoint"><xsl:with-param name="codepoint">1f16d</xsl:with-param></xsl:call-template></fo:inline>
-												<xsl:text> </xsl:text> -->
-												<!-- Circled Human Figure -->
-												<!-- <fo:inline font-size="10pt"><xsl:call-template name="getCharByCodePoint"><xsl:with-param name="codepoint">1f16f</xsl:with-param></xsl:call-template></fo:inline> -->
-												<!-- Characters replaced to SVG To prevent warning:
-																										PDF isn't valid PDF/UA-1:
-														ValidationResult [flavour=ua1, totalAssertions=112627, assertions=[
-														TestAssertion [ruleId=RuleId [specification=ISO 14289-1:2014, clause=7.21.7, testNumber=1], status=failed,
-														message=The Font dictionary of all fonts shall define the map of all used character codes to Unicode values, either via a ToUnicode entry, or other mechanisms as defined in ISO 14289-1, 7.21.7,
-														location=Location [level=CosDocument, context=root/document[0]/pages[0](919 0 obj PDPage)/contentStream[0](947 0 obj PDSemanticContentStream)/operators[1391]/usedGlyphs[0](EAAAAB+SourceSans3-Regular EAAAAB+SourceSans3-Regular 43 0 2124645278 0 true)], locationContext=null, errorMessage=null]], isCompliant=false]
-												-->
 												<fo:inline baseline-shift="-42%" padding-left="0.5mm">
 												<fo:instream-foreign-object content-width="5.6mm" fox:alt-text="Creative Commons circled icons for CC and human figure">
 													<xsl:copy-of select="$circledChars"/>
@@ -508,7 +495,7 @@
 		<xsl:attribute name="space-before">10mm</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
 		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow char-based PDF notation to be visible -->
-		<xsl:attribute name="margin-bottom">0mm</xsl:attribute>
+		<xsl:attribute name="margin-bottom">0</xsl:attribute>
 		<xsl:attribute name="keep-with-next">always</xsl:attribute>		
 	</xsl:template>
 
@@ -527,7 +514,7 @@
 
 	<!-- "Table of Contents" H1 heading -->
 	<xsl:template name="refine_toc-title-style"><?extend?>
-		<xsl:attribute name="margin-left">0mm</xsl:attribute>
+		<xsl:attribute name="margin-left">0</xsl:attribute>
 		<xsl:attribute name="margin-bottom">5mm</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
 		<xsl:copy-of select="mnx:title/@font-weight"/>
@@ -556,12 +543,12 @@
 
 	<!-- see https://github.com/metanorma/metanorma-pdfa/issues/43 -->
 	<xsl:template name="refine_toc-title-style"><?extend?>
-			<xsl:attribute name="margin-left">0mm</xsl:attribute>
+			<xsl:attribute name="margin-left">0</xsl:attribute>
 			<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
 	</xsl:template>
 
 	<xsl:template name="refine_bibliography-title-style"><?extend?>
-		<xsl:attribute name="margin-left">0mm</xsl:attribute>
+		<xsl:attribute name="margin-left">0</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
 	</xsl:template>
 
@@ -775,49 +762,17 @@
 		<xsl:attribute name="space-before">2mm</xsl:attribute>
 	</xsl:attribute-set>
 
-	<!-- Definition list (incl. Abbreviated terms) - center-aligned vertically. Match to p below. -->
-	<xsl:template name="refine_dt-cell-style">
-		<xsl:attribute name="line-height">1.5</xsl:attribute>
-		<xsl:attribute name="space-before">3mm</xsl:attribute>
-		<xsl:attribute name="space-after">3mm</xsl:attribute>
-		<xsl:attribute name="margin-bottom">2mm</xsl:attribute>
-	</xsl:template>
-
-	<!-- Copied from ribose.standard.xsl so to reduce space after top level lists -->
-	<xsl:template match="mn:ul | mn:ol" mode="list" priority="2">
-		<fo:block-container role="SKIP">
-			<fo:block-container xsl:use-attribute-sets="reset-margins-style">
-				<xsl:choose>
-					<xsl:when test="not(ancestor::mn:ul) and not(ancestor::mn:ol)">
-						<fo:block margin-left="3mm" margin-top="1mm" margin-bottom="0" padding-bottom="0" space-after="0" role="SKIP"><!-- removed padding-bottom="12pt" padding-top="4pt" for 1st level list items -->
-							<xsl:call-template name="listProcessing"/>
-						</fo:block>
-					</xsl:when>
-					<xsl:otherwise>
-						<fo:block margin-top="1mm" margin-bottom="0" padding-bottom="0" space-after="0" role="SKIP"><!-- 2nd level and deeper list items -->
-							<xsl:call-template name="listProcessing"/>
-						</fo:block>
-					</xsl:otherwise>
-				</xsl:choose>
-			</fo:block-container>
-		</fo:block-container>
-	</xsl:template>
-
 	<xsl:attribute-set name="figure-name-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
 		<xsl:attribute name="keep-with-next">always</xsl:attribute>
-	</xsl:attribute-set>
-
-	<xsl:attribute-set name="list-name-style"><?extend?>
-		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
 	</xsl:attribute-set>
 
 	<!-- Source code blocks -->
 	<xsl:template name="refine_sourcecode-container-style"><?extend?>
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
 		<xsl:attribute name="margin-right">3mm</xsl:attribute>
-		<xsl:attribute name="margin-top">0mm</xsl:attribute>
-		<xsl:attribute name="margin-bottom">0mm</xsl:attribute>
+		<xsl:attribute name="margin-top">0</xsl:attribute>
+		<xsl:attribute name="margin-bottom">0</xsl:attribute>
 		<xsl:attribute name="padding">2mm</xsl:attribute>
 		<xsl:attribute name="background-color">rgb(240, 240, 240)</xsl:attribute> <!-- check source code background color against table zebra stripes -->
 	</xsl:template>
@@ -826,8 +781,8 @@
 		<xsl:attribute name="space-before">2pt</xsl:attribute>
 		<xsl:attribute name="space-after">2pt</xsl:attribute>
 		<!-- xsl:attribute name="keep-with-next">always</xsl:attribute --><!-- do NOT do this as prefer to keep source code unsplit, colored background helps see where source code is -->
-		<xsl:attribute name="margin">0mm</xsl:attribute>
-		<xsl:attribute name="padding">0mm</xsl:attribute>
+		<xsl:attribute name="margin">0</xsl:attribute>
+		<xsl:attribute name="padding">0</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
 	</xsl:template>
 
@@ -835,10 +790,10 @@
 		<xsl:attribute name="font-family"><xsl:value-of select="$monospaced_font"/></xsl:attribute>
 		<xsl:attribute name="font-size"><xsl:value-of select="$mono_font-reduction"/></xsl:attribute>
 		<xsl:attribute name="padding-left">2mm</xsl:attribute>
-		<xsl:attribute name="padding-top">0mm</xsl:attribute>
-		<xsl:attribute name="margin-top">0mm</xsl:attribute>
-		<xsl:attribute name="padding-bottom">0mm</xsl:attribute>
-		<xsl:attribute name="margin-bottom">0mm</xsl:attribute>
+		<xsl:attribute name="padding-top">0</xsl:attribute>
+		<xsl:attribute name="margin-top">0</xsl:attribute>
+		<xsl:attribute name="padding-bottom">0</xsl:attribute>
+		<xsl:attribute name="margin-bottom">0</xsl:attribute>
 	</xsl:template>
 
 	<!-- Example blocks - mimic notes/admonitions above for margins and padding -->
@@ -850,7 +805,7 @@
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
 		<xsl:attribute name="margin-right">2mm</xsl:attribute>
 		<xsl:attribute name="padding">1.5mm</xsl:attribute>
-		<xsl:attribute name="padding-bottom">0mm</xsl:attribute>
+		<xsl:attribute name="padding-bottom">0</xsl:attribute>
 		<xsl:attribute name="margin-top">1mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">5mm</xsl:attribute>
 		<xsl:attribute name="border-left-style">solid</xsl:attribute>
@@ -860,12 +815,12 @@
 
 	<xsl:attribute-set name="example-name-style"><?extend?>
 		<xsl:attribute name="keep-with-next">always</xsl:attribute>
-		<xsl:attribute name="margin-left">0mm</xsl:attribute>
+		<xsl:attribute name="margin-left">0</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
 	</xsl:attribute-set>
 
 	<xsl:template name="refine_example-p-style"><?extend?>
-		<xsl:attribute name="margin">0mm</xsl:attribute>
+		<xsl:attribute name="margin">0</xsl:attribute>
 		<xsl:attribute name="margin-top">2mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">2mm</xsl:attribute>
 	</xsl:template>
@@ -876,7 +831,7 @@
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
 		<xsl:attribute name="margin-right">2mm</xsl:attribute>
 		<xsl:attribute name="padding">1.5mm</xsl:attribute>
-		<xsl:attribute name="padding-bottom">0mm</xsl:attribute>
+		<xsl:attribute name="padding-bottom">0</xsl:attribute>
 		<xsl:attribute name="margin-top">1mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">5mm</xsl:attribute>
 		<xsl:attribute name="border-left-style">solid</xsl:attribute>
@@ -886,7 +841,7 @@
 
 	<!-- Copy of "refine_example-p-style" above -->
 	<xsl:template name="refine_termexample-p-style"><?extend?>
-		<xsl:attribute name="margin">0mm</xsl:attribute>
+		<xsl:attribute name="margin">0</xsl:attribute>
 		<xsl:attribute name="margin-top">2mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">2mm</xsl:attribute>
 	</xsl:template>
@@ -940,14 +895,9 @@
 	<!-- Default paragraph formatting. Make equally centred vertically so narrow table cells look better -->
 	<xsl:template name="refine_p-style"><?extend?>
 		<xsl:attribute name="line-height">1.5</xsl:attribute><!-- ensure WCAG Level AA recommendation for 1.5 line height as a minimum. -->
-		<xsl:attribute name="space-before">3mm</xsl:attribute>
-		<xsl:attribute name="space-after">3mm</xsl:attribute>
+		<xsl:attribute name="space-before">2mm</xsl:attribute>
+		<xsl:attribute name="space-after">2mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">2mm</xsl:attribute>
-	</xsl:template>
-
-	<!-- Default list item formatting. -->
-	<xsl:template name="refine_list-item-style"><?extend?>
-		<xsl:attribute name="line-height">1.5</xsl:attribute><!-- ensure WCAG Level AA recommendation for 1.5 line height as a minimum. -->
 	</xsl:template>
 
 	<!-- Table formatting -->
@@ -957,15 +907,17 @@
 	</xsl:attribute-set>
 
 	<xsl:template name="refine_table-style"><?extend?>
-		<xsl:attribute name="border">1.5pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- Thick outer border -->
+		<xsl:attribute name="border">1pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- Thick outer border -->
 	</xsl:template>
 
 	<xsl:attribute-set name="table-header-cell-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute> <!-- allow PDF notation to be visible in table headers -->
+		<xsl:attribute name="font-size">110%</xsl:attribute>
 		<xsl:attribute name="display-align">center</xsl:attribute>
-		<xsl:attribute name="color">black</xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
 		<xsl:attribute name="background-color">rgb(216, 243, 255)</xsl:attribute> <!-- Shade heading cells very pale blue -->
-		<xsl:attribute name="border">1.5pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- Thick border -->
+		<xsl:attribute name="border">1pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- Thick header border -->
+		<xsl:attribute name="display-align">center</xsl:attribute><!-- center vertically -->
 		<xsl:attribute name="space-after">3pt</xsl:attribute>
 		<xsl:attribute name="space-before">3pt</xsl:attribute>
 	</xsl:attribute-set>
@@ -978,7 +930,7 @@
 	</xsl:template>
 
 	<xsl:template name="refine_table-cell-style"><?extend?>
-		<xsl:attribute name="border">0.75pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- narrow row and column borders -->
+		<xsl:attribute name="border">0.5pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- narrow row and column borders -->
 		<xsl:attribute name="space-after">3pt</xsl:attribute>
 		<xsl:attribute name="space-before">3pt</xsl:attribute>
 	</xsl:template>
@@ -1007,7 +959,46 @@
 		</xsl:if>
 	</xsl:template>
 
-	<!-- Bullet styles -->
+	<!-- LISTS -->
+	<!-- Definition list (incl. Abbreviated terms) - center-aligned vertically. Match to p below. -->
+	<xsl:template name="refine_dt-cell-style">
+		<xsl:attribute name="line-height">1.5</xsl:attribute><!-- ensure WCAG Level AA recommendation for 1.5 line height as a minimum. -->
+		<xsl:attribute name="space-before">1mm</xsl:attribute>
+		<xsl:attribute name="space-after">1mm</xsl:attribute>
+		<xsl:attribute name="margin-left">2mm</xsl:attribute>
+		<xsl:attribute name="margin-bottom">1mm</xsl:attribute>
+	</xsl:template>
+
+	<!-- Copied from ribose.standard.xsl so to reduce space after top level lists -->
+	<!-- Cannot have any margins or padding above/below because they accumulate with nested lists -->
+	<xsl:template match="mn:ul | mn:ol" mode="list" priority="2">
+		<fo:block-container role="SKIP">
+			<fo:block-container xsl:use-attribute-sets="reset-margins-style">
+				<xsl:choose>
+					<xsl:when test="not(ancestor::mn:ul) and not(ancestor::mn:ol)">
+						<fo:block margin-left="2mm" margin-top="0" margin-bottom="0" padding-bottom="0" space-after="0" space-before="0" role="SKIP"><!-- removed padding-bottom="12pt" padding-top="4pt" for 1st level list items -->
+							<xsl:call-template name="listProcessing"/>
+						</fo:block>
+					</xsl:when>
+					<xsl:otherwise>
+						<fo:block margin-top="0" margin-bottom="0" padding-bottom="0" space-after="0" space-before="0" role="SKIP"><!-- 2nd level and deeper list items -->
+							<xsl:call-template name="listProcessing"/>
+						</fo:block>
+					</xsl:otherwise>
+				</xsl:choose>
+			</fo:block-container>
+		</fo:block-container>
+	</xsl:template>
+
+	<xsl:template name="refine_list-style_provisional-distance-between-starts"><?extends?>
+		<xsl:attribute name="provisional-distance-between-starts">10mm</xsl:attribute><!-- gap between left edge of list marker and left edge of list body -->
+	</xsl:template>
+
+	<xsl:template name="refine_list-item-style"><?extends?>
+		<xsl:attribute name="line-height">1.5</xsl:attribute><!-- ensure WCAG Level AA recommendation for 1.5 line height as a minimum. -->
+	</xsl:template>	
+
+	<!-- Unordered bullet styles -->
 	<xsl:template match="mn:ul/mn:li/mn:fmt-name" mode="update_xml_step1" priority="3">
 		<xsl:choose>
 			<xsl:when test="normalize-space() = 'o'">
@@ -1054,21 +1045,22 @@
 		<xsl:text>"</xsl:text>
 	</xsl:template>
 
-	<!-- Quote blocks - both quote and source to be in background color like HTML - https://github.com/metanorma/metanorma-pdfa/issues/50 -->
+	<!-- Quote blocks - both quote and source to be in background color like HTML -->
 	<xsl:template name="refine_quote-container-style"><?extend?>
 		<xsl:attribute name="background-color">rgb(230,230,230)</xsl:attribute>
+		<xsl:attribute name="margin">3mm</xsl:attribute>
+		<xsl:attribute name="padding">1mm</xsl:attribute>
 	</xsl:template>
 
 	<xsl:template name="refine_quote-style"><?extend?>
 		<xsl:attribute name="font-style">italic</xsl:attribute><!-- this loses some PDF notation -->
 		<xsl:attribute name="background-color">rgb(230, 230, 230)</xsl:attribute>
+		<xsl:attribute name="margin">0</xsl:attribute>
 		<xsl:attribute name="padding">1mm</xsl:attribute>
 	</xsl:template>
 
 	<!-- Replace generic "sans-serif" font with precise Arial and "monospace" with Courier New that were used by PlantUML diagrams -->
-	<!-- xsl:template match="*[local-name() = 'text'][ ancestor::*[ @data-diagram-type ] or ancestor::processing-instruction('plantuml') ]" mode="svg_update" -->
-
-	<!-- All PlantUML figures contain a plantuml processing instruction (@data-diagram-type attribute is not always used) -->
+	<!-- All PlantUML figures contain a plantuml processing instruction (whereas @data-diagram-type attribute is NOT always used) -->
 	<xsl:template match="*[processing-instruction('plantuml')]" mode="svg_update">
 			<!-- From the PI, select all sibling elements and all text descendants within them at any depth -->
 			<xsl:apply-templates select="processing-instruction('plantuml')/following-sibling::*/descendant-or-self::*[local-name() = 'text']" mode="svg_update"/>
