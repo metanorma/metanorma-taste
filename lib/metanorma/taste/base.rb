@@ -145,6 +145,7 @@ module Metanorma
         # Add attributes from different sources
         add_file_based_overrides(override_attrs)
         add_base_configuration_overrides(override_attrs, attrs)
+        add_bibliography_sort_overrides(override_attrs)
         apply_doctype_overrides(attrs, override_attrs)
         apply_stage_overrides(attrs, override_attrs)
         apply_committee_overrides(attrs, override_attrs)
@@ -251,6 +252,19 @@ module Metanorma
           value or next
           value += add_base_configuration_additive(config_key, attr_key, attrs)
           override_attrs << ":#{attr_key}: #{value}"
+        end
+      end
+
+      # Emit the publisher bibliography sort order as
+      # :sort-biblio-<abbrev>: <rank>: <name> document attributes, one per
+      # configured publisher. The shared Metanorma::Standoc::Ref sort helpers
+      # read these to override the base flavour's built-in publisher ranking.
+      def add_bibliography_sort_overrides(override_attrs)
+        items = @config.base_override&.bibliography_sort or return
+        items.each do |item|
+          item.abbrev.to_s.empty? and next
+          override_attrs <<
+            ":sort-biblio-#{item.abbrev}: #{item.rank}: #{item.name}"
         end
       end
 
