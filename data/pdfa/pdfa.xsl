@@ -37,7 +37,7 @@
 			</fo:simple-page-master>
 			
 			<fo:simple-page-master master-name="copyright-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
-				<fo:region-body margin-top="20mm" margin-bottom="35mm" margin-left="18mm" margin-right="18mm"/>
+				<fo:region-body margin-top="20mm" margin-bottom="35mm" margin-left="18mm" margin-right="18mm" role="SKIP"/>
 			</fo:simple-page-master>
 
 			<!-- ToC -->
@@ -190,17 +190,17 @@
 					</xsl:for-each> -->
 				</fo:block-container>
 
-				<fo:block-container absolute-position="fixed" top="95mm" left="17.5mm" font-size="20pt">
+				<fo:block-container absolute-position="fixed" top="95mm" left="17.5mm" font-size="20pt" role="SKIP">
 					<fo:table table-layout="fixed" width="174mm" role="SKIP">
 						<fo:table-column column-width="proportional-column-width(1)"/>
 						<fo:table-column column-width="proportional-column-width(1)"/>
 						<fo:table-column column-width="proportional-column-width(1)"/>
 						<fo:table-body role="SKIP">
 							<fo:table-row role="SKIP">
-								<fo:table-cell role="SKIP"><fo:block role="artifact">&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
-								<fo:table-cell role="SKIP"><fo:block role="artifact">&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
+								<fo:table-cell role="SKIP"><fo:block role="artifact" line-height="0"/></fo:table-cell>
+								<fo:table-cell role="SKIP"><fo:block role="artifact" line-height="0"/></fo:table-cell>
 								<fo:table-cell text-align="right" display-align="after" xsl:use-attribute-sets="cover_page_box" role="SKIP"> <!-- padding-left="5mm" padding-right="5mm" -->
-									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_yellow}">
+									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_yellow}" role="SKIP">
 										<fo:block font-size="18pt" margin-left="5mm" margin-right="5mm">
 											<fo:block>
 												<!-- <xsl:variable name="status" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:status"/> -->
@@ -238,25 +238,25 @@
 								</fo:table-cell>
 							</fo:table-row>
 							<fo:table-row role="SKIP">
-								<fo:table-cell role="SKIP"><fo:block role="artifact">&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
+								<fo:table-cell role="SKIP"><fo:block role="artifact" line-height="0"/></fo:table-cell>
 								<fo:table-cell text-align="center" display-align="center" xsl:use-attribute-sets="cover_page_box" role="SKIP">
-									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_green}">
+									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_green}" role="SKIP">
 										<fo:block font-size="0pt" role="SKIP">
 											<!-- set context node to the cover page image -->
 											<xsl:for-each select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:coverpage-image[1]/mn:image[1]">
 												<xsl:call-template name="insertPageImage">
-													<xsl:with-param name="svg_content_height">53</xsl:with-param> <!-- this parameter is using for SVG images -->
-													<xsl:with-param name="bitmap_width">53</xsl:with-param> <!-- this parameter is using for bitmap images -->
+													<xsl:with-param name="svg_content_height">53</xsl:with-param><!-- needed for SVG images -->
+													<xsl:with-param name="bitmap_width">53</xsl:with-param>
 												</xsl:call-template>
 											</xsl:for-each>
 										</fo:block>
 									</fo:block-container>
 								</fo:table-cell>
-								<fo:table-cell role="SKIP"><fo:block role="artifact">&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
+								<fo:table-cell role="SKIP"><fo:block role="artifact" line-height="0"/></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row role="SKIP">
 								<fo:table-cell display-align="after" xsl:use-attribute-sets="cover_page_box" role="SKIP">
-									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_red}">
+									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_red}" role="SKIP">
 										<!-- the group that authored the doc -->
 										<fo:block margin-left="5mm" margin-right="5mm" margin-bottom="3mm">
 											<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role[@type = 'author' and 
@@ -265,10 +265,10 @@
 										</fo:block>
 									</fo:block-container>
 								</fo:table-cell>
-								<fo:table-cell role="SKIP"><fo:block role="artifact">&#xa0;</fo:block></fo:table-cell><!-- NBSP required to maintain regular table -->
+								<fo:table-cell role="SKIP"><fo:block role="artifact" line-height="0"/></fo:table-cell>
 								<fo:table-cell display-align="after" xsl:use-attribute-sets="cover_page_box" role="SKIP">
-									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_blue}">
-										<fo:block margin-left="2mm">
+									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_blue}" role="SKIP">
+										<fo:block margin-left="2mm" role="SKIP">
 											<!-- Example: © 2025 PDF Association - pdfa.org -->
 											<fo:block font-size="9.9pt">
 												<xsl:text>© </xsl:text>
@@ -363,7 +363,7 @@
 
 	<xsl:template name="toc_and_boilerplate">
 		<xsl:param name="num"/>
-		<fo:block margin-bottom="12pt" role="SKIP"><fo:wrapper role="artifact">&#xA0;</fo:wrapper></fo:block>
+		<fo:block margin-bottom="12pt" role="SKIP"><fo:wrapper role="artifact" >&#xA0;</fo:wrapper></fo:block>
 		<fo:block-container height="{$pageHeight - $marginTop - $marginBottom - 20}mm" display-align="after">
 			<xsl:apply-templates select="/mn:metanorma/mn:boilerplate/*"/>
 		</fo:block-container>
@@ -589,7 +589,7 @@
 					<xsl:call-template name="setIDforNamedDestinationInline"/>
 					<xsl:variable name="section-number" select="normalize-space(mn:tab[1]/preceding-sibling::node())"/>
 					<xsl:if test="$section-number != ''">
-						<xsl:value-of select="$section-number"/>&#x2003; <!-- em space (wider than NBSP) -->
+						<xsl:value-of select="$section-number"/>&#x2003; <!-- EM space (wider than NBSP) -->
 					</xsl:if>
 					<xsl:call-template name="extractTitle"/> <!-- section title -->
 					<xsl:apply-templates select="following-sibling::*[1][self::mn:variant-title][@type = 'sub']" mode="subtitle"/>
@@ -774,7 +774,7 @@
 		<xsl:attribute name="margin-top">0</xsl:attribute>
 		<xsl:attribute name="margin-bottom">0</xsl:attribute>
 		<xsl:attribute name="padding">2mm</xsl:attribute>
-		<xsl:attribute name="background-color">rgb(240, 240, 240)</xsl:attribute> <!-- check source code background color against table zebra stripes -->
+		<xsl:attribute name="background-color">rgb(230, 230, 230)</xsl:attribute> <!-- check source code background color against table zebra stripes -->
 	</xsl:template>
 
 	<xsl:template name="refine_sourcecode-name-style"><?extend?>
@@ -914,10 +914,9 @@
 		<xsl:attribute name="font-weight">normal</xsl:attribute> <!-- allow PDF notation to be visible in table headers -->
 		<xsl:attribute name="font-size">110%</xsl:attribute>
 		<xsl:attribute name="display-align">center</xsl:attribute>
-		<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
-		<xsl:attribute name="background-color">rgb(216, 243, 255)</xsl:attribute> <!-- Shade heading cells very pale blue -->
+		<xsl:attribute name="color">black</xsl:attribute>
+		<xsl:attribute name="background-color">white</xsl:attribute>
 		<xsl:attribute name="border">1pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- Thick header border -->
-		<xsl:attribute name="display-align">center</xsl:attribute><!-- center vertically -->
 		<xsl:attribute name="space-after">3pt</xsl:attribute>
 		<xsl:attribute name="space-before">3pt</xsl:attribute>
 	</xsl:attribute-set>
@@ -925,7 +924,7 @@
 	<xsl:template name="refine_table-body-row-style"><!-- NO ?extend? ! -->
 		<xsl:variable name="number"><xsl:number/></xsl:variable>
 		<xsl:if test="$number mod 2 = 0">
-			<xsl:attribute name="background-color">rgb(221, 221, 221)</xsl:attribute> <!-- very pale zebra stripes. JND from sourcecode blocks. -->
+			<xsl:attribute name="background-color">rgb(242, 242, 242)</xsl:attribute> <!-- very pale zebra stripes. JND from sourcecode blocks. -->
 		</xsl:if>
 	</xsl:template>
 
