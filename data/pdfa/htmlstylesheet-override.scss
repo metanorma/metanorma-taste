@@ -85,7 +85,7 @@ summary {
 }
 
 .sourcecode {
-  background-color: rgb(240, 240, 240);
+  background-color: rgb(230, 230, 230);
 }
 
 figcaption.SourceTitle { /* Revert the title back from smaller monospaced font */
@@ -113,12 +113,11 @@ pre { /* Rouge source code blocks */
 /* Can also use DataTables.js classes - https://datatables.net/manual/styling/classes */
 
 table {
-  border: 2pt solid var(--color_blue) !important;
+  border: 2pt solid var(--color_blue) !important; /* thick */
 }
 
 table th { /* Table headers */
-  border: 2pt solid var(--color_blue) !important;
-  color: var(--color_blue);
+  border: 2pt solid var(--color_blue) !important; /* thick */
 }
 
 table > caption {
@@ -131,11 +130,11 @@ table > caption {
 table td {
   padding: 0;
   padding-left: 1mm;
-  border: 0.75pt solid var(--color_blue) !important;
+  border: 0.75pt solid var(--color_blue) !important; /* thin */
   margin-top: 1mm; /* Close up spacing */
 }
 
-table.layout { /* class="layout" implies a invisible table used to influence layout */
+table.layout { /* class="layout" implies an invisible table used to influence layout */
   border: none !important;
 }
 
