@@ -643,11 +643,11 @@
 		<xsl:attribute name="border-left-color">rgb(255, 200, 36)</xsl:attribute>
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
 		<xsl:attribute name="margin-right">2mm</xsl:attribute>
-		<xsl:attribute name="padding">1.5mm</xsl:attribute>
-		<xsl:attribute name="margin-top">2mm</xsl:attribute>
-		<xsl:attribute name="margin-bottom">2mm</xsl:attribute>
+		<xsl:attribute name="margin-top">1mm</xsl:attribute>
+		<xsl:attribute name="margin-bottom">0</xsl:attribute>
+		<xsl:attribute name="padding">1mm</xsl:attribute>
 		<xsl:if test="ancestor::mn:bibitem">
-			<xsl:attribute name="keep-with-previous">always</xsl:attribute><!-- keep with reference -->
+			<xsl:attribute name="keep-with-previous">always</xsl:attribute><!-- keep notes with their bibliographic reference -->
 			<xsl:attribute name="padding-top">0</xsl:attribute>
 			<xsl:attribute name="margin-top">0</xsl:attribute>
 			<xsl:attribute name="margin-left">8.5mm</xsl:attribute> <!-- Notes that belong to bibliographic items need larger left indent to align with hanging para -->
@@ -663,9 +663,9 @@
 		<xsl:attribute name="border-left-color">rgb(255, 200, 36)</xsl:attribute>
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
 		<xsl:attribute name="margin-right">2mm</xsl:attribute>
-		<xsl:attribute name="padding">1.5mm</xsl:attribute>
-		<xsl:attribute name="margin-top">2mm</xsl:attribute>
-		<xsl:attribute name="margin-bottom">2mm</xsl:attribute>
+		<xsl:attribute name="margin-top">1mm</xsl:attribute>
+		<xsl:attribute name="margin-bottom">0</xsl:attribute>
+		<xsl:attribute name="padding">1mm</xsl:attribute>
 	</xsl:template>
 
 	<!-- Admonitions -->
@@ -712,7 +712,7 @@
 					<xsl:attribute name="background-color">rgb(154,221,218)</xsl:attribute>
 					<xsl:attribute name="border">2pt solid black</xsl:attribute>
 				</xsl:when>
-				<xsl:otherwise><!-- handles anything else... -->
+				<xsl:otherwise><!-- handle anything else... -->
 					<xsl:attribute name="background-color">rgb(240,240,240)</xsl:attribute>
 					<xsl:attribute name="border-left-style">solid</xsl:attribute>
 					<xsl:attribute name="border-left-width">4pt</xsl:attribute>
@@ -750,8 +750,8 @@
 				<xsl:when test="../@type = 'box'">
 					<xsl:attribute name="color">black</xsl:attribute>
 				</xsl:when>
-				<xsl:otherwise><!-- handles anything else... -->
-					<xsl:attribute name="color">rgb(80,80,80)</xsl:attribute>
+				<xsl:otherwise><!-- handle anything else... -->
+					<xsl:attribute name="color">rgb(60,60,60)</xsl:attribute>
 				</xsl:otherwise>
 			</xsl:choose>
 			<xsl:apply-templates/>
@@ -763,27 +763,25 @@
 	</xsl:attribute-set>
 
 	<xsl:attribute-set name="figure-name-style"><?extend?>
-		<xsl:attribute name="font-weight">normal</xsl:attribute><!-- allow PDF notation to be visible -->
+		<xsl:attribute name="font-weight">normal</xsl:attribute> <!-- allow PDF notation to be visible -->
 		<xsl:attribute name="keep-with-next">always</xsl:attribute>
 	</xsl:attribute-set>
 
 	<!-- Source code blocks -->
 	<xsl:template name="refine_sourcecode-container-style"><?extend?>
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
-		<xsl:attribute name="margin-right">3mm</xsl:attribute>
+		<xsl:attribute name="margin-right">2mm</xsl:attribute>
 		<xsl:attribute name="margin-top">0</xsl:attribute>
 		<xsl:attribute name="margin-bottom">0</xsl:attribute>
-		<xsl:attribute name="padding">2mm</xsl:attribute>
+		<xsl:attribute name="padding">1mm</xsl:attribute>
 		<xsl:attribute name="background-color">rgb(230, 230, 230)</xsl:attribute> <!-- check source code background color against table zebra stripes -->
 	</xsl:template>
 
 	<xsl:template name="refine_sourcecode-name-style"><?extend?>
-		<xsl:attribute name="space-before">2pt</xsl:attribute>
-		<xsl:attribute name="space-after">2pt</xsl:attribute>
-		<!-- xsl:attribute name="keep-with-next">always</xsl:attribute --><!-- do NOT do this as prefer to keep source code unsplit, colored background helps see where source code is -->
 		<xsl:attribute name="margin">0</xsl:attribute>
 		<xsl:attribute name="padding">0</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
+		<xsl:attribute name="font-size">inherit</xsl:attribute> <!-- source code captions in tables needs to be slightly shrunk so inherit -->
 	</xsl:template>
 
 	<xsl:template name="refine_sourcecode-style"><?extend?>
@@ -804,7 +802,7 @@
 	<xsl:template name="refine_example-style"><?extend?>
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
 		<xsl:attribute name="margin-right">2mm</xsl:attribute>
-		<xsl:attribute name="padding">1.5mm</xsl:attribute>
+		<xsl:attribute name="padding">1mm</xsl:attribute>
 		<xsl:attribute name="padding-bottom">0</xsl:attribute>
 		<xsl:attribute name="margin-top">1mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">5mm</xsl:attribute>
@@ -907,31 +905,49 @@
 	</xsl:attribute-set>
 
 	<xsl:template name="refine_table-style"><?extend?>
-		<xsl:attribute name="border">1pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- Thick outer border -->
+		<xsl:attribute name="border">
+			<xsl:choose>
+				<xsl:when test="contains(ancestor-or-self::mn:table[1]/@class, 'layout')">0pt solid transparent</xsl:when> <!-- layout tables have no borders -->
+				<xsl:otherwise>1pt solid <xsl:value-of select="$color_blue"/></xsl:otherwise> <!-- thick row and column borders -->
+			</xsl:choose>
+		</xsl:attribute>
 	</xsl:template>
 
-	<xsl:attribute-set name="table-header-cell-style"><?extend?>
+	<xsl:template name="refine_table-header-cell-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute> <!-- allow PDF notation to be visible in table headers -->
-		<xsl:attribute name="font-size">110%</xsl:attribute>
-		<xsl:attribute name="display-align">center</xsl:attribute>
+		<xsl:attribute name="font-size">110%</xsl:attribute> <!-- slightly larger -->
 		<xsl:attribute name="color">black</xsl:attribute>
-		<xsl:attribute name="background-color">white</xsl:attribute>
-		<xsl:attribute name="border">1pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- Thick header border -->
+		<xsl:attribute name="background-color">rgb(204, 230, 255)</xsl:attribute>
+		<xsl:attribute name="border">
+			<xsl:choose>
+				<xsl:when test="contains(ancestor::mn:table[1]/@class, 'layout')">1pt solid white</xsl:when> <!-- layout tables have no borders -->
+				<xsl:otherwise>1pt solid <xsl:value-of select="$color_blue"/></xsl:otherwise> <!-- Thick header border -->
+			</xsl:choose>
+		</xsl:attribute>
 		<xsl:attribute name="space-after">3pt</xsl:attribute>
 		<xsl:attribute name="space-before">3pt</xsl:attribute>
-	</xsl:attribute-set>
+	</xsl:template>
 
-	<xsl:template name="refine_table-body-row-style"><!-- NO ?extend? ! -->
+	<xsl:template name="refine_table-body-row-style"><?extend?>
 		<xsl:variable name="number"><xsl:number/></xsl:variable>
-		<xsl:if test="$number mod 2 = 0">
-			<xsl:attribute name="background-color">rgb(242, 242, 242)</xsl:attribute> <!-- very pale zebra stripes. JND from sourcecode blocks. -->
+		<xsl:if test="not(contains(ancestor::mn:table[1]/@class, 'layout'))"> <!-- only non-layout tables have zebra stripes -->
+			<xsl:if test="$number mod 2 = 0">
+				<xsl:attribute name="background-color">rgb(242, 242, 242)</xsl:attribute> <!-- very pale zebra stripes. JND from sourcecode blocks. -->
+			</xsl:if>
 		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="refine_table-cell-style"><?extend?>
-		<xsl:attribute name="border">0.5pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- narrow row and column borders -->
-		<xsl:attribute name="space-after">3pt</xsl:attribute>
-		<xsl:attribute name="space-before">3pt</xsl:attribute>
+		<xsl:choose>
+			<xsl:when test="contains(ancestor::mn:table[1]/@class, 'layout')">
+				<xsl:attribute name="border">1pt solid white</xsl:attribute> <!-- layout tables have no borders -->
+				<xsl:attribute name="background-color">white</xsl:attribute> <!-- layout tables have no zebra stripes -->
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:attribute name="border">0.5pt solid <xsl:value-of select="$color_blue"/></xsl:attribute> <!-- narrow row and column borders -->
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:attribute name="padding-bottom">1mm</xsl:attribute> <!-- slight gap between cell content and border -->
 	</xsl:template>
 
 	<!-- Captions "Table X-", "Figure X -", "EXAMPLE -", "Tip", "Caution", etc., up to and including delimiter but NOT caption text itself as conflicts with PDF notation -->
