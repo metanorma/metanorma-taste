@@ -199,10 +199,10 @@
 							<fo:table-row role="SKIP">
 								<fo:table-cell role="SKIP"><fo:block role="artifact" line-height="0"/></fo:table-cell>
 								<fo:table-cell role="SKIP"><fo:block role="artifact" line-height="0"/></fo:table-cell>
-								<fo:table-cell text-align="right" display-align="after" xsl:use-attribute-sets="cover_page_box" role="SKIP"> <!-- padding-left="5mm" padding-right="5mm" -->
+								<fo:table-cell text-align="right" display-align="after" xsl:use-attribute-sets="cover_page_box" role="SKIP">
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_yellow}" role="SKIP">
-										<fo:block font-size="18pt" margin-left="5mm" margin-right="5mm">
-											<fo:block>
+										<fo:block font-size="18pt" margin-left="5mm" margin-right="5mm" role="SKIP">
+											<fo:block role="P">
 												<!-- <xsl:variable name="status" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:status"/> -->
 												<xsl:variable name="status">
 													<xsl:call-template name="capitalize">
@@ -227,10 +227,10 @@
 												<xsl:value-of select="$edition"/>
 												<xsl:if test="not(contains($edition, '.'))">.0</xsl:if>
 											</fo:block>
-											<fo:block margin-bottom="2mm">
+											<fo:block margin-bottom="2mm" role="P">
 												<xsl:value-of select="substring(/mn:metanorma/mn:bibdata/mn:version/mn:revision-date, 1, 7)"/>
 											</fo:block>
-											<fo:block margin-bottom="2mm" font-size="9pt"><!-- small size full document identifier -->
+											<fo:block margin-bottom="2mm" font-size="9pt" role="P"><!-- small size full document identifier -->
 												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
 											</fo:block>
 										</fo:block>
@@ -636,6 +636,7 @@
 	</xsl:attribute-set>
 
 	<xsl:template name="refine_note_block_style"><?extend?><!-- inconsistencies with "_" and "-"! -->
+		<xsl:attribute name="role">Note</xsl:attribute>
 		<xsl:attribute name="font-size"><xsl:value-of select="$small-text-reduction"/></xsl:attribute>
 		<xsl:attribute name="background-color">rgb(252, 251, 212)</xsl:attribute>
 		<xsl:attribute name="border-left-style">solid</xsl:attribute>
@@ -643,7 +644,7 @@
 		<xsl:attribute name="border-left-color">rgb(255, 200, 36)</xsl:attribute>
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
 		<xsl:attribute name="margin-right">2mm</xsl:attribute>
-		<xsl:attribute name="margin-top">1mm</xsl:attribute>
+		<xsl:attribute name="margin-top">0</xsl:attribute>
 		<xsl:attribute name="margin-bottom">0</xsl:attribute>
 		<xsl:attribute name="padding">1mm</xsl:attribute>
 		<xsl:if test="ancestor::mn:bibitem">
@@ -663,14 +664,14 @@
 		<xsl:attribute name="border-left-color">rgb(255, 200, 36)</xsl:attribute>
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
 		<xsl:attribute name="margin-right">2mm</xsl:attribute>
-		<xsl:attribute name="margin-top">1mm</xsl:attribute>
+		<xsl:attribute name="margin-top">0</xsl:attribute>
 		<xsl:attribute name="margin-bottom">0</xsl:attribute>
 		<xsl:attribute name="padding">1mm</xsl:attribute>
 	</xsl:template>
 
 	<!-- Admonitions -->
 	<xsl:template match="mn:admonition">
-		<fo:block margin-left="3mm" margin-right="2mm" padding="1.5mm" margin-top="2mm" margin-bottom="2mm" font-size="{$small-text-reduction}">
+		<fo:block margin-left="3mm" margin-right="2mm" padding="1mm" margin-top="2mm" margin-bottom="2mm" font-size="{$small-text-reduction}" role="Note">
 			<xsl:choose>
 				<xsl:when test="@type = 'tip'">
 					<xsl:attribute name="background-color">rgb(245,235,206)</xsl:attribute>
@@ -808,6 +809,7 @@
 	<xsl:variable name="example_display_in">block</xsl:variable>
 
 	<xsl:template name="refine_example-style"><?extend?>
+		<xsl:attribute name="role">Part</xsl:attribute>
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
 		<xsl:attribute name="margin-right">2mm</xsl:attribute>
 		<xsl:attribute name="padding">1mm</xsl:attribute>
@@ -833,6 +835,7 @@
 
 	<!-- Copy of "refine_example-style" above, but also shrink text size -->
 	<xsl:template name="refine_termexample-style"><?extend?>
+		<xsl:attribute name="role">Part</xsl:attribute>
 		<xsl:attribute name="font-size"><xsl:value-of select="$small-text-reduction"/></xsl:attribute>
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
 		<xsl:attribute name="margin-right">2mm</xsl:attribute>
