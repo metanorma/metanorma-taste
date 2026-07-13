@@ -767,6 +767,10 @@
 		<xsl:attribute name="keep-with-next">always</xsl:attribute>
 	</xsl:attribute-set>
 
+	<xsl:template name="refine_figure-style"><?extend?>
+		<xsl:attribute name="background-color">transparent</xsl:attribute> <!-- no color behind images -->
+	</xsl:template>
+
 	<!-- Source code blocks -->
 	<xsl:template name="refine_sourcecode-container-style"><?extend?>
 		<xsl:attribute name="margin-left">3mm</xsl:attribute>
@@ -781,6 +785,8 @@
 		<xsl:attribute name="margin">0</xsl:attribute>
 		<xsl:attribute name="padding">0</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
+		<xsl:attribute name="space-after">0</xsl:attribute>
+		<xsl:attribute name="space-before">0</xsl:attribute>
 		<xsl:attribute name="font-size">inherit</xsl:attribute> <!-- source code captions in tables needs to be slightly shrunk so inherit -->
 	</xsl:template>
 
@@ -792,6 +798,8 @@
 		<xsl:attribute name="margin-top">0</xsl:attribute>
 		<xsl:attribute name="padding-bottom">0</xsl:attribute>
 		<xsl:attribute name="margin-bottom">0</xsl:attribute>
+		<xsl:attribute name="space-after">0</xsl:attribute>
+		<xsl:attribute name="space-before">0</xsl:attribute>
 	</xsl:template>
 
 	<!-- Example blocks - mimic notes/admonitions above for margins and padding -->
@@ -1011,6 +1019,7 @@
 
 	<xsl:template name="refine_list-item-style"><?extends?>
 		<xsl:attribute name="line-height">1.5</xsl:attribute><!-- ensure WCAG Level AA recommendation for 1.5 line height as a minimum. -->
+		<xsl:attribute name="space-after">0</xsl:attribute>
 	</xsl:template>	
 
 	<!-- Unordered bullet styles -->
@@ -1063,15 +1072,15 @@
 	<!-- Quote blocks - both quote and source to be in background color like HTML -->
 	<xsl:template name="refine_quote-container-style"><?extend?>
 		<xsl:attribute name="background-color">rgb(230,230,230)</xsl:attribute>
-		<xsl:attribute name="margin">3mm</xsl:attribute>
-		<xsl:attribute name="padding">1mm</xsl:attribute>
+		<xsl:attribute name="margin-right">8mm</xsl:attribute>
 	</xsl:template>
 
 	<xsl:template name="refine_quote-style"><?extend?>
 		<xsl:attribute name="font-style">italic</xsl:attribute><!-- this loses some PDF notation -->
 		<xsl:attribute name="background-color">rgb(230, 230, 230)</xsl:attribute>
-		<xsl:attribute name="margin">0</xsl:attribute>
-		<xsl:attribute name="padding">1mm</xsl:attribute>
+		<xsl:attribute name="margin">3mm</xsl:attribute>
+		<xsl:attribute name="margin-top">0</xsl:attribute>
+		<xsl:attribute name="padding">2mm</xsl:attribute>
 	</xsl:template>
 
 	<!-- Replace generic "sans-serif" font with precise Arial and "monospace" with Courier New that were used by PlantUML diagrams -->
