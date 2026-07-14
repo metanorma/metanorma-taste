@@ -201,37 +201,49 @@
 								<fo:table-cell role="SKIP"><fo:block role="artifact" line-height="0"/></fo:table-cell>
 								<fo:table-cell text-align="right" display-align="after" xsl:use-attribute-sets="cover_page_box" role="SKIP">
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_yellow}" role="SKIP">
-										<fo:block font-size="18pt" margin-left="5mm" margin-right="5mm" role="SKIP">
+										<fo:block font-size="16pt" margin-left="4mm" margin-right="4mm" role="SKIP">
 											<fo:block role="P">
-												<!-- <xsl:variable name="status" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:status"/> -->
-												<xsl:variable name="status">
-													<xsl:call-template name="capitalize">
-														<xsl:with-param name="str" select="/mn:metanorma/mn:bibdata/mn:status/mn:stage"/>
+												<xsl:variable name="stage_alias" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:stage-alias"/> <!-- draft, release-candidate, or published as per YAML -->
+												<xsl:variable name="stage"       select="/mn:metanorma/mn:bibdata/mn:status/mn:stage"/> <!-- Draft or Published only -->
+												
+												<xsl:variable name="i18n_stage_alias"> <!-- map the YAML to actual words -->
+													<xsl:call-template name="getLocalizedString">
+														<xsl:with-param name="key"><xsl:value-of select="$stage_alias"/></xsl:with-param>
 													</xsl:call-template>
 												</xsl:variable>
-												<xsl:if test="normalize-space($status) != '' and $status != 'Published'">
-													<fo:block color="{$logo_red}">
-														<xsl:value-of select="$status"/>
+												
+												<xsl:if test="normalize-space($stage) != '' and $stage != 'Published'"> <!-- Published docs show nothing special, otherwise full stage phrase -->
+													<fo:block color="{$logo_red}" font-weight="bold">
+														<xsl:value-of select="$i18n_stage_alias"/>
 													</fo:block>
 												</xsl:if>
-												<xsl:variable name="i18n_version">
+												
+												<xsl:variable name="i18n_edition_word"> <!-- map "edition" -->
 													<xsl:call-template name="getLocalizedString">
-														<xsl:with-param name="key">edition </xsl:with-param>
+														<xsl:with-param name="key">edition </xsl:with-param> <!-- SPACE at end separates from edition value -->
 													</xsl:call-template>
 												</xsl:variable>
-												<xsl:call-template name="capitalize">
-													<xsl:with-param name="str" select="$i18n_version"/>
+
+												<xsl:call-template name="capitalize"> <!-- capitalize mapped word for edition -->
+													<xsl:with-param name="str" select="$i18n_edition_word"/>
 												</xsl:call-template>
-												<xsl:text></xsl:text>
+												
 												<xsl:variable name="edition" select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) = '']"/>
 												<xsl:value-of select="$edition"/>
-												<xsl:if test="not(contains($edition, '.'))">.0</xsl:if>
+												<xsl:if test="not(contains($edition, '.'))">.0</xsl:if> <!-- make edition value always end with a ".0", instead of just an integer --> 
 											</fo:block>
+
 											<fo:block margin-bottom="2mm" role="P">
-												<xsl:value-of select="substring(/mn:metanorma/mn:bibdata/mn:version/mn:revision-date, 1, 7)"/>
+												<xsl:call-template name="convertDate">
+													<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:date[@type = 'updated']"/>
+													<xsl:with-param name="format" select="'Month DD, YYYY'"/>
+												</xsl:call-template>
 											</fo:block>
-											<fo:block margin-bottom="2mm" font-size="9pt" role="P"><!-- small size full document identifier -->
+											
+											<fo:block margin-bottom="2mm" font-size="9pt" role="P"> <!-- small full document identifier including stage abbreviation -->
 												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
+												<xsl:text> </xsl:text> <!-- SPACE -->
+												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:status/mn:stage/@abbreviation"/>
 											</fo:block>
 										</fo:block>
 									</fo:block-container>
