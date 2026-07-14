@@ -22,6 +22,19 @@
 	<xsl:variable name="monospaced_font">Source Code Pro</xsl:variable>
 	<xsl:variable name="mono_font-reduction">85%</xsl:variable><!-- percentage of default typeface for monospaced text to reduce visual size -->
 
+	<!-- Uppercase / lowecase transformations -->
+	<xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'" />
+	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
+
+	<!-- Document stage / status -->
+	<xsl:variable name="stage" select="/mn:metanorma/mn:bibdata/mn:status/mn:stage"/> <!-- draft or published only -->
+	<xsl:variable name="stage_alias" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:stage-alias"/> <!-- draft, release-candidate, or published as per YAML -->
+	<xsl:variable name="i18n_stage_alias"> <!-- map to actual words: "Draft", "Release Candidate" -->
+		<xsl:call-template name="getLocalizedString">
+			<xsl:with-param name="key"><xsl:value-of select="$stage_alias"/></xsl:with-param>
+		</xsl:call-template>
+	</xsl:variable>
+
 	<xsl:attribute-set name="root-style"><?extend?>
 		<xsl:attribute name="font-family"><xsl:value-of select="$proportional_font"/></xsl:attribute>
 		<xsl:attribute name="font-size">11pt</xsl:attribute>
@@ -203,44 +216,48 @@
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_yellow}" role="SKIP">
 										<fo:block font-size="16pt" margin-left="4mm" margin-right="4mm" role="SKIP">
 											<fo:block role="P">
-												<xsl:variable name="stage_alias" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:stage-alias"/> <!-- draft, release-candidate, or published as per YAML -->
-												<xsl:variable name="stage"       select="/mn:metanorma/mn:bibdata/mn:status/mn:stage"/> <!-- Draft or Published only -->
-												
-												<xsl:variable name="i18n_stage_alias"> <!-- map the YAML to actual words -->
-													<xsl:call-template name="getLocalizedString">
-														<xsl:with-param name="key"><xsl:value-of select="$stage_alias"/></xsl:with-param>
-													</xsl:call-template>
-												</xsl:variable>
-												
-												<xsl:if test="normalize-space($stage) != '' and $stage != 'Published'"> <!-- Published docs show nothing special, otherwise full stage phrase -->
+												<xsl:if test="translate($stage, $uppercase, $lowercase) != 'published'"> <!-- Published docs show nothing special, otherwise show full stage phrase and edition details -->
+													<xsl:variable name="i18n_stage_alias"> <!-- map the YAML to actual words -->
+														<xsl:call-template name="getLocalizedString">
+															<xsl:with-param name="key"><xsl:value-of select="$stage_alias"/></xsl:with-param>
+														</xsl:call-template>
+													</xsl:variable>
+
+													<!-- Step 1 — get the localized string for "edition" -->
+													<xsl:variable name="i18n_edition_word">
+															<xsl:call-template name="getLocalizedString">
+																	<xsl:with-param name="key">edition</xsl:with-param>
+															</xsl:call-template>
+													</xsl:variable>
+
+													<!-- Step 2 — capitalize the result of step 1 -->
+													<xsl:variable name="i18n_edition_word_capitalized">
+															<xsl:call-template name="capitalize">
+																	<xsl:with-param name="str" select="$i18n_edition_word"/>
+															</xsl:call-template>
+													</xsl:variable>
+
+													<xsl:variable name="edition" select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) = '']"/>
+
 													<fo:block color="{$logo_red}" font-weight="bold">
 														<xsl:value-of select="$i18n_stage_alias"/>
 													</fo:block>
+													<xsl:if test="normalize-space($edition) != ''">
+														<fo:block>
+															<xsl:value-of select="normalize-space(concat($i18n_edition_word_capitalized, ' ', $edition))"/>
+														</fo:block>
+													</xsl:if>
 												</xsl:if>
-												
-												<xsl:variable name="i18n_edition_word"> <!-- map "edition" -->
-													<xsl:call-template name="getLocalizedString">
-														<xsl:with-param name="key">edition </xsl:with-param> <!-- SPACE at end separates from edition value -->
-													</xsl:call-template>
-												</xsl:variable>
-
-												<xsl:call-template name="capitalize"> <!-- capitalize mapped word for edition -->
-													<xsl:with-param name="str" select="$i18n_edition_word"/>
-												</xsl:call-template>
-												
-												<xsl:variable name="edition" select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) = '']"/>
-												<xsl:value-of select="$edition"/>
-												<xsl:if test="not(contains($edition, '.'))">.0</xsl:if> <!-- make edition value always end with a ".0", instead of just an integer --> 
-											</fo:block>
+										</fo:block>
 
 											<fo:block margin-bottom="2mm" role="P">
 												<xsl:call-template name="convertDate">
-													<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:date[@type = 'updated']"/>
+													<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:date[ @type = 'updated' ]"/>
 													<xsl:with-param name="format" select="'Month DD, YYYY'"/>
 												</xsl:call-template>
 											</fo:block>
-											
-											<fo:block margin-bottom="2mm" font-size="9pt" role="P"> <!-- small full document identifier including stage abbreviation -->
+
+											<fo:block margin-bottom="2mm" font-size="10pt" role="P"> <!-- small full document identifier including stage abbreviation -->
 												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
 												<xsl:text> </xsl:text> <!-- SPACE -->
 												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:status/mn:stage/@abbreviation"/>
@@ -431,7 +448,12 @@
 		<xsl:param name="section"/>
 		<fo:static-content flow-name="header" role="artifact">
 			<fo:block-container margin-top="10mm" border-bottom="0.5pt solid black" text-align="center" font-size="8pt">
-				<fo:block><xsl:copy-of select="$variables_pdfa/mnx:doc[@num = $num]/title/node()"/></fo:block>
+				<fo:block>
+					<xsl:copy-of select="$variables_pdfa/mnx:doc[@num = $num]/title/node()"/>
+					<xsl:if test="translate($stage, $uppercase, $lowercase) != 'published'">
+						<fo:inline color="{$logo_red}" font-weight="bold"><xsl:value-of select="concat(' - ', $i18n_stage_alias)"/></fo:inline>
+					</xsl:if>
+				</fo:block>
 			</fo:block-container>
 		</fo:static-content>
 	</xsl:template>
@@ -879,9 +901,6 @@
 			<xsl:apply-templates mode="update_xml_step1"/>
 		</xsl:copy>
 	</xsl:template>
-
-	<xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'" />
-	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 
 	<xsl:template match="mn:span[@class = 'requirement']">
 		<fo:inline color="rgb(255, 0, 0)" font-weight="bold"> <!-- Red -->
