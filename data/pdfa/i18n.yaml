@@ -19,7 +19,7 @@ term_def_boilerplate: |
 stage_dict:
   draft: Draft
   release-candidate: Release Candidate
-  published: Published
+  published:
 
 admonition:  # see https://github.com/metanorma/isodoc/issues/760
   tip: Tip
@@ -46,4 +46,3 @@ termsdefsymbols: Definitions, acronyms, and symbols
 termsdefabbrev: Definitions, acronyms, and abbreviations
 draft: Draft
 release-candidate: Release Candidate
-published: Final
