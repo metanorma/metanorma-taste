@@ -9370,6 +9370,7 @@
 		<xsl:variable name="svg_content">
 			<xsl:apply-templates select="." mode="svg_update"/>
 		</xsl:variable>
+		<!-- <svg_content><xsl:copy-of select="$svg_content"/></svg_content> -->
 
 		<xsl:variable name="alt-text">
 			<xsl:choose>
@@ -9584,7 +9585,7 @@
 		</xsl:copy>
 	</xsl:template>
 
-	<xsl:template match="mn:image/@href" mode="svg_update">
+	<xsl:template match="*[local-name() = 'image']/@href" mode="svg_update">
 		<xsl:attribute name="href" namespace="http://www.w3.org/1999/xlink">
 			<xsl:value-of select="."/>
 		</xsl:attribute>
