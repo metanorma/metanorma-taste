@@ -22,17 +22,23 @@
 	<xsl:variable name="monospaced_font">Source Code Pro</xsl:variable>
 	<xsl:variable name="mono_font-reduction">85%</xsl:variable><!-- percentage of default typeface for monospaced text to reduce visual size -->
 
-	<!-- Uppercase / lowecase transformations -->
+	<!-- Uppercase / lowercase transformations -->
 	<xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 
-	<!-- Document stage / status -->
-	<xsl:variable name="stage" select="/mn:metanorma/mn:bibdata/mn:status/mn:stage"/> <!-- draft or published only -->
-	<xsl:variable name="stage_alias" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:stage-alias"/> <!-- draft, release-candidate, or published as per YAML -->
-	<xsl:variable name="i18n_stage_alias"> <!-- map to actual words: "Draft", "Release Candidate" -->
+	<!-- Document stage and edition. Used on cover and page header -->
+	<xsl:variable name="stage" select="/mn:metanorma/mn:bibdata/mn:status/mn:stage"/> <!-- MN draft or published only -->
+	<xsl:variable name="stage_alias" select="/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:stage-alias"/> <!-- PDFa phases: draft, release-candidate, or published as per YAML -->
+	<xsl:variable name="edition" select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) = '']"/> <!-- only used with draft and release-candidate stages -->
+	<xsl:variable name="i18n_stage_alias"> <!-- map to actual words from YAML: "Draft", "Release Candidate" -->
 		<xsl:call-template name="getLocalizedString">
 			<xsl:with-param name="key"><xsl:value-of select="$stage_alias"/></xsl:with-param>
 		</xsl:call-template>
+	</xsl:variable>
+	<xsl:variable name="stage_edition"> <!-- Published docs show nothing additional, otherwise show stage wording with edition number -->
+		<xsl:if test="translate($stage, $uppercase, $lowercase) != 'published'">
+			<xsl:value-of select="normalize-space(concat($i18n_stage_alias, ' ', $edition))"/>
+		</xsl:if>
 	</xsl:variable>
 
 	<xsl:attribute-set name="root-style"><?extend?>
@@ -214,48 +220,22 @@
 								<fo:table-cell role="SKIP"><fo:block role="artifact" line-height="0"/></fo:table-cell>
 								<fo:table-cell text-align="right" display-align="after" xsl:use-attribute-sets="cover_page_box" role="SKIP">
 									<fo:block-container width="100%" height="{$cover_page_color_box_height}" border="{$cover_page_color_box_border_width} solid {$logo_yellow}" role="SKIP">
-										<fo:block font-size="16pt" margin-left="4mm" margin-right="4mm" role="SKIP">
-											<fo:block role="P">
-												<xsl:if test="translate($stage, $uppercase, $lowercase) != 'published'"> <!-- Published docs show nothing special, otherwise show full stage phrase and edition details -->
-													<xsl:variable name="i18n_stage_alias"> <!-- map the YAML to actual words -->
-														<xsl:call-template name="getLocalizedString">
-															<xsl:with-param name="key"><xsl:value-of select="$stage_alias"/></xsl:with-param>
-														</xsl:call-template>
-													</xsl:variable>
-
-													<!-- Step 1 — get the localized string for "edition" -->
-													<xsl:variable name="i18n_edition_word">
-															<xsl:call-template name="getLocalizedString">
-																	<xsl:with-param name="key">edition</xsl:with-param>
-															</xsl:call-template>
-													</xsl:variable>
-
-													<!-- Step 2 — capitalize the result of step 1 -->
-													<xsl:variable name="i18n_edition_word_capitalized">
-															<xsl:call-template name="capitalize">
-																	<xsl:with-param name="str" select="$i18n_edition_word"/>
-															</xsl:call-template>
-													</xsl:variable>
-
-													<xsl:variable name="edition" select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) = '']"/>
-
-													<fo:block color="{$logo_red}" font-weight="bold">
-														<xsl:value-of select="$i18n_stage_alias"/>
+										<fo:block font-size="16pt" margin-left="2mm" margin-right="2mm" role="SKIP">
+											<xsl:choose>
+												<xsl:when test="translate($stage, $uppercase, $lowercase) != 'published'">
+													<fo:block margin-bottom="2mm" color="{$logo_red}" font-weight="bold" role="P">
+														<xsl:value-of select="$stage_edition"/>
 													</fo:block>
-													<xsl:if test="normalize-space($edition) != ''">
-														<fo:block>
-															<xsl:value-of select="normalize-space(concat($i18n_edition_word_capitalized, ' ', $edition))"/>
-														</fo:block>
-													</xsl:if>
-												</xsl:if>
-										</fo:block>
-
-											<fo:block margin-bottom="2mm" role="P">
-												<xsl:call-template name="convertDate">
-													<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:date[ @type = 'updated' ]"/>
-													<xsl:with-param name="format" select="'Month DD, YYYY'"/>
-												</xsl:call-template>
-											</fo:block>
+												</xsl:when>
+												<xsl:otherwise>
+													<fo:block margin-bottom="2mm" role="P">
+														<xsl:call-template name="convertDate">
+															<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:date[ @type = 'published' ]"/>
+															<xsl:with-param name="format" select="'ddMMyyyy'"/>
+														</xsl:call-template>
+													</fo:block>
+												</xsl:otherwise>
+											</xsl:choose>
 
 											<fo:block margin-bottom="2mm" font-size="10pt" role="P"> <!-- small full document identifier including stage abbreviation -->
 												<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier"/>
@@ -390,16 +370,18 @@
 		</xsl:if>
 	</xsl:template>
 
+  <!-- TODO: causes "Sect soup" - don't know where to suppress Sect tag from outer block for this template -->
 	<xsl:template name="toc_and_boilerplate">
 		<xsl:param name="num"/>
 		<fo:block margin-bottom="12pt" role="SKIP"><fo:wrapper role="artifact" >&#xA0;</fo:wrapper></fo:block>
-		<fo:block-container height="{$pageHeight - $marginTop - $marginBottom - 20}mm" display-align="after">
+		<fo:block-container height="{$pageHeight - $marginTop - $marginBottom - 20}mm" display-align="after" role="Sect"> <!-- ensure copyright boilerplate gets a separate Sect tag -->
 			<xsl:apply-templates select="/mn:metanorma/mn:boilerplate/*"/>
 		</fo:block-container>
-		<fo:block break-after="page"/>
-		<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'toc']">
-			<xsl:with-param name="num" select="$num"/>
-		</xsl:apply-templates>
+		<fo:block break-after="page" role="Sect"> <!-- ensure ToC gets a separate Sect tag -->
+			<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'toc']">
+				<xsl:with-param name="num" select="$num"/>
+			</xsl:apply-templates>
+		</fo:block>
 	</xsl:template>
 
 	<!-- empty back-page to omit back cover -->
@@ -451,7 +433,7 @@
 				<fo:block>
 					<xsl:copy-of select="$variables_pdfa/mnx:doc[@num = $num]/title/node()"/>
 					<xsl:if test="translate($stage, $uppercase, $lowercase) != 'published'">
-						<fo:inline color="{$logo_red}" font-weight="bold"><xsl:value-of select="concat(' - ', $i18n_stage_alias)"/></fo:inline>
+						<fo:inline color="{$logo_red}" font-weight="bold"><xsl:value-of select="concat(' - ', $stage_edition)"/></fo:inline>
 					</xsl:if>
 				</fo:block>
 			</fo:block-container>
@@ -519,6 +501,15 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<!-- Every sub-clause and annex gets its own Sect tag -->
+	<xsl:template name="refine_clause-style"><?extend?>
+		<xsl:attribute name="role">Sect</xsl:attribute>
+	</xsl:template>
+
+	<xsl:template name="refine_annex_style"><?extend?>
+		<xsl:attribute name="role">Sect</xsl:attribute>
+	</xsl:template>
+
 	<!-- All titles (headings) are NOT bold to preserve PDF notation formatting -->
 	<xsl:template name="refine_title-style"><?extend?>
 		<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
@@ -554,7 +545,15 @@
 		<xsl:copy-of select="mnx:title/@font-weight"/>
 	</xsl:template>
 
-	<!-- Term acronyms (preferred, admintted, etc.) are not bold. We don't use deprecated. -->
+	<!-- Term acronyms (preferred, admintted, etc.) are not bold. We don't use deprecated. Group in Sect tags. -->
+	<xsl:attribute-set name="term-style">
+		<xsl:attribute name="role">Sect</xsl:attribute>
+	</xsl:attribute-set> <!-- term-style -->
+
+	<xsl:template name="refine_term-style"><?extend?>
+		<xsl:attribute name="role">Div</xsl:attribute>
+	</xsl:template>
+
 	<xsl:attribute-set name="refine_term-kind-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:attribute-set>
@@ -586,10 +585,6 @@
 		<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
 	</xsl:template>
 
-	<xsl:template name="refine_annex-title-style"><?extend?>
-		<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
-	</xsl:template>
-
 	<xsl:template name="refine_indexsect-title-style">
 		<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
 	</xsl:template>
@@ -615,7 +610,7 @@
 		<xsl:element name="{$element-name}">
 			<xsl:copy-of select="xalan:nodeset($title_styles)/styles/@*"/>
 			<xsl:if test="$level = 1 and not(parent::mn:annex)">
-				<xsl:attribute name="break-before">page</xsl:attribute><!-- ensure all H1s start on a new page (except Annexes) -->
+				<xsl:attribute name="break-before">page</xsl:attribute>
 			</xsl:if>
 			<xsl:call-template name="apply-heading-font-size"/>
 			<fo:block-container xsl:use-attribute-sets="reset-margins-style">
@@ -691,6 +686,7 @@
 
 	<!-- "Note X to entry" in T&D section. Same as above "refine_note_block_style" -->
 	<xsl:template name="refine_termnote-style"><?extend?>
+		<xsl:attribute name="role">Note</xsl:attribute>
 		<xsl:attribute name="font-size"><xsl:value-of select="$small-text-reduction"/></xsl:attribute>
 		<xsl:attribute name="background-color">rgb(252, 251, 212)</xsl:attribute>
 		<xsl:attribute name="border-left-style">solid</xsl:attribute>
@@ -990,6 +986,10 @@
 			</xsl:otherwise>
 		</xsl:choose>
 		<xsl:attribute name="padding-bottom">1mm</xsl:attribute> <!-- slight gap between cell content and border -->
+	</xsl:template>
+
+	<xsl:template name="refine_table-note-style"><?extend?>
+		<xsl:attribute name="role">Note</xsl:attribute>
 	</xsl:template>
 
 	<!-- Captions "Table X-", "Figure X -", "EXAMPLE -", "Tip", "Caution", etc., up to and including delimiter but NOT caption text itself as conflicts with PDF notation -->
