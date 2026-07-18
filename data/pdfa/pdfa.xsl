@@ -572,15 +572,7 @@
 	<xsl:template name="refine_tt-style"><?extend?>
 		<xsl:attribute name="font-size"><xsl:value-of select="$mono_font-reduction"/></xsl:attribute>
 	</xsl:template>
-	
-	<xsl:template name="refine_list-item-label-style"><?extend?>
-		<xsl:if test="parent::mn:ul">
-			<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
-			<xsl:copy-of select="@color"/>
-			<xsl:copy-of select="@font-size"/>
-		</xsl:if>
-	</xsl:template>
-	
+		
 	<xsl:template name="refine_sourcecode-style"><?extend?>
 		<xsl:attribute name="font-size">85%</xsl:attribute>
 	</xsl:template>
@@ -912,6 +904,31 @@
 				<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute><!-- default --><!-- TODO: not obeyed!?! -->
 			</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="refine_list-item-label-style"><?extend?>
+			<xsl:if test="parent::mn:ul">
+				<xsl:if test="count(ancestor::mn:ul) mod 4 = 1">
+					<xsl:attribute name="font-size">90%</xsl:attribute>
+					<xsl:attribute name="color"><xsl:value-of select="$logo_red"/></xsl:attribute>
+					<xsl:copy-of select="@font-size"/>
+					<xsl:copy-of select="@color"/>
+				</xsl:if>
+				<xsl:if test="count(ancestor::mn:ul) mod 4 = 2">
+					<xsl:attribute name="color"><xsl:value-of select="$logo_blue"/></xsl:attribute>
+					<xsl:copy-of select="@color"/>
+				</xsl:if>
+				<xsl:if test="count(ancestor::mn:ul) mod 4 = 3">
+					<xsl:attribute name="font-size">110%</xsl:attribute>
+					<xsl:attribute name="color"><xsl:value-of select="$logo_green"/></xsl:attribute>
+					<xsl:copy-of select="@font-size"/>
+					<xsl:copy-of select="@color"/>
+				</xsl:if>
+				<xsl:if test="count(ancestor::mn:ul) mod 4 = 0">
+					<xsl:attribute name="color"><xsl:value-of select="$logo_yellow"/></xsl:attribute>
+					<xsl:copy-of select="@color"/>
+				</xsl:if>
+			</xsl:if>
 	</xsl:template>
 
 </xsl:stylesheet>
