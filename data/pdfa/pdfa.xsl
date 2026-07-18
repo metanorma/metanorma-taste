@@ -648,7 +648,7 @@
 		<xsl:apply-templates/>
 	</xsl:template>
 
-	<xsl:template match="mn:admonition[@type = 'warning']/*/mn:fmt-name']">
+	<xsl:template match="mn:admonition[@type = 'warning']/*/mn:fmt-name">
 		<xsl:attribute name="keep-with-next">always</xsl:attribute>
 		<xsl:attribute name="font-weight">bold</xsl:attribute>
 			<xsl:attribute name="color">rgb(255,140,0)</xsl:attribute>		
