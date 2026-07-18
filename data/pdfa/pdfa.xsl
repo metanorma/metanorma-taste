@@ -509,11 +509,6 @@
 	<xsl:attribute-set name="refine_term-kind-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 	</xsl:attribute-set>
-
- <xsl:template name="refine_title-style"><?extend?>
-		<xsl:attribute name="color"><xsl:value-of select="$color_secondary"/></xsl:attribute>
-		<xsl:attribute name="font-weight">normal</xsl:attribute>
-	</xsl:attribute-set>
   
 	<!-- Suppress the boxes with text that appear to the right of preferred / admitted terms -->
 	<xsl:template name="display_term_kind">
