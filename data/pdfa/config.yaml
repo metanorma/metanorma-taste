@@ -48,11 +48,9 @@ stages:
   - taste: draft
     base: draft
     abbrev: DRAFT
-    abbreviation: DRAFT
   - taste: release-candidate
     base: draft
     abbrev: RC
-    abbreviation: RC
   - taste: published
     base: published
     default: true
