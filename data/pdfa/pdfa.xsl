@@ -1103,10 +1103,12 @@
 		<xsl:text>"</xsl:text>
 	</xsl:template>
 
-	<!-- Quote blocks - both quote and source to be in background color like HTML -->
+	<!-- Quote blocks - both quote and quote-source to be in background color like HTML -->
 	<xsl:template name="refine_quote-container-style"><?extend?>
 		<xsl:attribute name="background-color">rgb(230,230,230)</xsl:attribute>
 		<xsl:attribute name="margin-right">8mm</xsl:attribute>
+		<xsl:attribute name="margin-bottom">3mm</xsl:attribute>
+		<xsl:attribute name="padding-bottom">0</xsl:attribute>
 	</xsl:template>
 
 	<xsl:template name="refine_quote-style"><?extend?>
@@ -1114,6 +1116,7 @@
 		<xsl:attribute name="background-color">rgb(230, 230, 230)</xsl:attribute>
 		<xsl:attribute name="margin">3mm</xsl:attribute>
 		<xsl:attribute name="margin-top">0</xsl:attribute>
+		<xsl:attribute name="margin-bottom">0</xsl:attribute>
 		<xsl:attribute name="padding">2mm</xsl:attribute>
 	</xsl:template>
 
