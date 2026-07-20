@@ -16,6 +16,16 @@ base-override:
     #presentation-metadata-backcover-text: expresslang.org
     output-extensions: xml,html,pdf,doc
     fonts: Futura PT Book;Futura PT Demi;Futura PT Light
+  bibliography-sort:
+  - abbrev: OIML
+    rank: 1
+    name: International Organization of Legal Metrology
+  - abbrev: ISO
+    rank: 2
+    name: International Organization for Standardization
+  - abbrev: IEC
+    rank: 3
+    name: International Electrotechnical Commission
 doctypes:
   # OIML G
 - taste: international-guide
