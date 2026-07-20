@@ -437,15 +437,20 @@ RSpec.describe Metanorma::TasteRegister do
     end
 
     it "processes additive attributes correctly" do
+       # Test the additive font merge on swf, a taste with a stable,
+       # semicolon-delimited font stack. (pdfa was used here previously but
+       # its font config is tinkered with frequently, e.g. #171, which
+       # silently broke this pin.)
+       swf_fonts = "Nacelle;Nacelle SemiBold;Nacelle Light"
        fonts = "D050000L;TeXGyreTermes;STIX Two Math;FreeSerif;FreeSans;Source Sans 3"
        attrs = [":fonts: #{fonts}"]
-       taste = described_class.get(:pdfa)
+       taste = described_class.get(:swf)
        result = taste.process_input_adoc_overrides(attrs, {})
-       expect(result).to include(":fonts: Source Sans 3;Source Sans 3 SemiBold;Source Sans Pro;#{fonts}")
+       expect(result).to include(":fonts: #{swf_fonts};#{fonts}")
 
        attrs = []
        result = taste.process_input_adoc_overrides(attrs, {})
-       expect(result).to include(":fonts: Source Sans 3;Source Sans 3 SemiBold;Source Sans Pro")
+       expect(result).to include(":fonts: #{swf_fonts}")
     end
   end
 end
