@@ -22,7 +22,7 @@ base-override:
     fonts: "Source Sans 3 ExtraLight;Source Sans 3 Light;Source Sans 3;Source Sans 3 Medium;Source Sans 3 SemiBold;Source Sans 3 ExtraBold;Source Sans 3 Black;Source Code Pro ExtraLight;Source Code Pro Light;Source Code Pro;Source Code Pro Medium;Source Code Pro SemiBold;Source Code Pro ExtraBold;Source Code Pro Black;STIX Two Math;Arial;Courier New"
     output-extensions: xml,html,pdf
     toclevels-html: 6
-    docidentifier: '{{ doctype_abbr }}-{{ docnumeric | prepend: "000" | slice: -3,3 }} {% if draft %}v{{ draft }}{% endif %} {% if edition %}ed. {{ edition }}{% endif %}'
+    docidentifier: '{{ doctype_abbr }}-{{ docnumeric | prepend: "000" | slice: -3,3 }}{% if bibdata.status.stage.abbreviation %}-{{ bibdata.status.stage.abbreviation }}{% endif %} {% if draft %}v{{ draft }}{% endif %} {% if edition %}ed. {{ edition }}{% endif %}'
 doctypes:
 - taste: specification # Specification # The name goes into i18n.yaml
   base: standard
