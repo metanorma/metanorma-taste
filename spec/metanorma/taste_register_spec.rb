@@ -399,6 +399,25 @@ RSpec.describe Metanorma::TasteRegister do
       expect(result2).to include(":presentation-metadata-stage-alias: release-candidate")
       expect(result2).to include(":docstage-abbrev: RC")
       expect(result2).not_to include(":docstage-published: true")
+      # the taste advertises its stage repertoire to the base flavour
+      expect(result2).to include(":docstage-valid: draft,published")
+    end
+
+    it "warns and falls back to the default stage on an unrecognised stage" do
+      result = nil
+      expect do
+        result = taste2
+          .process_input_adoc_overrides(attrs2.dup + [":docstage: working-draft"],
+                                        options)
+      end.to output(/working-draft is not a recognised status for taste pdfa/)
+        .to_stderr_from_any_process
+      # the taste's stage repertoire supersedes the base flavour's:
+      # working-draft is a ribose stage but not a pdfa one
+      expect(result).to include(":docstage: published")
+      expect(result).to include(":docstage-published: true")
+      expect(result).to include(":presentation-metadata-stage-alias: published")
+      expect(result).to include(":docstage-valid: draft,published")
+      expect(result).not_to include(":docstage: working-draft")
     end
 
     it "generates output with the correct boilerplate path" do

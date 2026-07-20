@@ -604,6 +604,30 @@ These include:
 * `doctype`: mapping of taste doctypes to native base flavor doctypes
 * `stage`: mapping of taste stages to native base flavor stages
 
+=== Stage repertoire contract
+
+When a taste defines `stages:`, its stage repertoire supersedes the base
+flavor's: input stages are validated against the taste's stage names, an
+unrecognised stage is reported and replaced with the taste's default stage,
+and the base stages the taste maps to are advertised to the flavor as valid
+(through the `:docstage-valid:` document attribute), so the flavor does not
+report them as unrecognised in turn.
+
+The `base:` values of taste stages must respect the base flavor's native
+stage semantics:
+
+* For flavors with free-form stage names (Metanorma Generic and its
+  derivatives, such as Ribose), any string is acceptable as a `base:` stage;
+  draft-ness is controlled by the `published:` flag of the stage.
+* For flavors whose machinery interprets stage values — above all ISO, where
+  document identifiers (pubid) and cover/boilerplate logic are keyed to the
+  numeric harmonized stage codes — `base:` values must be drawn from the
+  flavor's native repertoire (for ISO: numeric stage codes such as `30`,
+  `60`). A stage the flavor cannot interpret will degrade identifier
+  generation to a warning (the taste's own docidentifier template is used
+  instead), but stage-keyed rendering logic will treat the document as a
+  draft.
+
 
 == Data model
 
