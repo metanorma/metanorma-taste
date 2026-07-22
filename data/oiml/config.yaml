@@ -48,3 +48,12 @@ doctypes:
   # OIML S
 - taste: seminar-report
   base: international-standard
+  # OIML-CS PD
+- taste: oiml-cs-procedural-document
+  base: international-standard
+  # OIML-CS OD
+- taste: oiml-cs-operational-document
+  base: international-standard
+  # OIML-CS CID
+- taste: oiml-cs-clarification-document
+  base: international-standard
