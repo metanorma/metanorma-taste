@@ -301,7 +301,7 @@ module Metanorma
       directory = config_directory_for(flavor)
 
       # Create dynamic class if it doesn't exist
-      class_name = flavor.to_s.capitalize
+      class_name = flavor.to_s.split(/[-_]/).map(&:capitalize).join
       unless Taste.const_defined?(class_name)
         Taste.const_set(class_name, Class.new(Taste::Base))
       end
