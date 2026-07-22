@@ -1,0 +1,12 @@
+term_def_boilerplate:
+internal_terms_boilerplate:
+abbrev: Abbreviations
+note: Note
+termnote: Note
+example: Example
+inform_annex: Informative
+norm_annex: Mandatory
+doctype_dict:
+  procedural-document: Procedural Document
+  operational-document: Operational Document
+  clarification-document: Clarification Document

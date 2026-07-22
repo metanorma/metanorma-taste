@@ -20,11 +20,14 @@ base-override:
   - abbrev: OIML
     rank: 1
     name: International Organization of Legal Metrology
-  - abbrev: ISO
+  - abbrev: OIML-CS
     rank: 2
+    name: International Organization of Legal Metrology
+  - abbrev: ISO
+    rank: 3
     name: International Organization for Standardization
   - abbrev: IEC
-    rank: 3
+    rank: 4
     name: International Electrotechnical Commission
 doctypes:
   # OIML G
