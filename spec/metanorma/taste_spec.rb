@@ -11,6 +11,7 @@ RSpec.describe Metanorma::Taste do
                  icc: :iso,
                  mbxif: :ribose,
                  oiml: :iso,
+                 "oiml-cs": :iso,
                  pdfa: :ribose,
                  swf: :ribose,
                  wmo: :iho,
