@@ -26,6 +26,68 @@ RSpec.describe Metanorma::TasteRegister do
     end
   end
 
+  describe "taste inheritance (base-taste)" do
+    it "inherits the parent taste's config and overrides only its own keys" do
+      cfg = register.get_config(:"oiml-cs")
+      # inherited from oiml
+      expect(cfg.base_flavor).to eq("iso")
+      expect(cfg.base_override.value_attributes.fonts)
+        .to eq("Futura PT Book;Futura PT Demi;Futura PT Light")
+      expect(cfg.base_override.value_attributes.output_extensions)
+        .to include("pdf")
+      # overridden by oiml-cs
+      expect(cfg.base_override.value_attributes.publisher)
+        .to eq("OIML Certification System")
+      expect(cfg.base_override.value_attributes.publisher_abbr).to eq("OIML-CS")
+      expect(cfg.base_override.filename_attributes.publisher_logo)
+        .to eq("oiml-logo-cs-light.svg")
+      # doctypes are replaced (narrowed) by the child, not merged
+      expect(cfg.doctypes.map(&:taste))
+        .to eq(%w[procedural-document operational-document clarification-document])
+    end
+
+    it "aliases the child taste to its inherited base flavor" do
+      expect(register.send(:aliases)[:"oiml-cs"]).to eq(:iso)
+    end
+
+    it "resolves own assets from the child dir and shared assets from the parent" do
+      inst = register.get(:"oiml-cs")
+      expect(inst.send(:file_path_for, :publisher_logo))
+        .to end_with(File.join("data", "oiml-cs", "oiml-logo-cs-light.svg"))
+      expect(inst.send(:file_path_for, :pdfstylesheet_override))
+        .to end_with(File.join("data", "oiml", "oiml.xsl"))
+      expect(inst.send(:file_path_for, :copyright_notice))
+        .to end_with(File.join("data", "oiml", "copyright.adoc"))
+    end
+
+    it "deep-merges child over parent (hashes recurse, arrays/scalars replace)" do
+      merged = register.send(
+        :deep_merge,
+        { "a" => 1, "h" => { "x" => 1, "y" => 2 }, "arr" => [1, 2] },
+        { "a" => 9, "h" => { "y" => 3, "z" => 4 }, "arr" => [9] },
+      )
+      expect(merged)
+        .to eq("a" => 9, "h" => { "x" => 1, "y" => 3, "z" => 4 }, "arr" => [9])
+    end
+
+    it "raises on a cyclic base-taste chain" do
+      raw = {
+        "a" => { "hash" => { "base-taste" => "b" }, "directory" => "/a" },
+        "b" => { "hash" => { "base-taste" => "a" }, "directory" => "/b" },
+      }
+      expect { register.send(:resolve_raw_config, "a", raw, []) }
+        .to raise_error(described_class::InvalidTasteConfigError, /Cyclic/)
+    end
+
+    it "raises on an unknown base-taste" do
+      raw = { "a" => { "hash" => { "base-taste" => "ghost" },
+                       "directory" => "/a" } }
+      expect { register.send(:resolve_raw_config, "a", raw, []) }
+        .to raise_error(described_class::InvalidTasteConfigError,
+                        /Unknown base-taste/)
+    end
+  end
+
   describe "#isodoc_attrs" do
     it "returns isodoc attributes" do
       dir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "data"))

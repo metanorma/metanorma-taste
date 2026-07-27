@@ -91,10 +91,16 @@ module Metanorma
       # @example
       #   config = TasteConfig.from_yaml(File.read("config.yaml"))
       #   base = Base.new("icc", config, directory: "data/icc")
-      def initialize(flavor, config, directory: Dir.pwd)
+      def initialize(flavor, config, directory: Dir.pwd,
+                     directory_search_path: nil)
         @flavor = flavor
         @config = config
         @directory = directory
+        # Ordered list of directories to resolve asset filenames against:
+        # [own_dir, parent_dir, ...] for an inheriting taste, or just
+        # [own_dir] otherwise. Lets an inheriting taste ship only its own
+        # overriding assets while reusing the parent taste's files.
+        @directory_search_path = directory_search_path || [directory]
       end
 
       # Process input AsciiDoc attributes with taste-specific overrides
@@ -235,7 +241,12 @@ module Metanorma
         filename = @config.base_override.filename_attributes.send(config_attr)
         return nil unless filename
 
-        File.join(@directory, filename)
+        # Resolve against the search path (own dir first, then any inherited
+        # parent dirs); fall back to own dir so add_file_override's existence
+        # guard still drops truly-missing files (behaviour for a single-entry
+        # search path is identical to the previous File.join(@directory, ...)).
+        @directory_search_path.map { |dir| File.join(dir, filename) }
+          .find { |path| File.exist?(path) } || File.join(@directory, filename)
       end
 
       # Add value-based configuration override attributes

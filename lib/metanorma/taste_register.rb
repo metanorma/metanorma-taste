@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "singleton"
+require "yaml"
 require_relative "taste/taste_config"
 require_relative "taste/base"
 
@@ -199,8 +200,27 @@ module Metanorma
       data_directory_path = data_directory
       return unless data_directory_path && Dir.exist?(data_directory_path)
 
-      taste_directories = find_taste_directories(data_directory_path)
-      taste_directories.each { |dir| load_taste_from_directory(dir) }
+      # Phase 1: collect every taste's raw config, so a parent named by a
+      # child's `base-taste` is available regardless of directory iteration
+      # order. Phase 2: resolve inheritance and register.
+      raw = collect_raw_taste_configs(
+        find_taste_directories(data_directory_path),
+      )
+      raw.each_key { |flavor| resolve_and_register_taste(flavor, raw) }
+    end
+
+    # Phase 1: read each taste dir's config.yaml into a raw hash keyed by flavor.
+    #
+    # @param taste_directories [Array<String>]
+    # @return [Hash{String => Hash}] flavor => {"hash","content","directory"}
+    def collect_raw_taste_configs(taste_directories)
+      taste_directories.each_with_object({}) do |dir, acc|
+        content = File.read(File.join(dir, "config.yaml"))
+        hash = YAML.safe_load(content) || {}
+        flavor = (hash["flavor"] || File.basename(dir)).to_s
+        acc[flavor] = { "hash" => hash, "content" => content,
+                        "directory" => dir }
+      end
     end
 
     # Get the path to the data directory
@@ -229,23 +249,73 @@ module Metanorma
       File.exist?(File.join(directory, "config.yaml"))
     end
 
-    # Load and register a taste configuration from a directory
+    # Phase 2: resolve any `base-taste` inheritance for one taste, then
+    # validate and register the flattened config.
     #
-    # @param taste_directory [String] Path to the taste directory
+    # @param flavor [String] flavor key into +raw+
+    # @param raw [Hash] the phase-1 collection
     # @raise [InvalidTasteConfigError] If the configuration is invalid
-    def load_taste_from_directory(taste_directory)
-      config_file = File.join(taste_directory, "config.yaml")
-      directory_name = File.basename(taste_directory)
+    def resolve_and_register_taste(flavor, raw)
+      entry = raw[flavor]
+      if entry["hash"]["base-taste"]
+        merged, search_path = resolve_raw_config(flavor, raw, [])
+        yaml = merged.to_yaml
+      else
+        # No inheritance: parse the original content verbatim, so behaviour
+        # for existing tastes is identical to the previous single-pass loader.
+        yaml = entry["content"]
+        search_path = [entry["directory"]]
+      end
 
-      begin
-        config_content = File.read(config_file)
-        config = Taste::TasteConfig.from_yaml(config_content)
+      config = Taste::TasteConfig.from_yaml(yaml)
+      validate_taste_config!(config, File.basename(entry["directory"]))
+      register_taste_config(config, entry["directory"])
+      (@config_directory_search_paths ||= {})[flavor.to_sym] = search_path
+    rescue StandardError => e
+      raise InvalidTasteConfigError,
+            "Failed to load taste from #{raw[flavor]['directory']}: #{e.message}"
+    end
 
-        validate_taste_config!(config, directory_name)
-        register_taste_config(config, taste_directory)
-      rescue StandardError => e
+    # Recursively merge a taste's `base-taste` ancestry into its own raw
+    # config. Child keys win: hashes merge deeply, arrays and scalars replace.
+    #
+    # @param flavor [String] flavor key into +raw+
+    # @param raw [Hash] the phase-1 collection
+    # @param in_progress [Array<String>] chain being resolved (cycle guard)
+    # @return [Array(Hash, Array<String>)] [merged raw hash, dir search path]
+    # @raise [InvalidTasteConfigError] on a cycle or an unknown base-taste
+    def resolve_raw_config(flavor, raw, in_progress)
+      if in_progress.include?(flavor)
         raise InvalidTasteConfigError,
-              "Failed to load taste from #{taste_directory}: #{e.message}"
+              "Cyclic base-taste inheritance: " \
+              "#{(in_progress + [flavor]).join(' -> ')}"
+      end
+      entry = raw[flavor] or
+        raise InvalidTasteConfigError, "Unknown base-taste: #{flavor}"
+
+      hash = entry["hash"]
+      dir = entry["directory"]
+      parent = hash["base-taste"]
+      return [hash, [dir]] unless parent
+
+      parent_merged, parent_path =
+        resolve_raw_config(parent.to_s, raw, in_progress + [flavor])
+      merged = deep_merge(parent_merged, hash)
+      merged.delete("base-taste")
+      [merged, [dir, *parent_path]]
+    end
+
+    # Deep-merge +override+ onto +base+: recurse into hashes; arrays and
+    # scalars in +override+ replace those in +base+.
+    #
+    # @return [Hash] a new merged hash (inputs are not mutated)
+    def deep_merge(base, override)
+      base.merge(override) do |_key, base_val, over_val|
+        if base_val.is_a?(Hash) && over_val.is_a?(Hash)
+          deep_merge(base_val, over_val)
+        else
+          over_val
+        end
       end
     end
 
@@ -299,6 +369,8 @@ module Metanorma
     # @return [Taste::Base] The created taste instance
     def create_taste_instance(flavor, config)
       directory = config_directory_for(flavor)
+      search_path = (@config_directory_search_paths ||= {})[flavor] ||
+        [directory]
 
       # Create dynamic class if it doesn't exist
       class_name = flavor.to_s.split(/[-_]/).map(&:capitalize).join
@@ -308,7 +380,8 @@ module Metanorma
 
       # Create instance of the dynamic class
       dynamic_class = Taste.const_get(class_name)
-      dynamic_class.new(flavor, config, directory: directory)
+      dynamic_class.new(flavor, config, directory: directory,
+                                        directory_search_path: search_path)
     end
 
     # Get the directory path for a registered flavor
