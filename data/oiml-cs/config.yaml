@@ -1,21 +1,18 @@
 ---
 flavor: oiml-cs
 owner: OIML Certification System
-base-flavor: iso
+# Inherits the OIML taste (base-flavor iso, shared XSL, copyright, pdf-portfolio,
+# fonts, output-extensions); overrides only what is genuinely OIML-CS-specific.
+base-taste: oiml
 base-override:
   filename-attributes:
-    copyright-notice: copyright.adoc
+    # i18n.yaml genuinely differs from OIML and the CS cover logo is OIML-CS's
+    # own; copyright.adoc, oiml.xsl and the pdf-portfolio page are inherited.
     i18n-dictionary: i18n.yaml
     publisher-logo: oiml-logo-cs-light.svg
-    pdf-stylesheet-override: oiml-cs.xsl
-    coverpage-pdf-portfolio: pdfportfolio_default_page.pdf
   value-attributes:
     publisher: OIML Certification System
     publisher_abbr: OIML-CS
-    #presentation-metadata-color-secondary: '#3f65a2'
-    #presentation-metadata-backcover-text: expresslang.org
-    output-extensions: xml,html,pdf,doc
-    fonts: Futura PT Book;Futura PT Demi;Futura PT Light
   bibliography-sort:
   - abbrev: OIML-CS
     rank: 1

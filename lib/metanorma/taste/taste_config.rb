@@ -13,6 +13,10 @@ module Metanorma
       attribute :flavor, :string
       attribute :owner, :string
       attribute :base_flavor, :string
+      # Optional: another taste this one inherits from. Resolved (merged) at
+      # load time by TasteRegister, so by the time a config reaches consumers
+      # it is already flattened; kept here only so the key validates.
+      attribute :base_taste, :string
       attribute :base_override, BaseOverride
       attribute :doctypes, DoctypeConfig, collection: true
       attribute :stages, StageConfig, collection: true
@@ -23,6 +27,7 @@ module Metanorma
         map "flavor", to: :flavor
         map "owner", to: :owner
         map "base-flavor", to: :base_flavor
+        map "base-taste", to: :base_taste
         map "base-override", to: :base_override
         map "doctypes", to: :doctypes
         map "stages", to: :stages
