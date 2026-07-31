@@ -32,7 +32,7 @@
 	
 	<xsl:template name="cover-page">
 		<xsl:param name="num"/>
-		<fo:page-sequence master-reference="cover-page" force-page-count="end-on-even" font-family="Futura PT Book" color="rgb(34,30,31)" initial-page-number="1"> <!-- Futura Bk -->
+		<fo:page-sequence master-reference="cover-page" force-page-count="end-on-even" font-family="Jost" color="rgb(34,30,31)" initial-page-number="1">
 			<xsl:variable name="curr_lang"><xsl:call-template name="getLang"/></xsl:variable>
 			<xsl:variable name="docidentifier"><xsl:call-template name="get_docidentifier"/></xsl:variable>
 			<xsl:variable name="title_complementary"><xsl:call-template name="get_title_complementary"/></xsl:variable>
@@ -77,7 +77,7 @@
 											<xsl:variable name="y">30</xsl:variable>
 											<xsl:for-each select="xalan:nodeset($doctype_splitted)//mnx:item">
 												<!-- <xsl:copy-of select="."/> -->
-												<text font-family="Futura PT Book" x="0" y="{$y * position() + 10 * (position() - 1)}" font-size="19pt" transform="scale({$ratio},1)">
+												<text font-family="Jost" x="0" y="{$y * position() + 10 * (position() - 1)}" font-size="19pt" transform="scale({$ratio},1)">
 													<xsl:call-template name="capitalize_oiml">
 														<xsl:with-param name="str" select="."/>
 														<xsl:with-param name="font_size_capital">25</xsl:with-param>
@@ -91,7 +91,7 @@
 							</fo:table-cell>
 							<fo:table-cell text-align="right">
 								<!-- Example: OIML R 60-1 -->
-								<!-- <fo:block font-size="27pt" font-family="Futura PT Demi"> 
+								<!-- <fo:block font-size="27pt" font-family="Jost SemiBold"> 
 									<xsl:value-of select="$docidentifier"/>
 									<xsl:if test="$title_complementary != ''"><xsl:text> </xsl:text></xsl:if>
 									<xsl:copy-of select="$title_complementary"/>
@@ -102,7 +102,7 @@
 											<xsl:if test="$title_complementary != ''">
 												<xsl:attribute name="height">70</xsl:attribute>
 											</xsl:if>
-											<g font-family="Futura PT Demi" font-size="28pt" transform="scale({$ratio},1)">
+											<g font-family="Jost SemiBold" font-size="28pt" transform="scale({$ratio},1)">
 												<text x="{250 div $ratio}" y="25" text-anchor="end">
 													<xsl:value-of select="$docidentifier"/>
 												</text>
@@ -123,7 +123,7 @@
 									<fo:instream-foreign-object fox:alt-text="edition" width="100%" content-height="100%" scaling="uniform">
 										<svg xmlns="http://www.w3.org/2000/svg" width="250" height="60">
 											<!-- <line x1="250" y1="0" x2="250" y2="50" stroke="red" /> -->
-											<text font-family="Futura PT Book" x="{250 div $ratio}" y="20" font-size="18pt" transform="scale({$ratio},1)" text-anchor="end" dominant-baseline="middle">
+											<text font-family="Jost" x="{250 div $ratio}" y="20" font-size="18pt" transform="scale({$ratio},1)" text-anchor="end" dominant-baseline="middle">
 												<xsl:value-of select="$edition"/>
 											</text>
 										</svg>
@@ -175,7 +175,7 @@
 							</fo:table-row>
 							<fo:table-row height="25mm" font-size="11pt" role="SKIP">
 								<fo:table-cell role="SKIP">
-									<fo:block role="SKIP" font-family="Futura PT Light"> <!-- Futura-Light font-weight="300" -->
+									<fo:block role="SKIP" font-family="Jost Light">
 										<xsl:variable name="lang_other">
 											<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:title[@language != $curr_lang]">
 												<xsl:if test="not(preceding-sibling::mn:title[@language = current()/@language])">
@@ -276,7 +276,7 @@
 						<!-- <xsl:value-of select="$docidentifier_full"/> -->
 						<fo:instream-foreign-object fox:alt-text="doctype" width="100%" content-height="100%" scaling="uniform">
 							<svg xmlns="http://www.w3.org/2000/svg" width="100mm" height="10mm">
-								<text font-family="Futura PT Book" x="0" y="15" font-size="13pt" transform="scale(0.85,1)">
+								<text font-family="Jost" x="0" y="15" font-size="13pt" transform="scale(0.85,1)">
 									<xsl:value-of select="$docidentifier_full"/>
 								</text>
 							</svg>
@@ -293,7 +293,7 @@
 		<xsl:param name="ratio">0.82</xsl:param>
 		<fo:instream-foreign-object fox:alt-text="doctype" width="100%" content-height="100%" scaling="uniform">
 			<svg xmlns="http://www.w3.org/2000/svg" width="250" height="52">
-				<g font-family="Futura PT Book" font-size="13pt" transform="scale({$ratio},1)">
+				<g font-family="Jost" font-size="13pt" transform="scale({$ratio},1)">
 					<text x="{250 div $ratio}" y="15" text-anchor="end">
 						<xsl:call-template name="capitalize_oiml">
 							<xsl:with-param name="str" select="$oiml_part1"/>
