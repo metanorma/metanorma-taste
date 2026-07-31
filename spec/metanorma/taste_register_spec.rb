@@ -32,7 +32,7 @@ RSpec.describe Metanorma::TasteRegister do
       # inherited from oiml
       expect(cfg.base_flavor).to eq("iso")
       expect(cfg.base_override.value_attributes.fonts)
-        .to eq("Futura PT Book;Futura PT Demi;Futura PT Light")
+        .to eq("Jost;Jost SemiBold;Jost Light")
       expect(cfg.base_override.value_attributes.output_extensions)
         .to include("pdf")
       # overridden by oiml-cs
