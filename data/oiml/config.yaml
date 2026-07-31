@@ -15,7 +15,7 @@ base-override:
     #presentation-metadata-color-secondary: '#3f65a2'
     #presentation-metadata-backcover-text: expresslang.org
     output-extensions: xml,html,pdf,doc
-    fonts: Futura PT Book;Futura PT Demi;Futura PT Light
+    fonts: Jost;Jost SemiBold;Jost Light
   bibliography-sort:
   - abbrev: OIML
     rank: 1
