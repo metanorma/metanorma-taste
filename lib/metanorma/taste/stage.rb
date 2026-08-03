@@ -15,12 +15,14 @@ module Metanorma
       # @param attrs [Array<String>] The attributes array (modified in place)
       # @param override_attrs [Array<String>] Array to append override attributes to
       def apply_stage_overrides(attrs, override_attrs)
+        add_valid_stages_attribute(override_attrs)
         stage_index = find_stage_attribute_index(attrs)
         stage_index ||= insert_default_stage(attrs)
         return unless stage_index
 
         current_stage = extract_stage_value(attrs[stage_index])
-        stage_config = find_stage_configuration(current_stage)
+        stage_config = find_stage_configuration(current_stage) ||
+          fallback_stage_configuration(current_stage)
         return unless stage_config
 
         # Transform the stage attribute
@@ -28,6 +30,40 @@ module Metanorma
 
         # Add stage-specific overrides
         add_stage_specific_overrides(override_attrs, stage_config)
+      end
+
+      # Advertise the base stages this taste can emit, as the
+      # :docstage-valid: document attribute: when a taste defines
+      # stages, its repertoire supersedes the base flavour's for stage
+      # validation (the flavour would otherwise warn about the mapped
+      # base stages as unrecognised).
+      #
+      # @param override_attrs [Array<String>] Array to append override attributes to
+      def add_valid_stages_attribute(override_attrs)
+        bases = @config.stages&.map(&:base)&.compact&.uniq
+        bases.nil? || bases.empty? and return
+        override_attrs << ":docstage-valid: #{bases.join(',')}"
+      end
+
+      # A stage not in the taste's repertoire: the taste's stages
+      # supersede the base flavour's, so warn and fall back to the
+      # taste's default stage (nil if none is flagged default, in which
+      # case the unknown stage passes through unchanged).
+      #
+      # @param current_stage [String] The unrecognised input stage
+      # @return [StageConfig, nil] The default stage configuration
+      def fallback_stage_configuration(current_stage)
+        @config.stages.nil? || @config.stages.empty? and return nil
+        warn_unrecognised_stage(current_stage)
+        @config.stages.detect { |dt| dt.default == "true" }
+      end
+
+      # Kernel#warn, not Metanorma::Util.log: the latter goes to stdout
+      # and only when Metanorma.configuration.logs opts into :warning,
+      # which would silently swallow a validation warning.
+      def warn_unrecognised_stage(stage)
+        warn "[metanorma-taste] WARNING: #{stage} is not a recognised " \
+             "status for taste #{@flavor}; reverting to default stage"
       end
 
       # Find the index of the stage attribute in the attributes array

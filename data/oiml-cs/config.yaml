@@ -1,0 +1,38 @@
+---
+flavor: oiml-cs
+owner: OIML Certification System
+# Inherits the OIML taste (base-flavor iso, shared XSL, copyright, pdf-portfolio,
+# fonts, output-extensions); overrides only what is genuinely OIML-CS-specific.
+base-taste: oiml
+base-override:
+  filename-attributes:
+    # i18n.yaml genuinely differs from OIML and the CS cover logo is OIML-CS's
+    # own; copyright.adoc, oiml.xsl and the pdf-portfolio page are inherited.
+    i18n-dictionary: i18n.yaml
+    publisher-logo: oiml-logo-cs-light.svg
+  value-attributes:
+    publisher: OIML Certification System
+    publisher_abbr: OIML-CS
+  bibliography-sort:
+  - abbrev: OIML-CS
+    rank: 1
+    name: International Organization of Legal Metrology
+  - abbrev: OIML
+    rank: 2
+    name: International Organization of Legal Metrology
+  - abbrev: ISO
+    rank: 3
+    name: International Organization for Standardization
+  - abbrev: IEC
+    rank: 4
+    name: International Electrotechnical Commission
+doctypes:
+  # OIML-CS PD
+- taste: procedural-document
+  base: international-standard
+  # OIML-CS OD
+- taste: operational-document
+  base: international-standard
+  # OIML-CS CID
+- taste: clarification-document
+  base: international-standard

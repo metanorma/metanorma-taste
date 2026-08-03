@@ -28,7 +28,9 @@ code is required.
 
 **Base flavor dependency**:: Every taste must specify a `base-flavor` (e.g.,
 `iso`, `ietf`, `ieee`) that provides the document structure and validation
-logic.
+logic. A taste may instead inherit from another taste with `base-taste`, in
+which case the parent taste supplies the `base-flavor`; see
+<<taste-inheritance>>.
 
 **Lightweight customization**:: Tastes can override document attributes, provide
 custom copyright notices, modify presentation styling, and add
@@ -189,6 +191,11 @@ currently available:
 |`iso`
 |International Organization of Legal Metrology specifications and standards with OIML branding and copyright
 
+|`oiml-cs`
+|OIML Certification System
+|`oiml` (via `base-taste`)
+|OIML Certification System publications (PD, OD, CID), inheriting the `oiml` taste and overriding only the OIML-CS logo, i18n, publisher and doctypes
+
 |`wmo`
 |World Meteorological Organization
 |`iho`
@@ -250,6 +257,7 @@ The main configuration file for each taste:
 flavor: string             # The name of the custom flavor (e.g., "icc")
 owner: string              # Organization name (e.g., "International Color Consortium")
 base-flavor: string        # Base Metanorma flavor to extend (e.g., "iso")
+base-taste: string         # Optional: another taste to inherit config and assets from (e.g., "oiml"); see Taste inheritance
 base-override:             # Document attributes to override from base flavor
   filename-attributes:     # Metanorma document attributes that contain filenames
     copyright-notice: string   # Path to boilerplate file (e.g., "copyright.adoc")
@@ -370,6 +378,62 @@ committees:
       abbrev: PDM-IF
       logo: mbxif-logos_pdmif.svg
 ----
+====
+
+[[taste-inheritance]]
+==== Taste inheritance (`base-taste`)
+
+A taste can inherit from another taste by declaring `base-taste` instead of
+`base-flavor`. This keeps related tastes DRY: the child inherits all of the
+parent taste's configuration and content assets, and overrides only the keys
+and files that genuinely differ.
+
+Resolution rules:
+
+* Configuration is merged parent-first, child-wins. Nested mappings (such as
+  `base-override.filename-attributes` and `base-override.value-attributes`) are
+  merged key-by-key; arrays and scalars (such as `doctypes`,
+  `bibliography-sort` and `base-flavor`) are replaced wholesale by the child
+  when it specifies them.
+* Content assets are resolved from the child taste's directory first, then the
+  parent's. A child therefore ships only the assets it overrides and reuses the
+  parent's copyright notice, stylesheets, portfolio pages, and so on.
+* `base-flavor` is inherited from the parent unless the child overrides it, so
+  the child maps to the same underlying Metanorma flavor.
+* Multi-level inheritance chains are supported; cycles and unknown parents are
+  reported as configuration errors.
+
+.The `oiml-cs` taste inherits `oiml`, overriding only its own logo, i18n, publisher and doctypes
+[example]
+====
+[source,yaml]
+----
+flavor: oiml-cs
+owner: OIML Certification System
+base-taste: oiml           # inherit OIML (base-flavor iso, shared XSL, copyright, portfolio, fonts)
+base-override:
+  filename-attributes:
+    i18n-dictionary: i18n.yaml             # OIML-CS-specific
+    publisher-logo: oiml-logo-cs-light.svg # OIML-CS cover logo
+  value-attributes:
+    publisher: OIML Certification System
+    publisher_abbr: OIML-CS
+  bibliography-sort:
+  - abbrev: OIML-CS
+    rank: 1
+    name: International Organization of Legal Metrology
+doctypes:
+- taste: procedural-document
+  base: international-standard
+- taste: operational-document
+  base: international-standard
+- taste: clarification-document
+  base: international-standard
+----
+
+Here `copyright.adoc`, the PDF stylesheet (`oiml.xsl`) and the PDF-portfolio
+page are absent from the `oiml-cs` taste directory: they are inherited from the
+`oiml` taste.
 ====
 
 ==== i18n.yaml
@@ -603,6 +667,30 @@ These include:
 
 * `doctype`: mapping of taste doctypes to native base flavor doctypes
 * `stage`: mapping of taste stages to native base flavor stages
+
+=== Stage repertoire contract
+
+When a taste defines `stages:`, its stage repertoire supersedes the base
+flavor's: input stages are validated against the taste's stage names, an
+unrecognised stage is reported and replaced with the taste's default stage,
+and the base stages the taste maps to are advertised to the flavor as valid
+(through the `:docstage-valid:` document attribute), so the flavor does not
+report them as unrecognised in turn.
+
+The `base:` values of taste stages must respect the base flavor's native
+stage semantics:
+
+* For flavors with free-form stage names (Metanorma Generic and its
+  derivatives, such as Ribose), any string is acceptable as a `base:` stage;
+  draft-ness is controlled by the `published:` flag of the stage.
+* For flavors whose machinery interprets stage values — above all ISO, where
+  document identifiers (pubid) and cover/boilerplate logic are keyed to the
+  numeric harmonized stage codes — `base:` values must be drawn from the
+  flavor's native repertoire (for ISO: numeric stage codes such as `30`,
+  `60`). A stage the flavor cannot interpret will degrade identifier
+  generation to a warning (the taste's own docidentifier template is used
+  instead), but stage-keyed rendering logic will treat the document as a
+  draft.
 
 
 == Data model

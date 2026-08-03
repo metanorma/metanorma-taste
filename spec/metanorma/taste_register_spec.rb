@@ -26,6 +26,68 @@ RSpec.describe Metanorma::TasteRegister do
     end
   end
 
+  describe "taste inheritance (base-taste)" do
+    it "inherits the parent taste's config and overrides only its own keys" do
+      cfg = register.get_config(:"oiml-cs")
+      # inherited from oiml
+      expect(cfg.base_flavor).to eq("iso")
+      expect(cfg.base_override.value_attributes.fonts)
+        .to eq("Jost;Jost SemiBold;Jost Light")
+      expect(cfg.base_override.value_attributes.output_extensions)
+        .to include("pdf")
+      # overridden by oiml-cs
+      expect(cfg.base_override.value_attributes.publisher)
+        .to eq("OIML Certification System")
+      expect(cfg.base_override.value_attributes.publisher_abbr).to eq("OIML-CS")
+      expect(cfg.base_override.filename_attributes.publisher_logo)
+        .to eq("oiml-logo-cs-light.svg")
+      # doctypes are replaced (narrowed) by the child, not merged
+      expect(cfg.doctypes.map(&:taste))
+        .to eq(%w[procedural-document operational-document clarification-document])
+    end
+
+    it "aliases the child taste to its inherited base flavor" do
+      expect(register.send(:aliases)[:"oiml-cs"]).to eq(:iso)
+    end
+
+    it "resolves own assets from the child dir and shared assets from the parent" do
+      inst = register.get(:"oiml-cs")
+      expect(inst.send(:file_path_for, :publisher_logo))
+        .to end_with(File.join("data", "oiml-cs", "oiml-logo-cs-light.svg"))
+      expect(inst.send(:file_path_for, :pdfstylesheet_override))
+        .to end_with(File.join("data", "oiml", "oiml.xsl"))
+      expect(inst.send(:file_path_for, :copyright_notice))
+        .to end_with(File.join("data", "oiml", "copyright.adoc"))
+    end
+
+    it "deep-merges child over parent (hashes recurse, arrays/scalars replace)" do
+      merged = register.send(
+        :deep_merge,
+        { "a" => 1, "h" => { "x" => 1, "y" => 2 }, "arr" => [1, 2] },
+        { "a" => 9, "h" => { "y" => 3, "z" => 4 }, "arr" => [9] },
+      )
+      expect(merged)
+        .to eq("a" => 9, "h" => { "x" => 1, "y" => 3, "z" => 4 }, "arr" => [9])
+    end
+
+    it "raises on a cyclic base-taste chain" do
+      raw = {
+        "a" => { "hash" => { "base-taste" => "b" }, "directory" => "/a" },
+        "b" => { "hash" => { "base-taste" => "a" }, "directory" => "/b" },
+      }
+      expect { register.send(:resolve_raw_config, "a", raw, []) }
+        .to raise_error(described_class::InvalidTasteConfigError, /Cyclic/)
+    end
+
+    it "raises on an unknown base-taste" do
+      raw = { "a" => { "hash" => { "base-taste" => "ghost" },
+                       "directory" => "/a" } }
+      expect { register.send(:resolve_raw_config, "a", raw, []) }
+        .to raise_error(described_class::InvalidTasteConfigError,
+                        /Unknown base-taste/)
+    end
+  end
+
   describe "#isodoc_attrs" do
     it "returns isodoc attributes" do
       dir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "data"))
@@ -399,6 +461,25 @@ RSpec.describe Metanorma::TasteRegister do
       expect(result2).to include(":presentation-metadata-stage-alias: release-candidate")
       expect(result2).to include(":docstage-abbrev: RC")
       expect(result2).not_to include(":docstage-published: true")
+      # the taste advertises its stage repertoire to the base flavour
+      expect(result2).to include(":docstage-valid: draft,published")
+    end
+
+    it "warns and falls back to the default stage on an unrecognised stage" do
+      result = nil
+      expect do
+        result = taste2
+          .process_input_adoc_overrides(attrs2.dup + [":docstage: working-draft"],
+                                        options)
+      end.to output(/working-draft is not a recognised status for taste pdfa/)
+        .to_stderr_from_any_process
+      # the taste's stage repertoire supersedes the base flavour's:
+      # working-draft is a ribose stage but not a pdfa one
+      expect(result).to include(":docstage: published")
+      expect(result).to include(":docstage-published: true")
+      expect(result).to include(":presentation-metadata-stage-alias: published")
+      expect(result).to include(":docstage-valid: draft,published")
+      expect(result).not_to include(":docstage: working-draft")
     end
 
     it "generates output with the correct boilerplate path" do
@@ -418,15 +499,20 @@ RSpec.describe Metanorma::TasteRegister do
     end
 
     it "processes additive attributes correctly" do
+       # Test the additive font merge on swf, a taste with a stable,
+       # semicolon-delimited font stack. (pdfa was used here previously but
+       # its font config is tinkered with frequently, e.g. #171, which
+       # silently broke this pin.)
+       swf_fonts = "Nacelle;Nacelle SemiBold;Nacelle Light"
        fonts = "D050000L;TeXGyreTermes;STIX Two Math;FreeSerif;FreeSans;Source Sans 3"
        attrs = [":fonts: #{fonts}"]
-       taste = described_class.get(:pdfa)
+       taste = described_class.get(:swf)
        result = taste.process_input_adoc_overrides(attrs, {})
-       expect(result).to include(":fonts: Source Sans 3;Source Sans 3 SemiBold;Source Sans Pro;#{fonts}")
+       expect(result).to include(":fonts: #{swf_fonts};#{fonts}")
 
        attrs = []
        result = taste.process_input_adoc_overrides(attrs, {})
-       expect(result).to include(":fonts: Source Sans 3;Source Sans 3 SemiBold;Source Sans Pro")
+       expect(result).to include(":fonts: #{swf_fonts}")
     end
   end
 end

@@ -315,15 +315,15 @@
 		<fo:block role="P/Title">
 			<!-- Main title of doc -->
 			<fo:block font-size="{$font_size}pt" font-weight="bold" font-style="{$font_style}" role="SKIP">
-				<fo:block role="SKIP"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'intro' and @language = $curr_lang]/node()"/></fo:block>
+				<fo:block role="SKIP"><xsl:apply-templates select="mn:metanorma/mn:bibdata/mn:title[@type = 'intro' and @language = $curr_lang]/node()"/></fo:block>
 			</fo:block>
 			<!-- Subtitle of doc -->
 			<fo:block font-size="{$font_size - 2}pt" font-style="{$font_style}" role="SKIP">
-				<fo:block role="SKIP"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'main' and @language = $curr_lang][last()]/node()"/></fo:block>
+				<fo:block role="SKIP"><xsl:apply-templates select="mn:metanorma/mn:bibdata/mn:title[@type = 'main' and @language = $curr_lang][last()]/node()"/></fo:block>
 			</fo:block>
 			<!-- Part title -->
 			<fo:block font-size="{$font_size - 8}pt" font-style="{$font_style}" role="SKIP">
-				<fo:block role="SKIP"><xsl:apply-templates select="xalan:nodeset($bibdata)//mn:bibdata/mn:title[@type = 'part' and @language = $curr_lang]/node()"/></fo:block>
+				<fo:block role="SKIP"><xsl:apply-templates select="mn:metanorma/mn:bibdata/mn:title[@type = 'part' and @language = $curr_lang]/node()"/></fo:block>
 			</fo:block>
 		</fo:block>
 	</xsl:template>
@@ -405,7 +405,10 @@
 			<xsl:variable name="current_document"><xsl:copy-of select="."/></xsl:variable>
 			<xsl:for-each select="xalan:nodeset($current_document)">
 				<mnx:doc num="{$num}">
-					<title><xsl:apply-templates select="mn:metanorma/mn:bibdata/mn:title[@type = 'main'][last()]/node()"/></title>
+					<xsl:variable name="bibdata">
+						<xsl:apply-templates select="mn:metanorma/mn:bibdata" mode="update_xml_enclose_keep-together_within-line"/>
+					</xsl:variable>
+					<title><xsl:apply-templates select="xalan:nodeset($bibdata)/mn:bibdata/mn:title[@type = 'main'][last()]/node()"/></title>
 				</mnx:doc>
 			</xsl:for-each>
 		</xsl:for-each>
@@ -652,6 +655,10 @@
 	<xsl:template name="refine_tt-style"><?extend?>
 		<xsl:attribute name="font-family"><xsl:value-of select="$monospaced_font"/></xsl:attribute>
 		<xsl:attribute name="font-size"><xsl:value-of select="$mono_font-reduction"/></xsl:attribute>
+	</xsl:template>
+		
+	<xsl:template name="refine_sourcecode-style"><?extend?>
+		<xsl:attribute name="font-size">85%</xsl:attribute>
 	</xsl:template>
 
 	<xsl:template name="refine_pre-style"><?extend?>

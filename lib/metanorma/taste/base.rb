@@ -91,10 +91,16 @@ module Metanorma
       # @example
       #   config = TasteConfig.from_yaml(File.read("config.yaml"))
       #   base = Base.new("icc", config, directory: "data/icc")
-      def initialize(flavor, config, directory: Dir.pwd)
+      def initialize(flavor, config, directory: Dir.pwd,
+                     directory_search_path: nil)
         @flavor = flavor
         @config = config
         @directory = directory
+        # Ordered list of directories to resolve asset filenames against:
+        # [own_dir, parent_dir, ...] for an inheriting taste, or just
+        # [own_dir] otherwise. Lets an inheriting taste ship only its own
+        # overriding assets while reusing the parent taste's files.
+        @directory_search_path = directory_search_path || [directory]
       end
 
       # Process input AsciiDoc attributes with taste-specific overrides
@@ -145,6 +151,7 @@ module Metanorma
         # Add attributes from different sources
         add_file_based_overrides(override_attrs)
         add_base_configuration_overrides(override_attrs, attrs)
+        add_bibliography_sort_overrides(override_attrs)
         apply_doctype_overrides(attrs, override_attrs)
         apply_stage_overrides(attrs, override_attrs)
         apply_committee_overrides(attrs, override_attrs)
@@ -234,7 +241,12 @@ module Metanorma
         filename = @config.base_override.filename_attributes.send(config_attr)
         return nil unless filename
 
-        File.join(@directory, filename)
+        # Resolve against the search path (own dir first, then any inherited
+        # parent dirs); fall back to own dir so add_file_override's existence
+        # guard still drops truly-missing files (behaviour for a single-entry
+        # search path is identical to the previous File.join(@directory, ...)).
+        @directory_search_path.map { |dir| File.join(dir, filename) }
+          .find { |path| File.exist?(path) } || File.join(@directory, filename)
       end
 
       # Add value-based configuration override attributes
@@ -251,6 +263,19 @@ module Metanorma
           value or next
           value += add_base_configuration_additive(config_key, attr_key, attrs)
           override_attrs << ":#{attr_key}: #{value}"
+        end
+      end
+
+      # Emit the publisher bibliography sort order as
+      # :sort-biblio-<abbrev>: <rank>: <name> document attributes, one per
+      # configured publisher. The shared Metanorma::Standoc::Ref sort helpers
+      # read these to override the base flavour's built-in publisher ranking.
+      def add_bibliography_sort_overrides(override_attrs)
+        items = @config.base_override&.bibliography_sort or return
+        items.each do |item|
+          item.abbrev.to_s.empty? and next
+          override_attrs <<
+            ":sort-biblio-#{item.abbrev}: #{item.rank}: #{item.name}"
         end
       end
 

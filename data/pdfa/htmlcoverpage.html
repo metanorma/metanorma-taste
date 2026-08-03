@@ -39,7 +39,7 @@
 
   <div class="docidentifier">
     <p><b>
-    {{doctype_display}} : {{ docnumber }} {%if stage_display %} - <span style="color:red">{{stage_display}}</span>{% endif %}
+    {{doctype_display}} : {{ docnumber }} {%if stage_display %} - <span style="color:red">{{stage_display}}{% if bibdata.status.stage.abbreviation %} ({{ bibdata.status.stage.abbreviation }}){% endif %}</span>{% endif %}
     </b></p>
   </div>
   <hr/>
