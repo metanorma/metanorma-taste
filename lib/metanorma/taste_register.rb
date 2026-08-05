@@ -76,6 +76,41 @@ module Metanorma
       @taste_configs.keys
     end
 
+    # Register a per-taste document-model transformer contribution. Called from
+    # a taste's optional +data/<taste>/transformers.rb+ shim. The block is
+    # evaluated lazily by {#document_transformers_for} and must return a
+    # +{ format_symbol => spec }+ hash conforming to the metanorma-core
+    # +Processor#document_transformers+ contract. Because the block runs lazily,
+    # it may +require+ the gem that provides the transformer classes (e.g.
+    # metanorma-oiml), so that gem loads only for builds that use the taste.
+    def self.register_document_transformers(taste, &block)
+      instance.register_document_transformers(taste, &block)
+    end
+
+    def register_document_transformers(taste, &block)
+      (@transformer_hooks ||= {})[normalize_flavor_name(taste)] = block
+    end
+
+    # The document-model transformer specs contributed by +taste+ (e.g. the
+    # OIML taste's STS transformer), or +{}+ when the taste declares none.
+    # Memoised. The taste's +transformers.rb+ shim is required on first use, so
+    # the artefact gem loads only for a build that uses this taste. The compile
+    # driver forces this on the main thread (resolving output extensions) before
+    # parallel output workers read it.
+    def self.document_transformers_for(taste)
+      instance.document_transformers_for(taste)
+    end
+
+    def document_transformers_for(taste)
+      sym = normalize_flavor_name(taste)
+      @transformer_specs ||= {}
+      return @transformer_specs[sym] if @transformer_specs.key?(sym)
+
+      load_transformer_hook(sym)
+      block = (@transformer_hooks ||= {})[sym]
+      @transformer_specs[sym] = block ? block.call : {}
+    end
+
     # Get detailed information about a specific taste
     #
     # @param flavor [String, Symbol] The flavor name
@@ -388,6 +423,18 @@ module Metanorma
     #
     # @param flavor [Symbol] The flavor name
     # @return [String] The directory path
+    # Require the taste's optional data/<taste>/transformers.rb shim once, if
+    # present; it calls {#register_document_transformers} to register the taste's
+    # document-model transformers.
+    def load_transformer_hook(flavor)
+      path = File.join(config_directory_for(flavor), "transformers.rb")
+      require path if File.exist?(path)
+    rescue LoadError => e
+      raise UnknownTasteError,
+            "Taste #{flavor} declares document transformers but its artefact " \
+            "gem could not be loaded (#{e.message}); add it to your bundle."
+    end
+
     def config_directory_for(flavor)
       @config_directories ||= {}
       @config_directories[flavor] || File.join(data_directory, flavor.to_s)
