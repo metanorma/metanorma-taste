@@ -515,4 +515,27 @@ RSpec.describe Metanorma::TasteRegister do
        expect(result).to include(":fonts: #{swf_fonts}")
     end
   end
+
+  describe "config reading under a non-UTF-8 locale" do
+    it "reads taste configs as UTF-8 regardless of Encoding.default_external" do
+      dirs = register.send(:find_taste_directories,
+                           register.send(:data_directory))
+      old_enc = Encoding.default_external
+      begin
+        suppress_warnings { Encoding.default_external = Encoding::US_ASCII }
+        expect { register.send(:collect_raw_taste_configs, dirs) }
+          .not_to raise_error
+      ensure
+        suppress_warnings { Encoding.default_external = old_enc }
+      end
+    end
+
+    def suppress_warnings
+      old_verbose = $VERBOSE
+      $VERBOSE = nil
+      yield
+    ensure
+      $VERBOSE = old_verbose
+    end
+  end
 end
