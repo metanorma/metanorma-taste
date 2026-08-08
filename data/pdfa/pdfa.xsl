@@ -1014,12 +1014,13 @@
 			<xsl:attribute name="space-after">1.5mm</xsl:attribute>
 			<xsl:attribute name="font-weight">normal</xsl:attribute> <!-- avoid bold as it conflicts with PDF notation - rely on color -->
 			<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
-			<xsl:attribute name="keep-with-next">always</xsl:attribute><!-- cluster under top level headings -->
+			<!-- <xsl:attribute name="keep-with-next">always</xsl:attribute>--><!-- cluster under top level headings -->
 		</xsl:if>
 		<xsl:if test="@level &gt;= 2">
-			<xsl:attribute name="margin-left"><xsl:value-of select="(@level - 1) * $toc_item_indent"/>mm</xsl:attribute>
+			<xsl:attribute name="margin-left"><xsl:value-of select="$toc_item_indent"/>mm</xsl:attribute> <!-- (@level - 1) * -->
 			<xsl:attribute name="space-before">1.5mm</xsl:attribute>
 			<xsl:attribute name="space-after">1.5mm</xsl:attribute>
+			<xsl:attribute name="color">black</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
 
