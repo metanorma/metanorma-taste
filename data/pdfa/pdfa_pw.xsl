@@ -377,7 +377,7 @@
 		<fo:block margin-bottom="12pt" role="SKIP">
 			<fo:wrapper role="artifact">&#xA0;</fo:wrapper>
 		</fo:block>
-		<fo:block-container height="{$pageHeight - $marginTop - $marginBottom - 20}mm" display-align="after">
+		<fo:block-container height="{$pageHeight - $marginTop - $marginBottom - 20}mm" display-align="after" role="Sect">
 			<xsl:apply-templates select="/mn:metanorma/mn:boilerplate/*"/>
 		</fo:block-container>
 		<fo:block break-after="page"/>
@@ -400,12 +400,12 @@
 			<xsl:attribute name="space-after">1.5mm</xsl:attribute>
 			<xsl:attribute name="font-weight">normal</xsl:attribute> <!-- avoid bold as it conflicts with PDF notation - rely on color -->
 			<xsl:attribute name="color"><xsl:value-of select="$color_blue"/></xsl:attribute>
-			<xsl:attribute name="keep-with-next">always</xsl:attribute>
 		</xsl:if>
 		<xsl:if test="@level &gt;= 2">
-			<xsl:attribute name="margin-left"><xsl:value-of select="(@level - 1) * $toc_item_indent"/>mm</xsl:attribute>
+			<xsl:attribute name="margin-left"><xsl:value-of select="$toc_item_indent"/>mm</xsl:attribute>
 			<xsl:attribute name="space-before">1.5mm</xsl:attribute>
 			<xsl:attribute name="space-after">1.5mm</xsl:attribute>
+			<xsl:attribute name="color">black</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
 
@@ -732,7 +732,7 @@
 
 	<!-- See https://www.metanorma.org/author/topics/blocks/admonitions/ -->
 	<xsl:template match="mn:admonition">
-		<fo:block margin-left="3mm" margin-right="2mm" padding="1mm" margin-top="2mm" margin-bottom="2mm" font-style="normal" font-size="{$small-text-reduction}">
+		<fo:block margin-left="3mm" margin-right="2mm" padding="1mm" margin-top="2mm" margin-bottom="2mm" font-style="normal" font-size="{$small-text-reduction}" role="Note">
 			<xsl:attribute name="border-left-width">4pt</xsl:attribute>
 			<xsl:attribute name="border-left-style">solid</xsl:attribute>
 			<xsl:choose>
@@ -1039,7 +1039,7 @@
 	<!-- Captions "Table X-", "Figure X -", "EXAMPLE -", "Tip", "Caution", etc., up to and including delimiter but NOT caption text itself as conflicts with PDF notation -->
 	<xsl:template match="mn:span[@class = 'fmt-caption-label' or @class = 'fmt-element-name' or @class = 'fmt-caption-delim']" mode="contents_item" priority="3">
 		<xsl:attribute name="font-weight">bold</xsl:attribute>
-		<xsl:apply-templates/>
+		<xsl:apply-templates mode="contents_item"/>
 	</xsl:template>
 
 
