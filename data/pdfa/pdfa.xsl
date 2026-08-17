@@ -298,7 +298,7 @@
 											<fo:block font-size="8pt" margin-bottom="2mm">
 												<xsl:text>This work is licensed under CC-BY-4.0.</xsl:text>
 												<fo:inline baseline-shift="-42%" padding-left="0.5mm">
-													<fo:instream-foreign-object content-width="5.6mm" fox:placement="inline" fox:alt-text="Creative Commons circled icons for CC and human figure">
+													<fo:instream-foreign-object content-width="5.6mm" fox:placement="Inline" fox:alt-text="Creative Commons circled icons for CC and human figure">
 														<xsl:copy-of select="$circledChars"/>
 													</fo:instream-foreign-object>
 												</fo:inline>
