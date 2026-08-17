@@ -793,6 +793,46 @@ taste = Metanorma::TasteRegister.get(:acme)
 # Returns an instance of Metanorma::Taste::Acme
 ----
 
+=== Document-model output transformers
+
+Besides config overrides, a taste can contribute a document-model *output
+format* — a reader + transformer that the taste-aware metanorma-core `Processor`
+drives. This is how the OIML taste produces STS output through the pipeline
+(`metanorma compile -t oiml -x oimlsts`) instead of a standalone tool.
+
+Two pieces:
+
+. Add the format symbol to the taste's `output-extensions` in
+`data/<taste>/config.yaml` (under `base-override.value-attributes`), so it is
+selectable at compile time.
+
+. Add an optional `data/<taste>/transformers.rb` shim that registers the
+transformer spec. It is discovered and required *lazily* — only when a build of
+that taste resolves its output formats — so the artefact gem loads only for that
+taste, and metanorma-taste keeps no hard dependency on it:
+
+[source,ruby]
+----
+Metanorma::TasteRegister.register_document_transformers(:acme) do
+  require "metanorma/acme/sts"          # lazy: loaded only for :acme builds
+  {
+    acmests: {
+      reader: Metanorma::Acme::Sts::Reader,        # .from_xml(String) -> model
+      transformer: Metanorma::Acme::Sts::Standard, # .new(model, opts); #transform -> target#to_xml
+      strip_default_namespace: false,
+      to_xml_options: {},
+      suffix: "acme.sts.xml",   # output filename suffix
+      presentation: true,       # consume presentation XML (vs semantic)
+    },
+  }
+end
+----
+
+The `reader` / `transformer` / `strip_default_namespace` / `to_xml_options` keys
+conform to the metanorma-core `Processor#document_transformers` contract; the
+`suffix` / `presentation` keys are read by the Metanorma compile driver to make
+the format selectable and pick its input leg.
+
 === Taste code
 
 * Must be unique among all tastes
