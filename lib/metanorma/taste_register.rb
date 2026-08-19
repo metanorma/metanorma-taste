@@ -187,8 +187,18 @@ module Metanorma
     end
 
     def aliases
-      @taste_configs.each_with_object({}) do |(flavor, config), aliases|
-        aliases[flavor] = config.base_flavor&.to_sym if config.base_flavor
+      # SSOT: the metanorma-core flavor table. Transitional shim while
+      # FlavorLoader still reads this (removed in metanorma-core#18's
+      # final commit); the table is authoritative.
+      begin
+        require "metanorma-core"
+      rescue LoadError
+        return @taste_configs.each_with_object({}) do |(flavor, config), aliases|
+          aliases[flavor] = config.base_flavor&.to_sym if config.base_flavor
+        end
+      end
+      Metanorma::Core::Flavors.available_tastes.each_with_object({}) do |t, aliases|
+        aliases[t] = Metanorma::Core::Flavors.find(t).base_flavor
       end
     end
 

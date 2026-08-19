@@ -13,10 +13,10 @@ module Metanorma
     module FlavorRegistration
       class << self
         def register!
-          # metanorma-document is the registry host; in compile-only
-          # contexts without it, tastes keep working unregistered.
+          # metanorma-core hosts the flavor/taste table; in contexts
+          # without it, tastes keep working unregistered.
           begin
-            require "metanorma/document"
+            require "metanorma-core"
           rescue LoadError
             return
           end
@@ -37,20 +37,38 @@ module Metanorma
           directory = TasteRegister.instance
                          .send(:config_directory_for, taste)
 
-          Metanorma.register_flavor(Metanorma::Flavor.new(
-                                      name: taste,
-                                      model_class:
-                                        "Metanorma::#{camelize(base)}::Document::Root",
-                                      themes_dir: directory,
-                                      renderers: {
-                                        html: lambda do |document, **_options|
-                                          next nil unless abbrev
+          Metanorma::Core::Flavors.register(Metanorma::Core::Flavor.new(
+            name: taste,
+            base_flavor: base,
+            gem: "metanorma-taste",
+            model_root: "Metanorma::#{camelize(base)}::Document::Root",
+            publisher_abbr: abbrev,
+            branding_dir: directory,
+            doctype_map: doctype_map(config),
+            renderers: {
+              html: lambda do |document, **_options|
+                next nil unless abbrev
 
-                                          taste_publisher(document) == abbrev &&
-                                            base_renderer(base, document)
-                                        end,
-                                      },
-                                    ))
+                taste_publisher(document) == abbrev &&
+                  base_renderer(base, document)
+              end,
+            },
+          ))
+        end
+
+        def doctype_map(config)
+          Array(config.doctypes).each_with_object({}) do |dt, map|
+            taste_name = safe_read(dt, :taste)
+            base_name = safe_read(dt, :base)
+            map[taste_name.to_sym] = base_name.to_sym if taste_name && base_name
+          end
+        end
+
+        def safe_read(obj, attr)
+          return nil unless obj.is_a?(Lutaml::Model::Serializable)
+          return nil unless obj.class.attributes.key?(attr)
+
+          obj.public_send(attr)
         end
 
         def publisher_abbreviation(config)
@@ -85,8 +103,8 @@ module Metanorma
         end
 
         def base_renderer(base, document)
-          base_flavor = Metanorma.flavors.find { |f| f.name == base }
-          base_flavor&.renderer_for(:html, document)
+          entry = Metanorma::Core::Flavors.find(base)
+          entry&.renderer_for(:html, document)
         end
 
         def camelize(sym)
