@@ -4,6 +4,7 @@ require "singleton"
 require "yaml"
 require_relative "taste/taste_config"
 require_relative "taste/base"
+require_relative "taste/flavor_registration"
 
 module Metanorma
   # Registry for managing and providing access to taste configurations
@@ -37,6 +38,7 @@ module Metanorma
       @taste_configs = {}
       @taste_instances = {}
       discover_and_load_tastes
+      Taste::FlavorRegistration.register!
     end
 
     # Get a taste instance by flavor name
