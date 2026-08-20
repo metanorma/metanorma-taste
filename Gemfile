@@ -6,6 +6,9 @@ git_source(:github) { |repo| "https://github.com/#{repo}" }
 
 gemspec
 
+# TEMPORARY cross-PR pin (metanorma-core#18)
+gem "metanorma-core", github: "metanorma/metanorma-core", branch: "feat/flavor-table"
+
 group :development do
   gem "canon"
   gem "debug"
