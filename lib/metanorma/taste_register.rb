@@ -38,7 +38,10 @@ module Metanorma
       @taste_configs = {}
       @taste_instances = {}
       discover_and_load_tastes
-      Taste::FlavorRegistration.register!
+      # FlavorRegistration.register! is invoked AFTER the singleton is
+      # fully constructed (see the bottom of this file). Calling it here
+      # deadlocks: register! calls TasteRegister.instance, which re-enters
+      # the Singleton mutex while initialize still holds it.
     end
 
     # Get a taste instance by flavor name
@@ -418,3 +421,7 @@ module Metanorma
     end
   end
 end
+
+# Deferred: runs after TasteRegister.instance is fully built
+# (see TasteRegister#initialize). Safe to call instance here.
+Metanorma::Taste::FlavorRegistration.register!
