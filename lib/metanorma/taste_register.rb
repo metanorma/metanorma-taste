@@ -227,7 +227,11 @@ module Metanorma
     # @return [Hash{String => Hash}] flavor => {"hash","content","directory"}
     def collect_raw_taste_configs(taste_directories)
       taste_directories.each_with_object({}) do |dir, acc|
-        content = File.read(File.join(dir, "config.yaml"))
+        # explicit encoding: config files are UTF-8, the process locale may
+        # not be (metanorma-cli sets Encoding.default_external to UTF-8, but
+        # library consumers loading the register directly have no such shield)
+        content = File.read(File.join(dir, "config.yaml"),
+                            encoding: "UTF-8")
         hash = YAML.safe_load(content) || {}
         flavor = (hash["flavor"] || File.basename(dir)).to_s
         acc[flavor] = { "hash" => hash, "content" => content,

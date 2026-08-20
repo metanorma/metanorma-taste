@@ -297,7 +297,7 @@
 						<fo:block-container absolute-position="fixed" left="11mm" top="245mm">
 							<fo:block>
 								<!-- <fo:external-graphic src="{concat('data:image/png;base64,', normalize-space($Image-Logo))}" width="42mm" content-height="scale-to-fit" scaling="uniform" fox:alt-text="Image {@alt}"/> -->
-								<fo:instream-foreign-object content-width="42mm" fox:alt-text="CSA Logo">
+								<fo:instream-foreign-object content-width="42mm" fox:alt-text="CSA Logo" fox:placement="Block">
 									<xsl:copy-of select="$Image-Logo-SVG"/>
 								</fo:instream-foreign-object>
 							</fo:block>
@@ -577,7 +577,7 @@
 
 			<xsl:if test="$level = 2">
 				<fo:inline padding-right="1mm">
-					<fo:external-graphic src="{concat('data:image/png;base64,', normalize-space($Image-Title))}" width="15mm" content-height="scale-to-fit" scaling="uniform" fox:alt-text="Image {@alt}" vertical-align="middle"/>
+					<fo:external-graphic src="{concat('data:image/png;base64,', normalize-space($Image-Title))}" width="15mm" content-height="scale-to-fit" scaling="uniform" fox:alt-text="Image {@alt}" vertical-align="middle" fox:placement="Inline"/>
 				</fo:inline>
 			</xsl:if>
 
@@ -1724,7 +1724,7 @@
 		</xsl:element>
 	</xsl:template> -->
 
-	<xsl:template match="mn:span[                @class = 'fmt-caption-label' or                 @class = 'fmt-element-name' or                @class = 'fmt-caption-delim' or                @class = 'fmt-autonum-delim']" mode="update_xml_step1" priority="3">
+	<xsl:template match="mn:span[                @class = 'fmt-caption-label' or                 @class = 'fmt-element-name' or                @class = 'fmt-caption-delim' or                @class = 'fmt-autonum-delim' or                @class = 'fmt-clause-delim']" mode="update_xml_step1" priority="3">
 		<xsl:apply-templates mode="update_xml_step1"/>
 	</xsl:template>
 
@@ -2757,6 +2757,9 @@
 
 	<xsl:template name="refine_sourcecode-style">
 		<xsl:call-template name="setKeepAttributes"/>
+		<xsl:if test="ancestor::mn:sourcecode and parent::mn:td">
+			<xsl:attribute name="role">SKIP</xsl:attribute>
+		</xsl:if>
 	</xsl:template> <!-- refine_sourcecode-style -->
 
 	<xsl:attribute-set name="sourcecode-number-style">
@@ -3083,30 +3086,30 @@
 	</xsl:template>
 
 	<!-- outer table with line numbers for sourcecode -->
-	<xsl:template match="mn:sourcecode[@linenums = 'true']/mn:table" priority="2"> <!-- *[local-name()='table'][@type = 'sourcecode'] |  -->
-		<fo:block>
-			<fo:table width="100%" table-layout="fixed">
+	<xsl:template match="mn:sourcecode[@linenums = 'true']/mn:table" priority="3"> <!-- *[local-name()='table'][@type = 'sourcecode'] |  -->
+		<fo:block role="SKIP">
+			<fo:table width="100%" table-layout="fixed" role="SKIP">
 				<xsl:copy-of select="@id"/>
 					<fo:table-column column-width="8%"/>
 					<fo:table-column column-width="92%"/>
-					<fo:table-body>
+					<fo:table-body role="SKIP">
 						<xsl:apply-templates/>
 					</fo:table-body>
 			</fo:table>
 		</fo:block>
 	</xsl:template>
-	<xsl:template match="mn:sourcecode[@linenums = 'true']/mn:table/mn:tbody" priority="2"> <!-- *[local-name()='table'][@type = 'sourcecode']/*[local-name() = 'tbody'] |  -->
+	<xsl:template match="mn:sourcecode[@linenums = 'true']/mn:table/mn:tbody" priority="3"> <!-- *[local-name()='table'][@type = 'sourcecode']/*[local-name() = 'tbody'] |  -->
 		<xsl:apply-templates/>
 	</xsl:template>
-	<xsl:template match="mn:sourcecode[@linenums = 'true']/mn:table//mn:tr" priority="2"> <!-- *[local-name()='table'][@type = 'sourcecode']//*[local-name()='tr'] |  -->
-		<fo:table-row>
+	<xsl:template match="mn:sourcecode[@linenums = 'true']/mn:table//mn:tr" priority="3"> <!-- *[local-name()='table'][@type = 'sourcecode']//*[local-name()='tr'] |  -->
+		<fo:table-row role="SKIP">
 			<xsl:apply-templates/>
 		</fo:table-row>
 	</xsl:template>
 	<!-- first td with line numbers -->
-	<xsl:template match="mn:sourcecode[@linenums = 'true']/mn:table//mn:tr/*[local-name() = 'td'][not(preceding-sibling::*)]" priority="2"> <!-- *[local-name()='table'][@type = 'sourcecode'] -->
-		<fo:table-cell>
-			<fo:block>
+	<xsl:template match="mn:sourcecode[@linenums = 'true']/mn:table//mn:tr/*[local-name() = 'td'][not(preceding-sibling::*)]" priority="3"> <!-- *[local-name()='table'][@type = 'sourcecode'] -->
+		<fo:table-cell role="SKIP">
+			<fo:block role="SKIP">
 
 				<!-- set attibutes for line numbers - same as sourcecode -->
 				<xsl:variable name="sourcecode_attributes">
@@ -3114,7 +3117,7 @@
 						<xsl:call-template name="get_sourcecode_attributes"/>
 					</xsl:for-each>
 				</xsl:variable>
-				<xsl:for-each select="xalan:nodeset($sourcecode_attributes)/sourcecode_attributes/@*[not(starts-with(local-name(), 'margin-') or starts-with(local-name(), 'space-'))]">
+				<xsl:for-each select="xalan:nodeset($sourcecode_attributes)/sourcecode_attributes/@*[not(starts-with(local-name(), 'margin-') or starts-with(local-name(), 'space-') or starts-with(local-name(), 'role'))]">
 					<xsl:attribute name="{name()}">
 						<xsl:value-of select="."/>
 					</xsl:attribute>
@@ -3126,8 +3129,8 @@
 	</xsl:template>
 
 	<!-- second td with sourcecode -->
-	<xsl:template match="mn:sourcecode[@linenums = 'true']/mn:table//mn:tr/*[local-name() = 'td'][preceding-sibling::*]" priority="2"> <!-- *[local-name()='table'][@type = 'sourcecode'] -->
-		<fo:table-cell>
+	<xsl:template match="mn:sourcecode[@linenums = 'true']/mn:table//mn:tr/*[local-name() = 'td'][preceding-sibling::*]" priority="3"> <!-- *[local-name()='table'][@type = 'sourcecode'] -->
+		<fo:table-cell role="SKIP">
 			<fo:block role="SKIP">
 				<xsl:apply-templates/>
 			</fo:block>
@@ -3697,7 +3700,7 @@
 		<xsl:param name="value"/>
 		<xsl:variable name="add_width" select="string-length($value) * 20"/>
 		<xsl:variable name="maxwidth" select="60 + $add_width"/>
-			<fo:instream-foreign-object fox:alt-text="OpeningTag" baseline-shift="-10%"><!-- alignment-baseline="middle" -->
+			<fo:instream-foreign-object fox:alt-text="OpeningTag" baseline-shift="-10%" fox:placement="Inline"><!-- alignment-baseline="middle" -->
 				<xsl:attribute name="height">3.5mm</xsl:attribute> <!-- 5mm -->
 				<xsl:attribute name="content-width">100%</xsl:attribute>
 				<xsl:attribute name="content-width">scale-down-to-fit</xsl:attribute>
@@ -3926,11 +3929,12 @@
 			<xsl:choose>
 
 				<xsl:when test="ancestor::mn:sourcecode[@linenums = 'true'] and ancestor::*[local-name() = 'td'][1][not(preceding-sibling::*)]"> <!-- pre in the first td in the table with @linenums = 'true' -->
+					<xsl:attribute name="role">SKIP</xsl:attribute>
 					<xsl:if test="ancestor::mn:tr[1]/following-sibling::mn:tr"> <!-- is current tr isn't last -->
 						<xsl:attribute name="margin-top">0pt</xsl:attribute>
 						<xsl:attribute name="margin-bottom">0pt</xsl:attribute>
 					</xsl:if>
-					<fo:instream-foreign-object fox:alt-text="{.}" content-width="95%">
+					<fo:instream-foreign-object fox:alt-text="{.}" content-width="95%" fox:placement="Inline" role="artifact">
 						<math xmlns="http://www.w3.org/1998/Math/MathML">
 							<mtext><xsl:value-of select="."/></mtext>
 						</math>
@@ -4742,6 +4746,7 @@
 	<xsl:template match="mn:termexample/mn:p">
 		<xsl:variable name="element">inline
 
+			<xsl:value-of select="$example_display_in"/>
 		</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="contains($element, 'block')">
@@ -5466,19 +5471,22 @@
 		<xsl:if test="normalize-space() != ''">
 
 			<fo:block xsl:use-attribute-sets="table-name-style">
-
 				<xsl:call-template name="refine_table-name-style">
 					<xsl:with-param name="continued" select="$continued"/>
 				</xsl:call-template>
 
-				<xsl:choose>
-					<xsl:when test="$continued = 'true'">
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:apply-templates/>
-					</xsl:otherwise>
-				</xsl:choose>
+				<!-- <Caption><P> tags, see https://github.com/metanorma/metanorma-pdfa/issues/81 -->
+				<fo:block role="P">
 
+					<xsl:choose>
+						<xsl:when test="$continued = 'true'">
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:apply-templates/>
+						</xsl:otherwise>
+					</xsl:choose>
+
+				</fo:block>
 			</fo:block>
 
 			<!-- <xsl:if test="$namespace = 'bsi' or $namespace = 'pas' or $namespace = 'iec' or $namespace = 'iso'"> -->
@@ -5962,7 +5970,7 @@
 
 			<xsl:variable name="tableWithNotesAndFootnotes">
 
-				<fo:table keep-with-previous="always" role="SKIP">
+				<fo:table keep-with-previous="always" role="TFoot">
 					<xsl:for-each select="xalan:nodeset($table_attributes)/table_attributes/@*">
 						<xsl:variable name="name" select="local-name()"/>
 						<xsl:choose>
@@ -6000,14 +6008,14 @@
 					</xsl:choose>
 
 					<fo:table-body role="SKIP">
-						<fo:table-row role="SKIP">
+						<fo:table-row>
 							<xsl:for-each select="ancestor::mn:table[1]">
 								<xsl:call-template name="setTableStyles">
 									<xsl:with-param name="scope">ancestor_table</xsl:with-param>
 								</xsl:call-template>
 							</xsl:for-each>
 
-							<fo:table-cell xsl:use-attribute-sets="table-footer-cell-style" number-columns-spanned="{$cols-count}" role="SKIP">
+							<fo:table-cell xsl:use-attribute-sets="table-footer-cell-style" number-columns-spanned="{$cols-count}">
 
 								<xsl:call-template name="refine_table-footer-cell-style"/>
 
@@ -8312,6 +8320,13 @@
 	<xsl:template name="refine_note-style">
 	</xsl:template> <!-- refine_note-style -->
 
+	<xsl:attribute-set name="note-block-style">
+		<xsl:attribute name="role">SKIP</xsl:attribute>
+	</xsl:attribute-set> <!-- note-block-style -->
+
+	<xsl:template name="refine_note-block-style">
+	</xsl:template> <!-- refine_note-block-style -->
+
 	<xsl:variable name="note-body-indent">10mm</xsl:variable>
 	<xsl:variable name="note-body-indent-table">5mm</xsl:variable>
 
@@ -8387,9 +8402,9 @@
 					<xsl:if test="ancestor::mn:ul or ancestor::mn:ol and not(ancestor::mn:note[1]/following-sibling::*)">
 						<xsl:attribute name="margin-bottom">0pt</xsl:attribute>
 					</xsl:if>
-						<fo:block role="SKIP">
+						<fo:block xsl:use-attribute-sets="note-block-style">
 
-							<xsl:call-template name="refine_note_block_style"/>
+							<xsl:call-template name="refine_note-block-style"/>
 
 							<fo:inline xsl:use-attribute-sets="note-name-style">
 
@@ -8427,9 +8442,6 @@
 			</fo:block-container>
 		</fo:block-container>
 	</xsl:template>
-
-	<xsl:template name="refine_note_block_style">
-	</xsl:template> <!-- refine_note_block_style -->
 
 	<xsl:template match="mn:note/mn:p">
 		<xsl:variable name="num"><xsl:number/></xsl:variable>
@@ -8551,9 +8563,9 @@
 	<!-- ====== -->
 
 	<xsl:attribute-set name="quote-container-style">
+		<xsl:attribute name="role">BlockQuote</xsl:attribute>
 		<xsl:attribute name="margin-left">12mm</xsl:attribute>
 		<xsl:attribute name="margin-right">12mm</xsl:attribute>
-		<xsl:attribute name="role">SKIP</xsl:attribute>
 		<xsl:attribute name="margin-bottom">6pt</xsl:attribute>
 		<xsl:attribute name="margin-left">13mm</xsl:attribute>
 	</xsl:attribute-set>
@@ -8577,6 +8589,7 @@
 	</xsl:template> <!-- refine_quote-style -->
 
 	<xsl:attribute-set name="quote-source-style">
+		<xsl:attribute name="role">Caption</xsl:attribute>
 		<xsl:attribute name="text-align">right</xsl:attribute>
 		<xsl:attribute name="margin-right">-12mm</xsl:attribute>
 		<xsl:attribute name="margin-right">13mm</xsl:attribute>
@@ -8610,7 +8623,7 @@
 					<xsl:call-template name="refine_quote-style"/>
 
 					<fo:block-container margin-left="0mm" margin-right="0mm" role="SKIP">
-						<fo:block role="BlockQuote">
+						<fo:block role="SKIP"> <!-- BlockQuote -->
 							<xsl:apply-templates select="./node()[not(self::mn:author) and         not(self::mn:fmt-source) and         not(self::mn:attribution)]"/> <!-- process all nested nodes, except author and source -->
 						</fo:block>
 					</fo:block-container>
@@ -8619,11 +8632,15 @@
 					<fo:block-container margin-left="0mm" margin-right="0mm" role="SKIP">
 						<fo:block xsl:use-attribute-sets="quote-source-style">
 							<xsl:call-template name="refine_quote-source-style"/>
-							<!-- — ISO, ISO 7301:2011, Clause 1 -->
-							<xsl:apply-templates select="mn:author"/>
-							<xsl:apply-templates select="mn:fmt-source"/>
-							<!-- added for https://github.com/metanorma/isodoc/issues/607 -->
-							<xsl:apply-templates select="mn:attribution/mn:p/node()"/>
+
+							<!-- <Caption><P> tags, see https://github.com/metanorma/metanorma-pdfa/issues/81 -->
+							<fo:block role="P">
+								<!-- — ISO, ISO 7301:2011, Clause 1 -->
+								<xsl:apply-templates select="mn:author"/>
+								<xsl:apply-templates select="mn:fmt-source"/>
+								<!-- added for https://github.com/metanorma/isodoc/issues/607 -->
+								<xsl:apply-templates select="mn:attribution/mn:p/node()"/>
+							</fo:block>
 						</fo:block>
 					</fo:block-container>
 				</xsl:if>
@@ -9090,7 +9107,8 @@
 
 					<!-- debug scale='<xsl:value-of select="$scale"/>', indent='<xsl:value-of select="$indent"/>' -->
 
-					<fo:external-graphic src="{$src}" fox:alt-text="Image {@alt}" vertical-align="middle">
+					<fo:external-graphic src="{$src}" vertical-align="middle" fox:placement="Inline">
+						<xsl:call-template name="addAltText"/>
 
 						<xsl:if test="parent::mn:logo"> <!-- publisher's logo -->
 							<xsl:attribute name="scaling">uniform</xsl:attribute>
@@ -9154,11 +9172,12 @@
 					<xsl:choose>
 						<xsl:when test="$isDeleted = 'true'">
 							<!-- enclose in svg -->
-							<fo:instream-foreign-object fox:alt-text="Image {@alt}">
+							<fo:instream-foreign-object fox:placement="Block">
 								<xsl:attribute name="width">100%</xsl:attribute>
 								<xsl:attribute name="content-height">100%</xsl:attribute>
 								<xsl:attribute name="content-width">scale-down-to-fit</xsl:attribute>
 								<xsl:attribute name="scaling">uniform</xsl:attribute>
+								<xsl:call-template name="addAltText"/>
 
 								<xsl:apply-templates select="." mode="cross_image"/>
 
@@ -9174,7 +9193,8 @@
 							<xsl:value-of select="concat('scale=', $scale,', indent=', $indent)"/>
 							</fo:block> -->
 
-							<fo:external-graphic src="{$src}" fox:alt-text="Image {@alt}">
+							<fo:external-graphic src="{$src}" fox:placement="Block">
+								<xsl:call-template name="addAltText"/>
 
 								<xsl:choose>
 									<!-- default -->
@@ -9232,6 +9252,25 @@
 				</fo:block>
 			</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="addAltText">
+		<xsl:param name="name">Image</xsl:param>
+		<xsl:variable name="alt-text">
+			<xsl:choose>
+				<xsl:when test="self::mn:image and normalize-space(@alt) != ''">
+					<xsl:value-of select="@alt"/>
+				</xsl:when>
+				<xsl:when test="normalize-space(../@alt) != ''">
+					<xsl:value-of select="../@alt"/>
+				</xsl:when>
+				<xsl:when test="normalize-space(../mn:fmt-name) != ''">
+					<xsl:value-of select="../mn:fmt-name"/>
+				</xsl:when>
+				<xsl:otherwise><xsl:value-of select="$name"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:attribute name="fox:alt-text"><xsl:value-of select="$alt-text"/></xsl:attribute>
 	</xsl:template>
 
 	<xsl:template name="setImageWidth">
@@ -9422,6 +9461,9 @@
 
 		<xsl:variable name="alt-text">
 			<xsl:choose>
+				<xsl:when test="normalize-space(../@alt) != ''">
+					<xsl:value-of select="../@alt"/>
+				</xsl:when>
 				<xsl:when test="normalize-space(../mn:fmt-name) != ''">
 					<xsl:value-of select="../mn:fmt-name"/>
 				</xsl:when>
@@ -9490,7 +9532,7 @@
 											</xsl:if>
 											<fo:block text-depth="0" line-height="0" font-size="0">
 
-												<fo:instream-foreign-object fox:alt-text="{$alt-text}">
+												<fo:instream-foreign-object fox:alt-text="{$alt-text}" fox:placement="Block">
 													<xsl:attribute name="width">100%</xsl:attribute>
 													<xsl:attribute name="content-height">100%</xsl:attribute>
 													<xsl:attribute name="content-width">scale-down-to-fit</xsl:attribute>
@@ -9539,7 +9581,7 @@
 					<xsl:copy>
 						<xsl:copy-of select="@*"/>
 					<!-- <fo:block xsl:use-attribute-sets="image-style"> -->
-						<fo:instream-foreign-object fox:alt-text="{$alt-text}">
+						<fo:instream-foreign-object fox:alt-text="{$alt-text}" fox:placement="Block">
 
 							<xsl:choose>
 								<xsl:when test="$image_class = 'corrigenda-tag'">
@@ -9602,6 +9644,10 @@
 
 							<xsl:if test="$scale_y != 1">
 								<xsl:attribute name="content-height"><xsl:value-of select="round($scale_x * $scale_y * 100)"/>%</xsl:attribute>
+							</xsl:if>
+
+							<xsl:if test="self::fo:inline">
+								<xsl:attribute name="fox:placement">Inline</xsl:attribute>
 							</xsl:if>
 
 							<xsl:copy-of select="$svg_content"/>
@@ -9879,10 +9925,12 @@
 	<xsl:template match="mn:figure/mn:fmt-name |         mn:image/mn:fmt-name">
 		<xsl:if test="normalize-space() != ''">
 			<fo:block xsl:use-attribute-sets="figure-name-style">
-
 				<xsl:call-template name="refine_figure-name-style"/>
 
-				<xsl:apply-templates/>
+				<!-- <Caption><P> tags, see https://github.com/metanorma/metanorma-pdfa/issues/81 -->
+				<fo:block role="P">
+					<xsl:apply-templates/>
+				</fo:block>
 			</fo:block>
 		</xsl:if>
 	</xsl:template>
@@ -9904,6 +9952,7 @@
 
 	<!-- Formula's styles -->
 	<xsl:attribute-set name="formula-style">
+		<xsl:attribute name="role">P</xsl:attribute>
 		<xsl:attribute name="margin-top">6pt</xsl:attribute>
 		<xsl:attribute name="margin-bottom">12pt</xsl:attribute>
 	</xsl:attribute-set> <!-- formula-style -->
@@ -9912,6 +9961,7 @@
 	</xsl:template>
 
 	<xsl:attribute-set name="formula-stem-block-style">
+		<xsl:attribute name="role">SKIP</xsl:attribute>
 		<xsl:attribute name="text-align">center</xsl:attribute>
 		<xsl:attribute name="text-align">left</xsl:attribute>
 		<xsl:attribute name="margin-left">5mm</xsl:attribute>
@@ -9921,6 +9971,7 @@
 	</xsl:template> <!-- refine_formula-stem-block-style -->
 
 	<xsl:attribute-set name="formula-stem-number-style">
+		<xsl:attribute name="role">Span</xsl:attribute>
 		<xsl:attribute name="text-align">right</xsl:attribute>
 	</xsl:attribute-set> <!-- formula-stem-number-style -->
 	<!-- End Formula's styles -->
@@ -9929,11 +9980,24 @@
 	</xsl:template>
 
 	<xsl:attribute-set name="mathml-style">
+		<xsl:attribute name="role">Formula</xsl:attribute>
 		<xsl:attribute name="font-family">STIX Two Math</xsl:attribute>
 	</xsl:attribute-set>
 
 	<xsl:template name="refine_mathml-style">
 	</xsl:template>
+
+	<xsl:attribute-set name="mathml-instream-foreign-object-style">
+		<xsl:attribute name="fox:alt-text">Math</xsl:attribute>
+		<xsl:attribute name="fox:actual-text">Math</xsl:attribute>
+		<xsl:attribute name="fox:placement">Inline</xsl:attribute>
+	</xsl:attribute-set> <!-- mathml-instream-foreign-object-style -->
+
+	<xsl:template name="refine_mathml-instream-foreign-object-style">
+		<xsl:if test="ancestor::mn:formula">
+			<xsl:attribute name="fox:placement">Block</xsl:attribute>
+		</xsl:if>
+	</xsl:template> <!-- refine_mathml-instream-foreign-object-style -->
 
 	<!-- ====== -->
 	<!-- formula  -->
@@ -9950,7 +10014,7 @@
 			</xsl:if>
 			<fo:block-container margin-left="0mm" role="SKIP">
 				<xsl:call-template name="setNamedDestination"/>
-				<fo:block id="{@id}">
+				<fo:block id="{@id}" role="SKIP">
 					<xsl:apply-templates select="node()[not(self::mn:fmt-name)]"/> <!-- formula's number will be process in 'stem' template -->
 				</fo:block>
 			</fo:block-container>
@@ -9983,22 +10047,22 @@
 
 			<xsl:call-template name="refine_formula-style"/>
 
-			<fo:table table-layout="fixed" width="100%">
+			<fo:table table-layout="fixed" width="100%" role="SKIP">
 				<fo:table-column column-width="95%"/>
 				<fo:table-column column-width="5%"/>
-				<fo:table-body>
-					<fo:table-row>
-						<fo:table-cell display-align="center">
-							<fo:block xsl:use-attribute-sets="formula-stem-block-style" role="SKIP">
+				<fo:table-body role="SKIP">
+					<fo:table-row role="SKIP">
+						<fo:table-cell display-align="center" role="SKIP">
+							<fo:block xsl:use-attribute-sets="formula-stem-block-style">
 
 								<xsl:call-template name="refine_formula-stem-block-style"/>
 
 								<xsl:apply-templates/>
 							</fo:block>
 						</fo:table-cell>
-						<fo:table-cell display-align="center">
+						<fo:table-cell display-align="center" role="SKIP">
 
-							<fo:block xsl:use-attribute-sets="formula-stem-number-style" role="SKIP">
+							<fo:block xsl:use-attribute-sets="formula-stem-number-style">
 
 								<xsl:for-each select="../mn:fmt-name">
 									<xsl:call-template name="setIDforNamedDestination"/>
@@ -10146,9 +10210,9 @@
 			<xsl:apply-templates select="." mode="mathml"/>
 		</xsl:variable>
 
-		<fo:instream-foreign-object fox:alt-text="Math" fox:actual-text="Math">
+		<fo:instream-foreign-object xsl:use-attribute-sets="mathml-instream-foreign-object-style">
 
-			<xsl:call-template name="refine_mathml_insteam_object_style"/>
+			<xsl:call-template name="refine_mathml-instream-foreign-object-style"/>
 
 			<xsl:if test="$isGenerateTableIF = 'false'">
 				<!-- put MathML in Actual Text -->
@@ -10171,9 +10235,6 @@
 
 		</fo:instream-foreign-object>
 	</xsl:template>
-
-	<xsl:template name="refine_mathml_insteam_object_style">
-	</xsl:template> <!-- refine_mathml_insteam_object_style -->
 
 	<xsl:template match="mathml:*" mode="mathml_actual_text">
 		<!-- <xsl:text>a+b</xsl:text> -->
@@ -11282,8 +11343,10 @@
 
 	</xsl:template> <!-- references[not(@normative='true')]/bibitem -->
 
+	<!-- commented 2026-08-06: from https://github.com/metanorma/metanorma-standoc/issues/1140:
+			Presentation XML will no longer contain notes following bibitem, those notes will have been moved in Presentation XML to inside bibitem, and then duplicated to inside formattedref. -->
 	<!-- bibitem's notes will be processing in 'processBibitemFollowingNotes' -->
-	<xsl:template match="mn:references/mn:note" priority="2"/> <!-- [not(@normative='true')] -->
+	<!-- <xsl:template match="mn:references/mn:note" priority="2"/>--> <!-- [not(@normative='true')] -->
 
 	<xsl:template name="insertListItem_Bibitem">
 		<xsl:choose>
@@ -11983,7 +12046,7 @@
 			<xsl:call-template name="set_id_metanorma_form_item">
 				<xsl:with-param name="form_item_type" select="$form_item_type"/>
 			</xsl:call-template>
-			<fo:instream-foreign-object fox:alt-text="Box" baseline-shift="-10%">
+			<fo:instream-foreign-object fox:alt-text="Box" baseline-shift="-10%" fox:placement="Inline">
 				<xsl:attribute name="height">3.5mm</xsl:attribute>
 				<xsl:attribute name="content-width">100%</xsl:attribute>
 				<xsl:attribute name="content-width">scale-down-to-fit</xsl:attribute>
@@ -12010,7 +12073,7 @@
 			<xsl:call-template name="set_id_metanorma_form_item">
 				<xsl:with-param name="form_item_type" select="$form_item_type"/>
 			</xsl:call-template>
-			<fo:instream-foreign-object fox:alt-text="Box" baseline-shift="-10%">
+			<fo:instream-foreign-object fox:alt-text="Box" baseline-shift="-10%" fox:placement="Inline">
 				<xsl:attribute name="height">3.5mm</xsl:attribute>
 				<xsl:attribute name="content-width">100%</xsl:attribute>
 				<xsl:attribute name="content-width">scale-down-to-fit</xsl:attribute>
@@ -12289,7 +12352,9 @@
 				</xsl:variable>
 				<mnx:example id="{@id}" alt-text="{normalize-space($example_name)}">
 					<xsl:element name="fmt-name" namespace="{$namespace_full}">
-						<xsl:value-of select="mn:fmt-xref-label[@container]"/>
+						<xsl:call-template name="capitalize"><!-- https://github.com/metanorma/metanorma-pdfa/issues/72 -->
+							<xsl:with-param name="str" select="mn:fmt-xref-label[@container]"/>
+						</xsl:call-template>
 						<xsl:if test="normalize-space($example_name) != ''">
 							<xsl:value-of select="mn:fmt-name/mn:span[@class = 'fmt-caption-delim']"/>
 							<xsl:copy-of select="$example_name"/>
@@ -14039,7 +14104,8 @@
 	<xsl:template match="//mn:metanorma/mn:preface/*" priority="2" name="preface_node"> <!-- /*/mn:preface/* -->
 		<fo:block break-after="page"/>
 		<xsl:call-template name="setNamedDestination"/>
-		<fo:block>
+		<fo:block role="Sect">
+			<xsl:call-template name="addTagElementT"/>
 			<xsl:call-template name="setId"/>
 			<xsl:call-template name="addReviewHelper"/>
 			<xsl:apply-templates/>
@@ -14128,7 +14194,7 @@
 
 	<xsl:template match="mn:blacksquare" name="blacksquare">
 		<fo:inline padding-right="2.5mm" baseline-shift="5%">
-			<fo:instream-foreign-object content-height="2mm" content-width="2mm" fox:alt-text="Quad">
+			<fo:instream-foreign-object content-height="2mm" content-width="2mm" fox:alt-text="Quad" fox:placement="Inline">
 					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" viewBox="0 0 2 2">
 						<rect x="0" y="0" width="2" height="2" fill="black"/>
 					</svg>
@@ -15084,13 +15150,13 @@
 		<xsl:param name="bitmap_width" select="$pageWidth"/>
 		<xsl:choose>
 			<xsl:when test="*[local-name() = 'svg'] or java:endsWith(java:java.lang.String.new(@src), '.svg')">
-				<fo:instream-foreign-object fox:alt-text="Image Front">
+				<fo:instream-foreign-object fox:alt-text="Image Front" fox:placement="Block">
 					<xsl:attribute name="content-height"><xsl:value-of select="$svg_content_height"/>mm</xsl:attribute>
 					<xsl:call-template name="getSVG"/>
 				</fo:instream-foreign-object>
 			</xsl:when>
 			<xsl:when test="starts-with(@src, 'data:application/pdf;base64')">
-				<fo:external-graphic src="{@src}" fox:alt-text="Image Front"/>
+				<fo:external-graphic src="{@src}" fox:alt-text="Image Front" fox:placement="Block"/>
 			</xsl:when>
 			<xsl:otherwise> <!-- bitmap image -->
 				<xsl:variable name="coverimage_src" select="normalize-space(@src)"/>
@@ -15100,7 +15166,7 @@
 							<xsl:with-param name="src" select="$coverimage_src"/>
 						</xsl:call-template>
 					</xsl:variable>
-					<fo:external-graphic src="{$coverpage}" width="{$bitmap_width}mm" content-height="scale-to-fit" scaling="uniform" fox:alt-text="Image Front"/>
+					<fo:external-graphic src="{$coverpage}" width="{$bitmap_width}mm" content-height="scale-to-fit" scaling="uniform" fox:alt-text="Image Front" fox:placement="Block"/>
 				</xsl:if>
 			</xsl:otherwise>
 		</xsl:choose>
