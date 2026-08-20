@@ -14,12 +14,15 @@ module Metanorma
       class << self
         def register!
           # metanorma-core hosts the flavor/taste table; in contexts
-          # without it, tastes keep working unregistered.
+          # without it (or with a released version predating the table),
+          # tastes keep working unregistered.
           begin
             require "metanorma-core"
           rescue LoadError
             return
           end
+
+          return unless defined?(Metanorma::Core::Flavors)
 
           TasteRegister.instance.available_tastes.each do |taste|
             register_taste(taste)
