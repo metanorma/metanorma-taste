@@ -1193,7 +1193,7 @@
 				<xsl:if test="@font-family = 'monospace'">
 					<xsl:attribute name="font-family">Courier New</xsl:attribute>
 				</xsl:if>
-			<xsl:apply-templates select="node()"/>
+			<xsl:apply-templates select="node()" mode="svg_update"/>
 		</xsl:copy>
 	</xsl:template>
 
