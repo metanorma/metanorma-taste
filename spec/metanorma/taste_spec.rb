@@ -8,6 +8,7 @@ RSpec.describe Metanorma::Taste do
                  csa: :generic,
                  elf: :iso,
                  enosema: :iso,
+                 iala: :generic,
                  icc: :iso,
                  mbxif: :ribose,
                  oiml: :iso,
