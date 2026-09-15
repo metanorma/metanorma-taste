@@ -193,15 +193,35 @@ module Metanorma
       # SSOT: the metanorma-core flavor table. Transitional shim while
       # FlavorLoader still reads this (removed in metanorma-core#18's
       # final commit); the table is authoritative.
+      #
+      # register! may have run before Metanorma::Core::Flavors was defined
+      # (metanorma loads metanorma-taste early). Retry registration on demand
+      # and fall back to config-based aliases when the table is still empty.
       begin
         require "metanorma-core"
       rescue LoadError
-        return @taste_configs.each_with_object({}) do |(flavor, config), aliases|
-          aliases[flavor] = config.base_flavor&.to_sym if config.base_flavor
+        return config_based_aliases
+      end
+
+      if defined?(Metanorma::Core::Flavors) &&
+          Metanorma::Core::Flavors.available_tastes.empty?
+        Metanorma::Taste::FlavorRegistration.register!
+      end
+
+      if defined?(Metanorma::Core::Flavors) &&
+          !Metanorma::Core::Flavors.available_tastes.empty?
+        return Metanorma::Core::Flavors.available_tastes
+          .each_with_object({}) do |t, aliases|
+          aliases[t] = Metanorma::Core::Flavors.find(t).base_flavor
         end
       end
-      Metanorma::Core::Flavors.available_tastes.each_with_object({}) do |t, aliases|
-        aliases[t] = Metanorma::Core::Flavors.find(t).base_flavor
+
+      config_based_aliases
+    end
+
+    def config_based_aliases
+      @taste_configs.each_with_object({}) do |(flavor, config), aliases|
+        aliases[flavor] = config.base_flavor&.to_sym if config.base_flavor
       end
     end
 

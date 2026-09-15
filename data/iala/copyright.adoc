@@ -1,0 +1,59 @@
+== copyright-statement
+=== {blank}
+[align="center"]
+© Copyright International Organization for Marine Aids to Navigation (IALA) {{ docyear }}
+
+This work is copyright. Apart from any use permitted in accordance with the
+Berne Convention for the Protection of Literary and Artistic Works (1886), and
+except in the circumstances described below, no part may be translated,
+reproduced by any process, adapted, communicated or commercially exploited
+without prior written permission from the International Organization for Marine
+Aids to Navigation (IALA). Copyright in some of the material in this publication
+may be owned by another party and permission for the translation and/or
+reproduction of that material must be obtained from the owner.
+
+{% if unpublished %}
+== license-statement
+=== Warning for Drafts
+
+This document is not a published IALA {{ doctype }}. It is distributed for review
+and comment, and is subject to change without notice and may not be referred to
+as a published IALA document. Recipients of this draft are invited to submit,
+with their comments, notification of any relevant patent rights of which they
+are aware and to provide supporting documentation.
+{% endif %}
+
+== license-statement
+=== {blank}
+This document or partial material from this document may be translated,
+reproduced or distributed for general information, on no more than a cost
+recovery basis. Copies may not be sold or distributed for profit or gain without
+prior written agreement of the IALA Secretariat and any other copyright holders.
+
+In the event that this document or partial material from this document is
+reproduced, translated or distributed under the terms described above, the
+following statements are to be included:
+
+____
+"Material from IALA publication [reference to extract: Title, Edition] is
+reproduced with the permission of the IALA Secretariat acting for the
+International Organization for Marine Aids to Navigation (IALA), which does not
+accept responsibility for the correctness of the material as reproduced: in case
+of doubt, the IALA authentic text shall prevail. The incorporation of material
+sourced from IALA shall not be construed as constituting an endorsement by IALA
+of this product."
+____
+
+The IALA logo or other identifiers shall not be used in any derived product
+without prior written permission from the IALA Secretariat.
+
+== feedback-statement
+=== {blank}
+Published by the +
+International Organization for Marine Aids to Navigation (IALA) +
+10, rue des Gaudines +
+78100 Saint-Germain-en-Laye +
+France +
+Tel: +33 (0)1 34 51 70 01 +
+mailto:contact@iala.int[] +
+https://www.iala.int[www.iala.int]
