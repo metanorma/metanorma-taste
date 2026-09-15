@@ -16,6 +16,9 @@ module Metanorma
           # metanorma-core hosts the flavor/taste table; in contexts
           # without it (or with a released version predating the table),
           # tastes keep working unregistered.
+          #
+          # Idempotent: safe to call again after Flavors becomes defined
+          # (metanorma may load metanorma-taste before Core::Flavors exists).
           begin
             require "metanorma-core"
           rescue LoadError

@@ -1,0 +1,34 @@
+doctype_dict:
+  standard: Standard
+  recommendation: Recommendation
+  guideline: Guideline
+  model-course: Model Course
+  resolution: Resolution
+  general-assembly: General Assembly Resolution
+  manual: Manual
+  advice: Advice
+  report: Report
+  letter: Letter
+  annex: Annex
+stage_dict:
+  draft: Draft
+  published: Published
+  withdrawn: Withdrawn
+table_of_contents: Contents
+clause: Clause
+subclause: Clause
+annex: Annex
+# Style Guide §2.7.9 — Definitions section is fixed IALA Dictionary boilerplate
+term_def_boilerplate: |
+  The definitions of terms used in this {{ doctype }} can be found in the
+  International Dictionary of Marine Aids to Navigation (IALA Dictionary) at
+  https://www.iala.int/ and were checked as correct at the time of going to
+  print. Where conflict arises, the IALA Dictionary should be considered as the
+  authoritative source of definitions used in IALA documents.
+internal_terms_boilerplate:
+abbrev: Abbreviations
+note: Note
+termnote: Note
+example: Example
+inform_annex: Informative
+norm_annex: Normative
