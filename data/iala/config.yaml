@@ -1,13 +1,14 @@
 ---
 flavor: iala
 owner: International Organization for Marine Aids to Navigation
-base-flavor: generic
+base-flavor: iho
 base-override:
   filename-attributes:
     customize: metanorma.yml
     copyright-notice: copyright.adoc
     i18n-dictionary: i18n.yaml
     publisher-logo: iala-logo.svg
+    pdf-stylesheet-override: iala.xsl
   value-attributes:
     publisher: International Organization for Marine Aids to Navigation
     publisher_abbr: IALA
