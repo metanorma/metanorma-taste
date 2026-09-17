@@ -271,12 +271,28 @@
 	<xsl:template match="mn:preface//mn:clause[@type = 'toc']/mn:fmt-title" priority="3">
 		<fo:block xsl:use-attribute-sets="toc-title-style">
 			<xsl:call-template name="refine_toc-title-style"/>
-			<fo:block-container width="100%" border-bottom="1pt solid {$color_corporate_blue}" role="SKIP">
+			<fo:block-container width="100%" border-bottom="2pt solid {$color_corporate_blue}" role="SKIP">
 				<fo:block margin-bottom="2mm" role="SKIP">
 					<xsl:apply-templates />
 				</fo:block>
 			</fo:block-container>
 		</fo:block>
+	</xsl:template>
+
+
+	<xsl:template name="refine_title-style"><?extend?>
+		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+		<xsl:if test="$level = 1">
+			<xsl:attribute name="font-size">14pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$level = 2 or $level = 3">
+			<!-- <xsl:attribute name="font-size">11pt</xsl:attribute> To do --> 
+			<xsl:attribute name="font-size">12pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$level = 4">
+			<xsl:attribute name="font-size">11pt</xsl:attribute>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="insertHeaderFooter">
@@ -289,6 +305,42 @@
 		<xsl:call-template name="insertFooter"/>
 	</xsl:template>
 
+	<!-- Tabulation processing -->
+	<xsl:template match="mn:tab">
+		<xsl:variable name="padding-right">8</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="../../@inline-header = 'true'">
+				<fo:inline font-size="90%" role="SKIP">
+					<xsl:call-template name="insertNonBreakSpaces">
+						<xsl:with-param name="count" select="$padding-right"/>
+					</xsl:call-template>
+				</fo:inline>
+			</xsl:when>
+			<xsl:otherwise>
+				<fo:inline padding-right="{$padding-right}mm" role="SKIP"><xsl:value-of select="$zero_width_space"/></fo:inline>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template> <!-- tab -->
+
+	<xsl:template match="mn:fmt-title[@depth = '3']/text()[1][following-sibling::*[1][self::mn:tab]][translate(substring(., 1, 1), '0123456789.', '') = '']">
+		<fo:inline font-size="11pt"><xsl:value-of select="."/></fo:inline>
+	</xsl:template>
+
+	<xsl:attribute-set name="figure-name-style"><?extend?>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+		<xsl:attribute name="font-style">italic</xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_secondary_gray"/></xsl:attribute>
+	</xsl:attribute-set>
+
+
+	<!-- keep ' — ' -->
+	<xsl:template match="mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-delim']" mode="update_xml_step1" priority="4">
+		<padding value="5mm"/>
+	</xsl:template>
+
+	<!-- <xsl:template match="mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-delim']" priority="4">
+		<fo:inline padding-right="5mm" role="SKIP"><xsl:value-of select="$zero_width_space"/></fo:inline>
+	</xsl:template> -->
 
 	<xsl:template name="insertHeader">
 		<fo:static-content flow-name="header" role="artifact">
