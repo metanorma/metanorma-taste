@@ -1,0 +1,77 @@
+---
+flavor: iala
+owner: International Organization for Marine Aids to Navigation
+base-flavor: iho
+base-override:
+  filename-attributes:
+    customize: metanorma.yml
+    copyright-notice: copyright.adoc
+    i18n-dictionary: i18n.yaml
+    publisher-logo: iala-logo.svg
+    pdf-stylesheet-override: iala.xsl
+  value-attributes:
+    publisher: International Organization for Marine Aids to Navigation
+    publisher_abbr: IALA
+    # Style Guide G1115: headings/tables blue RGB(0, 85, 140)
+    presentation-metadata-color-secondary: '#00558C'
+    presentation-metadata-backcover-text: iala.int
+    # Style Guide: Calibri; Carlito is the metric-compatible open substitute
+    body-font: Carlito, Calibri, Arial, sans-serif
+    header-font: Carlito, Calibri, Arial, sans-serif
+    monospace-font: '"Source Code Pro", monospace'
+    fonts: Carlito;Source Code Pro;Source Han Sans;STIX Two Math
+    presentation-metadata-ul-label-list: "&#x2022;, &#x25e6;, &#x25aa;"
+    presentation-metadata-annex-delim: "<br/>"
+    presentation-metadata-middle-title: ""
+    # PDF deferred until the IALA XSL is built (generic ships no default XSL)
+    output-extensions: xml,html,doc,rxl
+  bibliography-sort:
+  - abbrev: IALA
+    rank: 1
+    name: International Organization for Marine Aids to Navigation
+  - abbrev: IMO
+    rank: 2
+    name: International Maritime Organization
+  - abbrev: IHO
+    rank: 3
+    name: International Hydrographic Organization
+  - abbrev: IEC
+    rank: 4
+    name: International Electrotechnical Commission
+  - abbrev: ISO
+    rank: 5
+    name: International Organization for Standardization
+doctypes:
+  # S — Standard (General Assembly)
+  - taste: standard
+    base: standard
+  # R — Recommendation (Council)
+  - taste: recommendation
+    base: standard
+  # G — Guideline (Council). Generic's own default doctype is "guideline".
+  - taste: guideline
+    base: guideline
+  # C — Model course (Council)
+  - taste: model-course
+    base: standard
+  # P — Resolutions (General Assembly / Council); Edoxen-format source decisions
+  - taste: resolution
+    base: standard
+  # GA — General Assembly Resolution series (GA01-Res.xx)
+  - taste: general-assembly
+    base: standard
+  # M — Manual
+  - taste: manual
+    base: standard
+  # A — Advice
+  - taste: advice
+    base: guideline
+  # X — Report
+  - taste: report
+    base: report
+  # L — Letter (no numbered series)
+  - taste: letter
+    base: report
+  # Annex (standalone annex publications; no prefix letter)
+  - taste: annex
+    base: standard
