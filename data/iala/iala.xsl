@@ -2,7 +2,7 @@
 
 	<xsl:variable name="marginTop">19</xsl:variable>
 	<xsl:variable name="marginBottom">25.8</xsl:variable>
-	<xsl:variable name="marginLeftRight1">15.3</xsl:variable>
+	<xsl:variable name="marginLeftRight1">16</xsl:variable>
 	<xsl:variable name="marginLeftRight2">13.2</xsl:variable>
 
 	<!-- CORPORATE COLOURS -->
@@ -267,18 +267,79 @@
 		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
 	</xsl:attribute-set>
 
+	<xsl:attribute-set name="toc-style"><?extend?>
+		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+		<xsl:attribute name="margin-top">6mm</xsl:attribute>
+		<!-- 
+		<xsl:attribute name="border-right">1pt solid black</xsl:attribute> -->
+	</xsl:attribute-set>
 
+	<xsl:template name="refine_toc-item-block-style">
+		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+		<xsl:attribute name="line-height">1.4</xsl:attribute>
+		<xsl:attribute name="margin-right">8mm</xsl:attribute>
+		<xsl:attribute name="provisional-distance-between-starts">
+			<xsl:choose>
+				<xsl:when test="@root = 'preface'">0mm</xsl:when>
+				<xsl:when test="@level = 1">7mm</xsl:when>
+				<xsl:when test="@level = 2">12mm</xsl:when>
+				<xsl:when test="@level = 3">13mm</xsl:when>
+				<xsl:otherwise>15mm</xsl:otherwise>
+			</xsl:choose>
+		</xsl:attribute>
+		
+		<xsl:if test="@level = 1">
+			<xsl:attribute name="font-weight">bold</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="@level &gt;= 3">
+			<xsl:attribute name="font-size">9pt</xsl:attribute>
+		</xsl:if>
+		
+		<xsl:if test="@level &lt;= 2">
+			<xsl:attribute name="margin-top">2pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="@level &gt;= 3">
+			<xsl:attribute name="margin-top">2pt</xsl:attribute>
+		</xsl:if>
+		
+		<xsl:if test="@level &gt;= 3">
+			<xsl:attribute name="margin-left">7mm</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	
+	
+	<xsl:template name="refine_toc-item-style"><?extend?>
+		<xsl:attribute name="margin-left">0mm</xsl:attribute>
+		<xsl:attribute name="text-indent">0mm</xsl:attribute>
+	</xsl:template>
+
+	<xsl:template name="refine_toc-listof-title-style"><?extend?>
+		<xsl:attribute name="font-size">20pt</xsl:attribute>
+		<xsl:attribute name="font-weight">bold</xsl:attribute>
+		<xsl:attribute name="margin-top">9mm</xsl:attribute>
+		<xsl:attribute name="margin-bottom">6mm</xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_toc_title"/></xsl:attribute>
+	</xsl:template>
+
+	<xsl:template name="refine_toc-listof-item-style"><?extend?>
+		<xsl:attribute name="margin-left">0mm</xsl:attribute>
+		<xsl:attribute name="text-indent">0mm</xsl:attribute>
+		<xsl:attribute name="line-height">1.4</xsl:attribute>
+		<xsl:attribute name="margin-right">8mm</xsl:attribute>
+		<xsl:attribute name="font-style">italic</xsl:attribute>
+	</xsl:template>
+	
+	
 	<xsl:template match="mn:preface//mn:clause[@type = 'toc']/mn:fmt-title" priority="3">
 		<fo:block xsl:use-attribute-sets="toc-title-style">
 			<xsl:call-template name="refine_toc-title-style"/>
-			<fo:block-container width="100%" border-bottom="2pt solid {$color_corporate_blue}" role="SKIP">
+			<fo:block-container width="100%" border-bottom="1.25pt solid {$color_corporate_blue}" role="SKIP">
 				<fo:block margin-bottom="2mm" role="SKIP">
 					<xsl:apply-templates />
 				</fo:block>
 			</fo:block-container>
 		</fo:block>
 	</xsl:template>
-
 
 	<xsl:template name="refine_title-style"><?extend?>
 		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
@@ -294,6 +355,8 @@
 			<xsl:attribute name="font-size">11pt</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
+
+
 
 	<xsl:template name="insertHeaderFooter">
 		<xsl:param name="orientation"/>
@@ -341,6 +404,18 @@
 	<!-- <xsl:template match="mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-delim']" priority="4">
 		<fo:inline padding-right="5mm" role="SKIP"><xsl:value-of select="$zero_width_space"/></fo:inline>
 	</xsl:template> -->
+
+	<xsl:template name="refine_bibitem-normative-list-style"><?extend?>
+		<xsl:attribute name="provisional-distance-between-starts">
+			<xsl:choose>
+				<xsl:when test="string-length($docidentifier) = 0">0mm</xsl:when>
+				<xsl:when test="string-length($docidentifier) &gt; 19">46.5mm</xsl:when>
+				<xsl:when test="string-length($docidentifier) &gt; 10">37mm</xsl:when>
+				<xsl:otherwise>9.5mm</xsl:otherwise>
+			</xsl:choose>
+		</xsl:attribute>
+	</xsl:template>
+
 
 	<xsl:template name="insertHeader">
 		<fo:static-content flow-name="header" role="artifact">
