@@ -16,7 +16,7 @@ RSpec.describe Metanorma::TasteRegister do
       info = register.get_config(:iala)
       expect(info).to be_a(Metanorma::Taste::TasteConfig)
       expect(info.flavor).to eq("iala")
-      expect(info.base_flavor).to eq("generic")
+      expect(info.base_flavor).to eq("iho")
       expect(info.owner).to eq("International Organization for Marine Aids to Navigation")
       expect(info.base_override.value_attributes.publisher_abbr).to eq("IALA")
       expect(info.doctypes.map(&:taste)).to include(
