@@ -88,7 +88,7 @@
 					</date>
 
 					<!-- Example: urn:mrn:iala:pub:g1199:ed1.0 -->
-					<urn>urn:mrn:iala:pub:g1199:ed1.0</urn><!-- To do -->
+					<urn>urn:<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'urn']"/></urn>
 
 				</mnx:doc>
 			</xsl:for-each>
@@ -263,7 +263,7 @@
 	<xsl:attribute-set name="toc-title-style"><?extend?>
 		<xsl:attribute name="font-size">28pt</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_toc_title"/></xsl:attribute>
-		<xsl:attribute name="margin-bottom">8pt</xsl:attribute>
+		<xsl:attribute name="margin-bottom">0</xsl:attribute>
 		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
 	</xsl:attribute-set>
 
@@ -330,6 +330,54 @@
 	</xsl:template>
 	
 	
+	<xsl:template match="mn:preface//mn:clause[@type = 'toc']" name="toc" priority="4">
+		<xsl:variable name="num" select="number(java:org.metanorma.fop.global.Variables.getVariable('num'))"/>
+		<!-- Table of Contents -->
+		<fo:block xsl:use-attribute-sets="toc-container-style">
+			<xsl:call-template name="refine_toc-container-style"/>
+			<xsl:call-template name="addTagElementT"/>
+			
+			<xsl:copy-of select="@id"/>
+		
+			<fo:table role="SKIP" table-layout="fixed" width="100%">
+				<fo:table-column column-width="100%"/>
+				<!-- repeat CONTENTS on each page -->
+				<fo:table-header role="SKIP">
+					<fo:table-row role="SKIP" height="33mm" display-align="after">
+						<fo:table-cell role="SKIP" text-align="left">
+							<fo:block role="SKIP">
+								<xsl:apply-templates select="mn:fmt-title"/>
+							</fo:block>
+						</fo:table-cell>
+					</fo:table-row>
+				</fo:table-header>
+				<fo:table-body role="SKIP">
+					<fo:table-row role="SKIP">
+						<fo:table-cell role="SKIP" text-align="left">
+							<xsl:apply-templates select="node()[not(self::mn:fmt-title)]"/>
+							
+							<xsl:if test="count(*) = 1 and mn:fmt-title"> <!-- if there isn't user ToC -->
+			
+								<fo:block role="SKIP" xsl:use-attribute-sets="toc-style">
+								
+									<fo:block role="TOC">
+										<xsl:apply-templates select="$contents/mnx:doc[@num = $num]/mnx:contents/mnx:item[@display = 'true']">
+											<xsl:with-param name="num" select="$num"/>
+										</xsl:apply-templates>
+									</fo:block>
+									
+									<xsl:call-template name="insertListsOf">
+										<xsl:with-param name="num" select="$num"/>
+									</xsl:call-template>
+								</fo:block>
+							</xsl:if>
+						</fo:table-cell>
+					</fo:table-row>
+				</fo:table-body>
+			</fo:table>
+		</fo:block>
+	</xsl:template>
+	
 	<xsl:template match="mn:preface//mn:clause[@type = 'toc']/mn:fmt-title" priority="3">
 		<fo:block xsl:use-attribute-sets="toc-title-style">
 			<xsl:call-template name="refine_toc-title-style"/>
@@ -354,18 +402,6 @@
 		<xsl:if test="$level = 4">
 			<xsl:attribute name="font-size">11pt</xsl:attribute>
 		</xsl:if>
-	</xsl:template>
-
-
-
-	<xsl:template name="insertHeaderFooter">
-		<xsl:param name="orientation"/>
-		
-		<xsl:call-template name="insertHeader">
-			<xsl:with-param name="orientation" select="$orientation"/>
-		</xsl:call-template>
-		
-		<xsl:call-template name="insertFooter"/>
 	</xsl:template>
 
 	<!-- Tabulation processing -->
@@ -416,6 +452,15 @@
 		</xsl:attribute>
 	</xsl:template>
 
+	<xsl:template name="insertHeaderFooter">
+		<xsl:param name="orientation"/>
+		
+		<xsl:call-template name="insertHeader">
+			<xsl:with-param name="orientation" select="$orientation"/>
+		</xsl:call-template>
+		
+		<xsl:call-template name="insertFooter"/>
+	</xsl:template>
 
 	<xsl:template name="insertHeader">
 		<fo:static-content flow-name="header" role="artifact">
