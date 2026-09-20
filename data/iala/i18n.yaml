@@ -32,3 +32,5 @@ termnote: Note
 example: Example
 inform_annex: Informative
 norm_annex: Normative
+toc_figures: List of Figures
+toc_tables: List of Tables
