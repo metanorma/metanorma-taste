@@ -1208,6 +1208,14 @@
 	</xsl:template>
 
 
+	<xsl:template match="mn:table[ancestor::*[local-name() = 'ol' or local-name() = 'ul'][1]/@class]" mode="update_xml_step1">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<xsl:copy-of select="ancestor::*[local-name() = 'ol' or local-name() = 'ul'][1]/@class"/>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+
 	<!-- SVG AND PLANTUML -->
 	<!-- Replace generic "sans-serif" font with precise Arial, "serif" with precise Times New Roman, and "monospace" with Courier New that were used by PlantUML diagrams -->
 	<!-- All PlantUML figures contain a plantuml processing instruction (whereas @data-diagram-type attribute is NOT always used) -->
