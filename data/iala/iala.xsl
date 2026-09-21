@@ -169,7 +169,7 @@
 		<xsl:param name="num"/>
 		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" initial-page-number="1" color="{$color_corporate_blue}">
 			<!-- Logo -->
-			<fo:static-content flow-name="cover-page-header">
+			<fo:static-content flow-name="cover-page-header" id="__internal_layout__coverpage_image_{$num}_{generate-id()}" role="SKIP">
 				<fo:block text-align="center" margin-left="0.5mm" margin-top="3mm" font-size="0pt">
 					<fo:instream-foreign-object content-width="47mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
 						<xsl:copy-of select="$IALA-Logo-full"/>
@@ -177,11 +177,11 @@
 				</fo:block>
 			</fo:static-content>
 			
-			<fo:static-content flow-name="cover-page-footer">
+			<fo:static-content flow-name="cover-page-footer" role="SKIP">
 				<fo:block-container border-top="1pt solid {$color_corporate_blue}" font-size="0pt" margin-left="2.5mm" margin-right="-3.5mm" role="SKIP">
 					<fo:block role="SKIP"><fo:wrapper role="artifact">&#xa0;</fo:wrapper></fo:block>
 				</fo:block-container>
-				<fo:block text-align="center" font-size="10pt">
+				<fo:block text-align="center" font-size="10pt" role="SKIP">
 					<fo:block margin-top="9mm" font-weight="bold">
 						<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'publisher']/mn:organization/mn:name"/>
 					</fo:block>
@@ -255,11 +255,41 @@
 		</fo:page-sequence>
 	</xsl:template> <!-- END cover-page -->
 
-
 	<xsl:template name="inner-cover-page">
 		<!-- empty -->
 	</xsl:template>
 
+	<xsl:attribute-set name="page-sequence-preface"><?extend?>
+		<xsl:attribute name="format">1</xsl:attribute>
+		<xsl:attribute name="force-page-count">no-force</xsl:attribute>
+	</xsl:attribute-set>
+
+	<xsl:attribute-set name="page-sequence-main"><?extend?>
+		<xsl:attribute name="force-page-count">no-force</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:template name="refine_page-sequence-main"><?extend?>
+		<xsl:attribute name="initial-page-number">auto</xsl:attribute>
+	</xsl:template>
+
+	<!-- DOCUMENT REVISION -->
+	<xsl:template match="mn:clause[@type = 'revision']" mode="contents"/>
+	<xsl:template match="mn:clause[@type = 'revision']" priority="3">
+		<fo:block role="Sect" break-after="page">
+			<xsl:apply-templates/>
+		</fo:block>
+	</xsl:template>
+	<xsl:template match="mn:clause[@type = 'revision']/mn:fmt-title" priority="3">
+		<fo:block xsl:use-attribute-sets="toc-title-style"  margin-top="13mm" margin-bottom="4.5mm">
+			<xsl:call-template name="refine_toc-title-style"/>
+			<fo:block-container width="100%" border-bottom="1.25pt solid {$color_corporate_blue}" role="SKIP">
+				<fo:block margin-bottom="2mm" role="SKIP">
+					<xsl:apply-templates />
+				</fo:block>
+			</fo:block-container>
+		</fo:block>
+	</xsl:template>
+	
 	<xsl:attribute-set name="toc-title-style"><?extend?>
 		<xsl:attribute name="font-size">28pt</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_toc_title"/></xsl:attribute>
@@ -432,14 +462,147 @@
 	</xsl:attribute-set>
 
 
+	<!-- ============================================================ -->
+	<!-- ============================================================ -->
+	<!-- mode="update_xml_step1" -->
+	<!-- ============================================================ -->
+	<!-- ============================================================ -->
+	<!-- change the order ToC and DOCUMENT REVISION -->
+	<xsl:template match="mn:preface/mn:clause[@type = 'toc']" mode="update_xml_step1" priority="4">
+		<xsl:apply-templates select="../mn:clause[@type = 'revision']" mode="update_xml_step1">
+			<xsl:with-param name="process">true</xsl:with-param>
+		</xsl:apply-templates>
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match="mn:preface/mn:clause[@type = 'revision']" mode="update_xml_step1" priority="4">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:copy>
+				<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+				<xsl:attribute name="displayorder">-1</xsl:attribute>
+				
+				<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+			</xsl:copy>
+		</xsl:if>
+	</xsl:template>
+
+	<xsl:template match="mn:clause[@type = 'revision']/mn:table[@unnumbered = 'true']" mode="update_xml_step1" priority="3">
+		<xsl:apply-templates select="." mode="document_revision"/>
+	</xsl:template>
+	
+	<!-- ============================================================ -->
+	<!-- ============================================================ -->
+	<!-- pre-processing for DOCUMENT REVISION table -->
+	<!-- ============================================================ -->
+	<!-- ============================================================ -->
+	<xsl:template match="@*|node()" mode="document_revision">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="document_revision"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="mn:table" mode="document_revision">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<xsl:copy-of select="ancestor::mn:clause[@type = 'revision']/@type"/>
+			<xsl:if test="not(mn:colgroup) and count(mn:tbody/mn:tr/*) = 3">
+				<mn:colgroup>
+					<mn:col width="18%"/>
+					<mn:col width="58%"/>
+					<mn:col width="24%"/>
+				</mn:colgroup>
+			</xsl:if>
+			<xsl:apply-templates select="node()" mode="document_revision"/>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template match="mn:tbody[count(mn:tr) &lt; 7]" mode="document_revision">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<xsl:apply-templates select="node()" mode="document_revision"/>
+			<xsl:variable name="tr_count" select="count(mn:tr)"/>
+			<xsl:variable name="td_count" select="count(mn:tr[last()]/*)"/>
+			<xsl:call-template name="addDocumentRevisionTableRow">
+				<xsl:with-param name="tr_count" select="7 - $tr_count"/>
+				<xsl:with-param name="td_count" select="$td_count"/>
+			</xsl:call-template>
+		</xsl:copy>
+	</xsl:template>
+	
+	<xsl:template name="addDocumentRevisionTableRow">
+		<xsl:param name="tr_count"/>
+		<xsl:param name="td_count"/>
+		<xsl:if test="$tr_count &gt; 0">
+			<mn:tr>
+				<xsl:call-template name="addDocumentRevisionTableCell">
+					<xsl:with-param name="td_count" select="$td_count"/>
+				</xsl:call-template>
+			</mn:tr>
+			<xsl:call-template name="addDocumentRevisionTableRow">
+				<xsl:with-param name="tr_count" select="$tr_count - 1"/>
+				<xsl:with-param name="td_count" select="$td_count"/>
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="addDocumentRevisionTableCell">
+		<xsl:param name="td_count"/>
+		<xsl:if test="$td_count &gt; 0">
+			<mn:td></mn:td>
+			<xsl:call-template name="addDocumentRevisionTableCell">
+				<xsl:with-param name="td_count" select="$td_count - 1"/>
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="mn:tbody//mn:td" mode="document_revision">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<xsl:attribute name="valign">middle</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="document_revision"/>
+		</xsl:copy>
+	</xsl:template>
+	<!-- ============================================================ -->
+	<!-- ============================================================ -->
+
 	<!-- keep ' — ' -->
 	<xsl:template match="mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-delim']" mode="update_xml_step1" priority="4">
 		<padding value="5mm"/>
 	</xsl:template>
+	
+	<!-- ============================================================ -->
+	<!-- ============================================================ -->
 
 	<!-- <xsl:template match="mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-delim']" priority="4">
 		<fo:inline padding-right="5mm" role="SKIP"><xsl:value-of select="$zero_width_space"/></fo:inline>
 	</xsl:template> -->
+	<xsl:template name="refine_table-container-style"><?extend?>
+		<xsl:attribute name="font-size">10pt</xsl:attribute>
+	</xsl:template>
+
+	<xsl:template name="refine_table-header-row-style"><?extend?>
+		<xsl:attribute name="background-color">transparent</xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+	</xsl:template>
+	
+	<xsl:template name="refine_table-header-cell-style"><?extend?>
+		<xsl:attribute name="padding-left">4mm</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:template name="refine_table-body-row-style"><?extend?>
+		<!-- @type added in <xsl:template match="mn:table" mode="document_revision"> -->
+		<xsl:if test="ancestor::mn:table[@type = 'revision']">
+			<!--not 15mm, because there are padding-top and padding-bottom -->
+			<xsl:attribute name="min-height">12mm</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template name="refine_table-cell-style"><?extend?>
+		<xsl:attribute name="padding-left">4mm</xsl:attribute>
+		<xsl:attribute name="display-align">center</xsl:attribute>
+	</xsl:template>
 
 	<xsl:template name="refine_bibitem-normative-list-style"><?extend?>
 		<xsl:attribute name="provisional-distance-between-starts">
