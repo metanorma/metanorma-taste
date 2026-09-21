@@ -1163,6 +1163,43 @@
 
 	<!-- CITATIONS AND CROSS-REFERENCES -->
 
+	<xsl:attribute-set name="bibliography-title-style"><?extend?>
+		<xsl:attribute name="margin-bottom">22pt</xsl:attribute>
+	</xsl:attribute-set>
+
+
+	<xsl:template match="mn:references[not(@normative='true')]" priority="3">
+		<fo:block break-after="page"/>
+		<fo:block id="{@id}" role="Sect">
+			<xsl:call-template name="addTagElementT"/>
+			
+			<fo:block xsl:use-attribute-sets="title-style"> <!-- Bibliography section title -->
+				<xsl:call-template name="refine_title-style"/>
+				<xsl:apply-templates select="mn:fmt-title/node()"/>
+			</fo:block>
+
+			<fo:block role="L">
+				<xsl:for-each select="node()[not(self::mn:fmt-title)]">
+					<xsl:choose>
+						<xsl:when test="self::mn:bibitem">
+							<xsl:apply-templates select="." />
+						</xsl:when>
+						<xsl:otherwise> <!-- for instance, self::mn:admonition -->
+							<xsl:variable name="item_content"><xsl:apply-templates select="." /></xsl:variable>
+							<xsl:if test="normalize-space($item_content) != ''">
+								<fo:block role="LI">
+									<fo:block role="LBody">
+										<xsl:copy-of select="$item_content"/>
+									</fo:block>
+								</fo:block>
+							</xsl:if>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:for-each>
+			</fo:block>
+		</fo:block>
+	</xsl:template>
+
 	<!-- Internal citation referencing styling (only H1s) - https://github.com/metanorma/metanorma-pdfa/issues/46 -->
 	<xsl:template match="mn:fmt-xref[ @style = 'full' ]/mn:semx[ @element = 'title' ]" mode="update_xml_step1">
 		<xsl:text>"</xsl:text>
