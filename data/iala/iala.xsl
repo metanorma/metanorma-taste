@@ -7,6 +7,7 @@
 
 	<!-- CORPORATE COLOURS -->
 	<xsl:variable name="color_corporate_blue">rgb(0, 85, 140)</xsl:variable>
+	<xsl:variable name="color_corporate_light_blue">rgb(103, 135, 196)</xsl:variable>
 	<xsl:variable name="color_corporate_yellow">rgb(254, 219, 0)</xsl:variable>
 	<xsl:variable name="color_corporate_gradient_blue_start">rgb(0, 109, 158)</xsl:variable>
 	<xsl:variable name="color_corporate_gradient_blue_end">rgb(0, 169, 207)</xsl:variable>
@@ -59,7 +60,8 @@
 			<xsl:for-each select="xalan:nodeset($current_document)">
 				<mnx:doc num="{$num}">
 					<!-- Example: guideline -->
-					<doctype><xsl:value-of select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[@language != '']"/></doctype>
+					<doctype><xsl:value-of select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = '']"/></doctype>
+					<doctype_full><xsl:value-of select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[@language != '']"/></doctype_full>
 					
 					<!-- Example: G1199 -->
 					<docidentifier><xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier[@primary = 'true']"/></docidentifier>
@@ -204,9 +206,21 @@
 				</fo:block>
 				
 				<!-- Example: GUIDELINE -->
-				<fo:block-container height="52mm" background-color="rgb(103, 135, 196)" color="white" display-align="center">
+				<fo:block-container height="52mm" color="white" display-align="center">
+					<xsl:variable name="doctype"><xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype</xsl:with-param></xsl:call-template></xsl:variable>
+					<xsl:attribute name="background-color">
+						<xsl:choose>
+							<xsl:when test="$doctype = 'standard'"><xsl:value-of select="$color_corporate_blue"/></xsl:when>
+							<xsl:when test="$doctype = 'recommendation'"><xsl:value-of select="$color_primary_recommendation_50"/></xsl:when>
+							<xsl:when test="$doctype = 'model-course'"><xsl:value-of select="$color_primary_model_course"/></xsl:when>
+							<!-- default, for doctype 'guideline' -->
+							<xsl:otherwise><xsl:value-of select="$color_corporate_light_blue"/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+					
+					
 					<fo:block font-size="25pt" font-weight="bold" margin-left="17mm" margin-right="17mm" margin-top="4pt" text-transform="uppercase">
-						<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype</xsl:with-param></xsl:call-template>
+						<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
 					</fo:block>
 				</fo:block-container>
 				
@@ -242,7 +256,7 @@
 										<fo:block font-size="14pt">
 											<xsl:call-template name="getVariable"><xsl:with-param name="variable">date</xsl:with-param></xsl:call-template>
 										</fo:block>
-										<fo:block font-size="14pt" margin-top="12pt">
+										<fo:block font-size="14pt" margin-top="12pt" text-transform="lowercase">
 											<xsl:call-template name="getVariable"><xsl:with-param name="variable">urn</xsl:with-param></xsl:call-template><!-- To do -->
 										</fo:block>
 									</fo:table-cell>
@@ -604,6 +618,33 @@
 		<xsl:attribute name="display-align">center</xsl:attribute>
 	</xsl:template>
 
+	<xsl:template name="refine_list-item-label-style"><?extend?>
+		<xsl:if test="parent::mn:ul">
+			<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+
+	<xsl:attribute-set name="quote-container-style">
+		<xsl:attribute name="margin-right">0mm</xsl:attribute>
+	</xsl:attribute-set>
+	
+	<xsl:template name="refine_quote-container-style"><?extend?>
+		<xsl:variable name="count_ancestor_lists" select="count(ancestor::mn:ul) + count(ancestor::mn:ol)"/>
+		<xsl:variable name="provisional_distance_between_starts_">
+			<attributes xsl:use-attribute-sets="list-style">
+				<xsl:call-template name="refine_list-style_provisional-distance-between-starts"/>
+			</attributes>
+		</xsl:variable>
+		<xsl:variable name="provisional_distance_between_starts__" select="substring-before(normalize-space(xalan:nodeset($provisional_distance_between_starts_)/attributes/@provisional-distance-between-starts), 'mm')"/>
+		<xsl:variable name="provisional_distance_between_starts">
+			<xsl:value-of select="$provisional_distance_between_starts__"/>
+			<xsl:if test="$provisional_distance_between_starts__ = ''">0</xsl:if>
+		</xsl:variable>
+		<xsl:variable name="provisional_distance_between_starts_value" select="number(normalize-space($provisional_distance_between_starts))"/>
+		<xsl:variable name="margin_left" select="$provisional_distance_between_starts_value + 6 * $count_ancestor_lists"/>
+		<xsl:attribute name="margin-left"><xsl:value-of select="$margin_left"/>mm</xsl:attribute>
+	</xsl:template>
+
 	<xsl:template name="refine_bibitem-normative-list-style"><?extend?>
 		<xsl:attribute name="provisional-distance-between-starts">
 			<xsl:choose>
@@ -641,7 +682,7 @@
 		<fo:static-content flow-name="footer" role="artifact">
 			<fo:block-container font-size="7.56pt" font-weight="bold" color="{$color_corporate_blue}" border-top="0.2pt solid black" line-height="1.43">
 				<fo:block margin-top="4.5mm">
-					<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype</xsl:with-param></xsl:call-template>
+					<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
 					<xsl:text> </xsl:text>
 					<xsl:call-template name="getVariable"><xsl:with-param name="variable">docidentifier</xsl:with-param></xsl:call-template>
 					<xsl:text> </xsl:text>
@@ -654,10 +695,9 @@
 					</xsl:for-each>
 				</fo:block>
 				<fo:block text-align-last="justify">
-					
 					<xsl:call-template name="getVariable"><xsl:with-param name="variable">edition</xsl:with-param></xsl:call-template>
 					<xsl:text> </xsl:text>
-					<xsl:call-template name="getVariable"><xsl:with-param name="variable">urn</xsl:with-param></xsl:call-template>
+					<fo:inline text-transform="lowercase"><xsl:call-template name="getVariable"><xsl:with-param name="variable">urn</xsl:with-param></xsl:call-template></fo:inline>
 					<fo:leader leader-pattern="space"/>
 					<xsl:text>P&#xa0;</xsl:text><fo:page-number />
 				</fo:block>
