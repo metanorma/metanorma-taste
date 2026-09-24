@@ -20,7 +20,10 @@ base-override:
     header-font: Carlito, Calibri, Arial, sans-serif
     monospace-font: '"Source Code Pro", monospace'
     fonts: Carlito;Source Code Pro;Source Han Sans;STIX Two Math
-    presentation-metadata-ul-label-list: "&#x2022;, &#x25e6;, &#x25aa;"
+    toclevels: 3
+    toc-figures: true
+    toc-tables: true
+    presentation-metadata-ul-label-list: "&#x2022;, &#x2022;, &#x25cb;"
     presentation-metadata-annex-delim: "<br/>"
     presentation-metadata-middle-title: ""
     # PDF deferred until the IALA XSL is built (generic ships no default XSL)
