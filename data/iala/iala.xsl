@@ -618,9 +618,27 @@
 		<xsl:attribute name="display-align">center</xsl:attribute>
 	</xsl:template>
 
+	<xsl:variable name="ul_labels_">
+		<!-- only styles are using -->
+		<!-- labes render from XML -->
+		<label level="1" font-size="120%" line-height="100%">•</label><!-- font-size="150%"   line-height="80%"-->
+		<label level="2" font-size="120%" line-height="100%">•</label><!-- font-size="150%" line-height="80%" -->
+		<label level="3" font-size="80%" line-height="130%">&#x25CB;</label><!-- white circle -->
+	</xsl:variable>
+
 	<xsl:template name="refine_list-item-label-style"><?extend?>
 		<xsl:if test="parent::mn:ul">
-			<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+			<xsl:attribute name="color">
+				<xsl:choose>
+					<xsl:when test="@label = '&#x25CB;'">black</xsl:when>
+					<xsl:when test="parent::mn:ul/parent::mn:li/@label = '&#x2022;'">
+						<xsl:value-of select="$color_primary_guideline_50"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$color_corporate_blue"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
 
