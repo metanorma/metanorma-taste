@@ -13204,6 +13204,10 @@
 		<xsl:text> </xsl:text>
 	</xsl:template>
 
+	<xsl:template match="*[local-name() = 'padding']" mode="bookmarks">
+		<xsl:text> </xsl:text>
+	</xsl:template>
+
 	<!-- =================== -->
 	<!-- Table of Contents (ToC) processing -->
 	<!-- =================== -->
