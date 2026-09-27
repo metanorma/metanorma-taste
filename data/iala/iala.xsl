@@ -586,6 +586,25 @@
 		<padding value="5mm"/>
 	</xsl:template>
 	
+	<!-- li/fmt-name -->
+	<xsl:template match="mn:ol/mn:li/mn:fmt-name" priority="2" mode="update_xml_step1">
+		<xsl:variable name="label_" select="normalize-space()"/>
+		<xsl:variable name="label_last_char" select="substring($label_, string-length($label_), 1)"/>
+		<!-- label without . or ) at the end -->
+		<xsl:variable name="label">
+			<xsl:choose>
+				<xsl:when test="$label_last_char = '.' or $label_last_char = ')'">
+					<xsl:value-of select="substring($label_, 1, string-length($label_) - 1)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$label_"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:attribute name="label"><xsl:value-of select="$label"/></xsl:attribute>
+		<xsl:attribute name="full">true</xsl:attribute>
+	</xsl:template>
+	
 	<!-- ============================================================ -->
 	<!-- ============================================================ -->
 
