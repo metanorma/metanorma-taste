@@ -7,6 +7,21 @@ RSpec.describe Metanorma::TasteRegister do
   describe "#available_tastes" do
     it "returns available tastes" do
       expect(register.available_tastes).to include(:icc)
+      expect(register.available_tastes).to include(:iala)
+    end
+  end
+
+  describe "#get_config iala" do
+    it "returns the IALA taste configuration" do
+      info = register.get_config(:iala)
+      expect(info).to be_a(Metanorma::Taste::TasteConfig)
+      expect(info.flavor).to eq("iala")
+      expect(info.base_flavor).to eq("iho")
+      expect(info.owner).to eq("International Organization for Marine Aids to Navigation")
+      expect(info.base_override.value_attributes.publisher_abbr).to eq("IALA")
+      expect(info.doctypes.map(&:taste)).to include(
+        "standard", "recommendation", "guideline", "model-course", "resolution"
+      )
     end
   end
 

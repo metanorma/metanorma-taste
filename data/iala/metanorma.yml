@@ -1,0 +1,74 @@
+metanorma_name: iala
+organization_name_short: IALA
+organization_name_long: International Organization for Marine Aids to Navigation
+document_namespace: https://www.metanorma.org/ns/iala
+xml_root_tag: iala-standard
+html_bodyfont: 'Carlito, Calibri, Arial, sans-serif'
+html_headerfont: 'Carlito, Calibri, Arial, sans-serif'
+html_monospacefont: '"Source Code Pro", Menlo, Monaco, Consolas, monospace'
+html_normalfontsize: "15px"
+html_footnotefontsize: "0.9em"
+i18nyaml: i18n.yaml
+boilerplate: copyright.adoc
+# Style Guide filename form: S1040 / G1199 / R1026 / C0103-1
+# Prefer explicit series letter attribute; fall back to seriesabbr.
+docid_template: "{% if series %}{{ series }}{% elsif seriesabbr %}{{ seriesabbr }}{% endif %}{{ docnumeric }}"
+webfont:
+  - "https://fonts.googleapis.com/css2?family=Carlito:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+  - "https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap"
+word_bodyfont: 'Carlito, Calibri, Arial, sans-serif'
+word_headerfont: 'Carlito, Calibri, Arial, sans-serif'
+word_monospacefont: '"Source Code Pro", "Courier New", monospace'
+word_normalfontsize: "11.0pt"
+word_smallerfontsize: "10.0pt"
+word_monospacefontsize: "10.0pt"
+word_footnotefontsize: "10.0pt"
+formats:
+  - html
+  - doc
+published_stages:
+  - published
+  - withdrawn
+default_stage: published
+stage_abbreviations:
+  draft:
+  published:
+  withdrawn:
+committee_types:
+  - committee
+  - workgroup
+doctypes:
+  standard:
+  recommendation:
+  guideline:
+  model-course:
+  resolution:
+  general-assembly:
+  manual:
+  advice:
+  report:
+  letter:
+  annex:
+default_doctype: guideline
+symbols_titles:
+  - Abbreviations
+  - Abbreviations and acronyms
+  - Symbols
+termsdefs_titles:
+  - Definitions
+normref_titles:
+  - References
+  - Further reading
+fonts_manifest:
+  Carlito:
+  Calibri:
+  Arial:
+  Source Code Pro:
+  Source Han Sans:
+  STIX Two Math:
+metadata_extensions:
+  structuredidentifier:
+    docnumber:
+    partnumber:
+      _output: part
+logo_path: ""

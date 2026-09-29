@@ -4,6 +4,7 @@ require "singleton"
 require "yaml"
 require_relative "taste/taste_config"
 require_relative "taste/base"
+require_relative "taste/flavor_registration"
 
 module Metanorma
   # Registry for managing and providing access to taste configurations
@@ -37,6 +38,10 @@ module Metanorma
       @taste_configs = {}
       @taste_instances = {}
       discover_and_load_tastes
+      # FlavorRegistration.register! is invoked AFTER the singleton is
+      # fully constructed (see the bottom of this file). Calling it here
+      # deadlocks: register! calls TasteRegister.instance, which re-enters
+      # the Singleton mutex while initialize still holds it.
     end
 
     # Get a taste instance by flavor name
@@ -185,6 +190,36 @@ module Metanorma
     end
 
     def aliases
+      # SSOT: the metanorma-core flavor table. Transitional shim while
+      # FlavorLoader still reads this (removed in metanorma-core#18's
+      # final commit); the table is authoritative.
+      #
+      # register! may have run before Metanorma::Core::Flavors was defined
+      # (metanorma loads metanorma-taste early). Retry registration on demand
+      # and fall back to config-based aliases when the table is still empty.
+      begin
+        require "metanorma-core"
+      rescue LoadError
+        return config_based_aliases
+      end
+
+      if defined?(Metanorma::Core::Flavors) &&
+          Metanorma::Core::Flavors.available_tastes.empty?
+        Metanorma::Taste::FlavorRegistration.register!
+      end
+
+      if defined?(Metanorma::Core::Flavors) &&
+          !Metanorma::Core::Flavors.available_tastes.empty?
+        return Metanorma::Core::Flavors.available_tastes
+          .each_with_object({}) do |t, aliases|
+          aliases[t] = Metanorma::Core::Flavors.find(t).base_flavor
+        end
+      end
+
+      config_based_aliases
+    end
+
+    def config_based_aliases
       @taste_configs.each_with_object({}) do |(flavor, config), aliases|
         aliases[flavor] = config.base_flavor&.to_sym if config.base_flavor
       end
@@ -406,3 +441,7 @@ module Metanorma
     end
   end
 end
+
+# Deferred: runs after TasteRegister.instance is fully built
+# (see TasteRegister#initialize). Safe to call instance here.
+Metanorma::Taste::FlavorRegistration.register!

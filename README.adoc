@@ -201,6 +201,10 @@ currently available:
 |`iho`
 |World Meteorological Organization specifications (e.g. S-411) with WMO branding and copyright, built on the IHO document structure
 
+|`iala`
+|International Organization for Marine Aids to Navigation
+|`generic`
+|IALA Standards (S), Recommendations (R), Guidelines (G), Model Courses (C) and Resolutions with IALA branding (#00558C, Calibri/Carlito), copyright and doctypes
 
 |===
 
