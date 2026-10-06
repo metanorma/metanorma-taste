@@ -13,3 +13,7 @@ base-override:
 doctypes:
 - taste: guide
   base: guide
+stages:
+# BIPM stage vocabulary: in-force is the published-and-current state
+- taste: in-force
+  base: published

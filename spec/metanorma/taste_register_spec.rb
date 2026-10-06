@@ -25,6 +25,8 @@ RSpec.describe Metanorma::TasteRegister do
       expect(info.base_override.filename_attributes.publisher_logo).to eq("logo-jcgm.svg")
       expect(info.doctypes.map(&:taste)).to eq(%w[guide])
       expect(info.doctypes.map(&:base)).to eq(%w[guide])
+      expect(info.stages.map(&:taste)).to eq(%w[in-force])
+      expect(info.stages.map(&:base)).to eq(%w[published])
     end
 
     it "aliases jcgm to its iso base flavor" do
