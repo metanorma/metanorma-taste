@@ -14,6 +14,8 @@ doctypes:
 - taste: guide
   base: guide
 stages:
-# BIPM stage vocabulary: in-force is the published-and-current state
+# BIPM stage vocabulary: in-force is the published-and-current state.
+# The ISO base flavour takes numeric stage codes: 60.60 is published.
 - taste: in-force
-  base: published
+  base: "60"
+  published: true

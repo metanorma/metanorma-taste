@@ -26,7 +26,8 @@ RSpec.describe Metanorma::TasteRegister do
       expect(info.doctypes.map(&:taste)).to eq(%w[guide])
       expect(info.doctypes.map(&:base)).to eq(%w[guide])
       expect(info.stages.map(&:taste)).to eq(%w[in-force])
-      expect(info.stages.map(&:base)).to eq(%w[published])
+      expect(info.stages.map(&:base)).to eq(%w[60])
+      expect(info.stages.map(&:published)).to eq(["true"])
     end
 
     it "aliases jcgm to its iso base flavor" do
