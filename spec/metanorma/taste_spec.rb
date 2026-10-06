@@ -9,6 +9,7 @@ RSpec.describe Metanorma::Taste do
                  elf: :iso,
                  enosema: :iso,
                  icc: :iso,
+                 jcgm: :iso,
                  mbxif: :ribose,
                  oiml: :iso,
                  "oiml-cs": :iso,

@@ -7,6 +7,36 @@ RSpec.describe Metanorma::TasteRegister do
   describe "#available_tastes" do
     it "returns available tastes" do
       expect(register.available_tastes).to include(:icc)
+      expect(register.available_tastes).to include(:jcgm)
+    end
+  end
+
+  describe "#get_config jcgm" do
+    it "returns the JCGM taste configuration" do
+      info = register.get_config(:jcgm)
+      expect(info).to be_a(Metanorma::Taste::TasteConfig)
+      expect(info.flavor).to eq("jcgm")
+      expect(info.base_flavor).to eq("iso")
+      expect(info.owner).to eq("Joint Committee for Guides in Metrology")
+      expect(info.base_override.value_attributes.publisher).to eq("Joint Committee for Guides in Metrology")
+      expect(info.base_override.value_attributes.publisher_abbr).to eq("JCGM")
+      expect(info.base_override.value_attributes.output_extensions).to eq("xml,html,pdf,rxl,presentation")
+      expect(info.base_override.filename_attributes.copyright_notice).to eq("copyright.adoc")
+      expect(info.base_override.filename_attributes.publisher_logo).to eq("logo-jcgm.svg")
+      expect(info.doctypes.map(&:taste)).to eq(%w[guide])
+      expect(info.doctypes.map(&:base)).to eq(%w[guide])
+    end
+
+    it "aliases jcgm to its iso base flavor" do
+      expect(register.aliases[:jcgm]).to eq(:iso)
+    end
+
+    it "resolves the JCGM assets from its own directory" do
+      inst = register.get(:jcgm)
+      expect(inst.send(:file_path_for, :copyright_notice))
+        .to end_with(File.join("data", "jcgm", "copyright.adoc"))
+      expect(inst.send(:file_path_for, :publisher_logo))
+        .to end_with(File.join("data", "jcgm", "logo-jcgm.svg"))
     end
   end
 
