@@ -32,3 +32,4 @@ begin
 rescue StandardError
   nil
 end
+gem "metanorma-oiml", github: "metanorma/metanorma-oiml", branch: "main" # oiml taste specs lazy-require the STS adapter (main-only, unreleased)
