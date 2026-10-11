@@ -108,7 +108,17 @@ module Metanorma
 
       load_transformer_hook(sym)
       block = (@transformer_hooks ||= {})[sym]
-      @transformer_specs[sym] = block ? block.call : {}
+      # Derived tastes (base-taste:) inherit the base taste's transformers —
+      # oiml-cs builds must get the OIML STS hook without redeclaring it.
+      # The loader consumes base-taste while merging, so walk the chain
+      # recorded during resolution.
+      @transformer_specs[sym] =
+        if block
+          block.call
+        else
+          parent = ((@base_taste_chain || {})[sym] || []).first
+          parent ? document_transformers_for(parent) : {}
+        end
     end
 
     # Get detailed information about a specific taste
@@ -339,6 +349,8 @@ module Metanorma
 
       parent_merged, parent_path =
         resolve_raw_config(parent.to_s, raw, in_progress + [flavor])
+      (@base_taste_chain ||= {})[normalize_flavor_name(flavor)] =
+        [normalize_flavor_name(parent), *@base_taste_chain[normalize_flavor_name(parent.to_s)]].compact
       merged = deep_merge(parent_merged, hash)
       merged.delete("base-taste")
       [merged, [dir, *parent_path]]
