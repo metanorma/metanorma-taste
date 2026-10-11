@@ -34,3 +34,7 @@ rescue StandardError
 end
 gem "metanorma-oiml", github: "metanorma/metanorma-oiml", branch: "main" # oiml taste specs lazy-require the STS adapter (main-only, unreleased)
 gem "relaton-iev", "2.0.2" # 2.0.1 and earlier cap relaton < 3, conflicting with the 3.x pre monogem
+# canonical 3.x pre line (the oiml chain needs prerelease relaton-logger)
+gem "relaton", "= 3.0.0.pre.alpha.11"
+gem "relaton-bib", "2.2.0.pre.alpha.1"
+gem "relaton-render", ">= 3.0.0.pre.alpha.43"
