@@ -1,0 +1,21 @@
+---
+flavor: jcgm
+owner: Joint Committee for Guides in Metrology
+base-flavor: iso
+base-override:
+  filename-attributes:
+    copyright-notice: copyright.adoc
+    publisher-logo: logo-jcgm.svg
+  value-attributes:
+    publisher: Joint Committee for Guides in Metrology
+    publisher_abbr: JCGM
+    output-extensions: xml,html,pdf,rxl
+doctypes:
+- taste: guide
+  base: guide
+stages:
+# BIPM stage vocabulary: in-force is the published-and-current state.
+# The ISO base flavour takes numeric stage codes: 60.60 is published.
+- taste: in-force
+  base: "60"
+  published: true

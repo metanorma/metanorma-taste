@@ -22,19 +22,21 @@ stage_dict:
   published:
 
 admonition:  # see https://github.com/metanorma/isodoc/issues/760
-  tip: Tip
+  tip: TIP
   danger: DANGER
-  warning: Warning
-  caution: Caution
-  important: IMPORTANT!
-  safety precautions: SECURITY!
+  warning: WARNING
+  caution: CAUTION
+  important: IMPORTANT
+  safety precautions: SECURITY
   editorial: Editor's Note
+  todo: To-Do
 
+clause_delimiter: ""
 abstract: Summary
 foreword: preface
 clause: section # not capitalized
 formula: equation
-subclause: sub-section
+subclause: sub-section # used in Table of Examples and sub-section citations
 section: section
 edition: edition # cover page word
 annex: Appendix # not capitalized, used in citations

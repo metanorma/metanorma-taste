@@ -1,11 +1,15 @@
 :root {
-  --color_blue: rgb(22, 97, 173); /* copied from ribose.standard.xsl */
+  --color_blue: rgb(22,97,173);
+  --table_border_thin: 0.75pt solid rgb(72,145,175);
+  --table_border_thick: 2.0pt solid rgb(72,145,175);
+  --table_header_color: rgb(183,183,183);
+  --table_zebra_color: rgb(239,239,239);
   --logo_yellow: rgb(202,152,49);
 	--logo_green: rgb(139,152,91);
 	--logo_red: rgb(208,63,78); /* only logo color with sufficient contrast for WCAG Level AA */
 	--logo_blue: rgb(72,145,175);
   --proportional_font: 'Source Sans 3', sans-serif;
-  --small-text-reduction: 85%;
+  --small-text-reduction: 90%;
   --monospaced_font: 'Source Code Pro', monospace;
   --mono_font-reduction: 90%;
   --ribose-primary-color: var(--logo_red); /* used by base flavor styling */
@@ -13,7 +17,7 @@
 
 a {
   text-decoration: underline; /* WCAG - all links must be clearly visible */
-  color: var(--logo_red)
+  color: rgb(194,56,70); /* need sufficient contrast against non-white backgrounds such as zebra stripes, notes, etc. */
 }
 
 img { /* Make images more responsive */
@@ -36,7 +40,8 @@ tt, td tt, p tt, li tt { /* override 0.8em formatting elsewhere */
 
 /* FIGURES, EXAMPLES, SOURCE CODE, ETC. */
 
-figure { /* incl. source code */
+figure, pre { /* need to override full base CSS */
+  background-color: unset;
   display: block;
   line-height: 1.5; /* WCAG level AA requires minimum line height of 1.5 */
   font-size: 100%;
@@ -44,9 +49,11 @@ figure { /* incl. source code */
   padding: 0;
   padding-left: 2mm;
   margin-bottom: 0; 
+  overflow: auto;
 }
 
 figure svg { /* avoid excessive up-scaling of SVGs */
+  background-color: unset;
   width: auto;
   height: auto;
   max-width:  800px;  /* hard ceiling - never too wide for wide figures */
@@ -54,8 +61,9 @@ figure svg { /* avoid excessive up-scaling of SVGs */
 }
 
 figure picture { /* images */
-  display: block;      /* picture must be block for margin: auto to work */
   width: fit-content;  /* shrink-wrap to the img's natural size */
+  margin-inline: auto; /* centred */
+  background-color: unset;
 }
 
 .figdl dt {
@@ -63,40 +71,36 @@ figure picture { /* images */
   font-weight: bolder; /* may slightly hide some PDF notation */
 }
 
-/* Collapsible examples - title */
-summary {
-  color: var(--color_blue);
-}
-
-.example {
+.example, details {
   margin-left: 3mm;
   padding: 2mm;
   margin-top: 2mm;
   border-left: 2pt solid var(--color_blue);
   text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
-  background-color: #D6FFFE; /* Very pale blue */
+  background-color: rgb(227,242,255); /* PDF does not have background color for examples */
 }
 
-.example .example-title {
+.example .example-title, summary {
   color: var(--color_blue);
   margin-left: 0;
-  font-weight: normal;
+  font-weight: bolder; /* slightly bolder */
   text-transform: none; /* PDF is case-sensitive! Never force uppercase! */
 }
 
 .sourcecode {
-  background-color: rgb(230, 230, 230);
+  background-color: rgb(247,247,247);
+  text-align: left;
 }
 
 figcaption.SourceTitle { /* Revert the title back from smaller monospaced font */
   font-family: var(--proportional_font) !important;
-  font-size: 110%;
+  font-size: 110%; /* Up-scale back to default for enclosing block */
   font-weight: normal;
   text-align: left !important;
   margin-top: 2mm;
   margin-bottom: 2mm; 
-  color: var(--color_blue);
-  order: -1; /* move to top */
+  color: rgb(91,94,52);
+  order: -1; /* move title to top of source code block */
 }
 
 pre { /* Rouge source code blocks */
@@ -110,32 +114,44 @@ pre { /* Rouge source code blocks */
 }
 
 /* TABLES - need to hard override some explicit style formatting on the HTML tags */
-/* Can also use DataTables.js classes - https://datatables.net/manual/styling/classes */
+/* We also use DataTables.js classes - https://datatables.net/manual/styling/classes */
+/* Line numbered Rouge also uses tables */
 
-table {
-  border: 2pt solid var(--color_blue) !important; /* thick */
+table:not(.layout, .rouge-line-table) {
+  border: var(--table_border_thick) !important;
 }
 
-table th { /* Table headers */
-  border: 2pt solid var(--color_blue) !important; /* thick */
+table:not(.layout, .rouge-line-table) th { /* Table headers */
+  background-color: var(--table_header_color);
+  border: var(--table_border_thick) !important;
 }
 
 table > caption {
   font-weight: normal; /* Retain PDF notation formatting */
   margin-top: 2mm; /* Close spacing at top */
   padding: 2mm;
-  color: var(--color_blue);
+  color: black;
 }
 
-table td {
+table:not(.layout, .rouge-line-table) td {
   padding: 0;
   padding-left: 1mm;
-  border: 0.75pt solid var(--color_blue) !important; /* thin */
+  border: var(--table_border_thin) !important;
   margin-top: 1mm; /* Close up spacing */
+}
+
+table:not(.layout, .rouge-line-table) tbody tr:nth-child(even) { 
+  background-color: var(--table_zebra_color); 
 }
 
 table.layout { /* class="layout" implies an invisible table used to influence layout */
   border: none !important;
+  background-color: unset;
+}
+
+table.layout td { /* class="layout" implies an invisible table used to influence layout */
+  border: none !important;
+  background-color: unset;
 }
 
 /* COVER MATERIAL */
@@ -144,15 +160,22 @@ table.layout { /* class="layout" implies an invisible table used to influence la
   text-align: center;
 }
 
-.docidentifier { /* cover page doc type, version and status */
-  line-height: 1.5; /* WCAG level AA requires minimum line height of 1.5 */
-  text-align: center;
-  font-size: 20pt;
-}
-
 .doctitle-en { /* cover page primary title */
   text-align: center;
   font-size: 32pt;
+}
+
+.docstage { /* cover page Draft or Release Candidate */
+  color: var(--logo_red); 
+  font-weight: bold;
+  text-align: center;
+  font-size: 28pt;
+}
+
+.docidentifier { /* cover page doc ID */
+  line-height: 1.5; /* WCAG level AA requires minimum line height of 1.5 */
+  text-align: center;
+  font-size: 18pt;
 }
 
 /* NAVIGATION MENU */
@@ -160,8 +183,9 @@ table.layout { /* class="layout" implies an invisible table used to influence la
 /* Avoid bullets on ToC items */
 #toc li::before, #toc li::marker {
   content: none;
-  display: inside;
+  display: none;
 }
+
 #toc li a, #toc > ul :is(.h1) li a {
   text-transform: none; /* PDF is case-sensitive! Never force nav bookmark text uppercase! */
   padding: 1pt;
@@ -178,15 +202,48 @@ table.layout { /* class="layout" implies an invisible table used to influence la
   font-weight: bolder; /* may slightly hide some PDF notation */
 }
 
-/* HEADINGS */
-
-h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
-  text-transform: none; /* PDF is case-sensitive! Never force headings uppercase! */
+/* HEADINGS H1-H6, classes and tags */
+h1, .h1 {
+  margin-top: 3mm; /* tighten up spacing */
+  font-size: 24pt;
+  color: var(--logo_red);
   font-weight: bolder;  /* may slightly hide some PDF notation */
+  text-transform: none; /* PDF is case-sensitive! Never force headings uppercase! */
 }
 
-h1, .h1 {
-  margin-top: 3mm; /* tighten up spacing */ 
+h2, .h2 {
+  font-size: 20pt;
+  color: var(--logo_red);
+  font-weight: bolder;  /* may slightly hide some PDF notation */
+  text-transform: none; /* PDF is case-sensitive! Never force headings uppercase! */
+}
+
+h3, .h3 {
+  font-size: 18pt;
+  color: var(--logo_red);
+  font-weight: bolder;  /* may slightly hide some PDF notation */
+  text-transform: none; /* PDF is case-sensitive! Never force headings uppercase! */
+}
+
+h4, .h4 {
+  font-size: 16pt;
+  color: var(--logo_red);
+  font-weight: bolder;  /* may slightly hide some PDF notation */
+  text-transform: none; /* PDF is case-sensitive! Never force headings uppercase! */
+}
+
+h5, .h5 {
+  font-size: 14pt;
+  color: var(--logo_red);
+  font-weight: bolder;  /* may slightly hide some PDF notation */
+  text-transform: none; /* PDF is case-sensitive! Never force headings uppercase! */
+}
+
+h6, .h6 {
+  font-size: 12pt;
+  color: var(--logo_red);
+  font-weight: bolder;  /* may slightly hide some PDF notation */
+  text-transform: none; /* PDF is case-sensitive! Never force headings uppercase! */
 }
 
 /* UNORDERED LIST BULLETS */
@@ -194,7 +251,7 @@ h1, .h1 {
 /* Null out other CSS that uses legacy ::before */
 ul > li::before {
   content: none;
-  display: outside;
+  display: none;
   width: auto;
   margin: 0;
   padding: 0;
@@ -245,8 +302,9 @@ div.ul_wrap:has(> ul > li) {
   margin-left: 4mm;
 }
 
-/* Block quotes */
+/* BLOCK QUOTES */
 .Quote {
+  background-color: rgb(227,242,255);
   width: 95%;
   margin-left: 15mm;
   margin-right: 5mm;
@@ -262,20 +320,21 @@ span.TermNum {
   font-weight: normal;
 }
 
+/* SEMANTIC SPANS */
 .requirement {
-  color: rgb(255, 0, 0); 
+  color: rgb(194,56,70); 
   font-weight: bold;
   text-transform: uppercase; /* Uppercase "SHALL" a-la RFCs */
 }
 
 .recommendation {
-  color: rgb(255, 140, 0);
+  color: rgb(134,103,39);
   font-weight: bold;
   text-transform: uppercase; /* Uppercase "SHOULD" a-la RFCs */
 }
 
 .pdf-version { 
-  color: rgb(0, 0, 255); 
+  color: rgb(39,78,19); 
   font-style: italic; 
   font-weight: lighter; 
 }
@@ -285,26 +344,22 @@ span.TermNum {
 .pdf-operator {
   font-family: var(--monospaced_font);
   font-size: var(--mono_font-reduction);
-  padding: 1pt;
-  background-color: rgb(224, 224, 175);
-  color: rgb(255, 0, 0); 
+  color: rgb(53,28,117); 
   font-weight: bold;
 }
 
 .pdf-keyword {
   font-family: var(--monospaced_font);
   font-size: var(--mono_font-reduction);
-  padding: 1pt;
-  background-color: rgb(224, 224, 175);
-  color: rgb(0, 0, 255); 
+  color: rgb(55,110,134); 
   font-weight: bold;
 }
 
 /* Base admonition styling */
 .Note, .Admonition  {
   font-size: var(--small-text-reduction);
-	background-color: rgb(252, 251, 212);
-	border-left: 4pt solid rgb(255, 200, 36);
+	background-color: rgb(255,249,232);
+	border-left: 4pt solid rgb(241,194,50);
   margin: 2mm;
   margin-left: 3mm;
   padding: 1.5mm;
@@ -312,6 +367,7 @@ span.TermNum {
 
 .note_label, .termnote_label {
   font-weight: bold; /* the "NOTE 1" or "Note to entry" text before the body of a note*/
+  color: rgb(55,110,134);
 }
 
 .AdmonitionTitle { /* titles of all admonitions */
@@ -322,73 +378,73 @@ span.TermNum {
 
 /* Tip admonition */
 .AdmonitionTip {
-  background-color: rgb(245,235,206);
-  border-left-color: rgb(208,63,78);
+  background-color: rgb(227,242,255);
+  border-left-color: rgb(28,69,135);
 }
 
 .AdmonitionTip.AdmonitionTitle {
-  color: rgb(208,63,78);
+  color: rgb(55,110,134);
   text-align: left !important; /* HTML has hard-coded style to center */
 }
 
 /* Warning admonition */
 .AdmonitionWarning {
-  background-color: rgb(255,245,230);
-  border-left-color: rgb(255,140,0);
+  background-color: rgb(244,255,240);
+  border-left-color: rgb(91,94,52);
 }
 
 .AdmonitionWarning.AdmonitionTitle {
-  color: rgb(255,140,0);
+  color: rgb(67,67,67);
   text-align: left !important; /* HTML has hard-coded style to center */
 }
 
 /* Caution admonition */
 .AdmonitionCaution {
-  background-color: rgb(255,250,205);
-  border-left-color: rgb(184,134,11);
+  background-color: rgb(255,255,191);
+  border-left-color: rgb(255,117,117);
 }
 
 .AdmonitionCaution.AdmonitionTitle {
-  color: rgb(184,134,11);
+  color: rgb(102,0,0);
   text-align: left !important; /* HTML has hard-coded style to center */
 }
 
 /* Important admonition */
 .AdmonitionImportant {
-  background-color: rgb(255,230,230);
-  border-left-color: rgb(255,0,0);
+  background-color: rgb(247,247,247);
+  border-left-color: rgb(102,102,102);
 }
 
 .AdmonitionImportant.AdmonitionTitle {
-  color: rgb(255,0,0);
+  color: rgb(194,56,70);
   text-align: left !important; /* HTML has hard-coded style to center */
 }
 
 /* Safety-precaution admonition */
 .AdmonitionSafetyPrecaution {
-  background-color:rgb(230,245,230);
-  border-left-color: rgb(0,128,0);
+  background-color:rgb(230,239,227);
+  border-left-color: black;
 }
 
 .AdmonitionSafetyPrecaution.AdmonitionTitle {
-  color: rgb(0,128,0);
+  color: rgb(67,67,67);
   text-align: left !important; /* HTML has hard-coded style to center */
 }
 
-/* Editorial admonition */
+/* Editorial admonition - never in final publications! */
 .AdmonitionEditorial {
-  background-color: rgb(240,240,240);
-  border-left-color: rgb(128,128,128);
+  background-color: rgb(239,239,239);
+  border-left-color: rgb(27,127,27);
 }
 
 .AdmonitionEditorial.AdmonitionTitle {
-  color: rgb(128,128,128);
+  color: rgb(67,67,67);
   text-align: left !important; /* HTML has hard-coded style to center */
 }
 
-/* Box admonition */
+/* Box admonition - not used */
 .AdmonitionBox {
-  background-color: rgb(154, 221, 218);
+  background-color: rgb(154,221,218);
   border: 2pt solid black;
 }
 
@@ -397,14 +453,14 @@ span.TermNum {
   text-align: left !important; /* HTML has hard-coded style to center */
 }
 
-/* Other admonition */
+/* Other admonition - should never happen */
 .AdmonitionOther {
-  background-color: rgb(240,240,240);
-  border-left-color: rgb(80, 80, 80);
+  background-color: rgb(239,239,239);
+  border-left-color: rgb(102,102,102);
 }
 
 .AdmonitionOther.AdmonitionTitle {
-  color: rgb(80, 80, 80);
+  color: rgb(67,67,67);
   text-align: left !important; /* HTML has hard-coded style to center */
 }
 

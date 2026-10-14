@@ -2,45 +2,75 @@
 
 <div class="coverpage-container" style="padding-left: 22px"> <!-- padding-left required to avoid submarining left edge text below "toggle" div -->
 
+  {% assign sponsors = false %}
+  {% for c in bibdata.contributor %}
+    {% for r in c.role %}
+      {% if r.type == "enabler" %}
+        {% assign sponsors = true %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+
   <div class="logo">
     <img src="{{ copublisher_logos[0] }}" alt="PDF Association logo"/>
+    {% if sponsors %}
+    <table class="layout">
+      <tr>
+        {% for c in bibdata.contributor %}
+          {% for r in c.role %}
+            {% if r.type == "enabler" %}
+              <td style="vertical-align: middle;">
+                <img src="{{ c.organization.logo[0].image.src }}" alt="{{ c.organization.name[0].content }} sponsorship logo"/>"
+              </td>
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      </tr>
+    </table>
+    {% endif %}
   </div>
 
-  <div>
-    <p class="doctitle-en">{{ doctitle }}</p>
-  </div>
+  <p class="doctitle-en">{{ doctitle }}</p>
+  {%if stage_display %}<p class="docstage">{{ stage_display }}{% if edition %} {{ edition }}{% endif %}</p>{% endif %}
+  <p class="docidentifier">{{doctype_display}} : {{ docnumber }}</p>
 
   <div style="display: none;">
-    <!-- p>document.docid.id = {{ document.docid.id }}</p -->
-    <!-- p>document.docstatus.stage = {{ document.docstatus.stage }}</p -->
     <!-- https://www.metanorma.org/develop/topics/metadata-and-boilerplate/#default-metadata -->
+    <p>bibdata.ext = {{ bibdata.ext }}</p>
+    <p>bibdata.ext.coverpage_image.image.src = {{ bibdata.ext.coverpage_image.image.src }}</p>
+    <p>bibdata.ext.coverpage_image.image[0].src = {{ bibdata.ext.coverpage_image.image[0].src }}</p>
+    <p>bibdata.ext.innercoverpage-image.image.src = {{ bibdata.ext.innercoverpage-image.image.src }}</p>
+    <p>bibdata = {{ bibdata }}</p>
+
+    {% for c in bibdata.contributor %}
+      {% for r in c.role %}
+        {% if r.type == "enabler" %}
+          <p>c.organization.name[0].content = {{ c.organization.name[0].content }}</p>
+          <p>c.organization.logo[0].image.mimetype = {{ c.organization.logo[0].image.mimetype }}</p>
+          <p>c.organization.logo[0].image.src = {{ c.organization.logo[0].image.src }}</p>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+
+    <p>bibdata.id = {{ bibdata.id }}</p>
+    <p>bibdata.docidentifier = {{ bibdata.docidentifier }}</p>
+    <p>bibdata.edition = {{ bibdata.edition }}</p>
+    <p>bibdata.version = {{ bibdata.version }}</p>
+    <p>bibdata.status  = {{ bibdata.status }}</p>
+    <p>bibdata.status.stage.abbreviation = {{ bibdata.status.stage.abbreviation }}</p>
     <p>doctype = {{ doctype }}</p>
     <p>doctype_display = {{ doctype_display }}</p>
     <p>doctype_abbr = {{ doctype_abbr }}</p>
-    <p>docidentifier = {{ docidentifier }}</p>
     <p>docnumber = {{ docnumber }}</p>
     <p>docnumeric = {{ docnumeric }}</p>
     <p>docyear = {{ docyear }}</p> 
     <p>edition = {{ edition }}</p>
     <p>edition_display = {{ edition_display }}</p>
-    <p>version = {{ version }}</p>
-    <p>version_display = {{ version_display }}</p>
-    <p>iteration = {{ iteration }}</p>
     <p>draft = {{ draft }}</p>
-    <p>status = {{ status }}</p>
     <p>stage = {{ stage }}</p>
     <p>stage_display = {{ stage_display }}</p>
-    <p>stage_abbr = {{ stage_abbr }}</p>
     <p>stageabbr = {{ stageabbr }}</p>
-    <p>statusabbr = {{ statusabbr }}</p>
-    <!-- p>doctype_abbreviated = {{ doctype_abbreviated }}</p -->
-    <!-- p>document.docstatus.stage.abbreviation = {{ document.docstatus.stage.abbreviation }}</p -->
-</div>
-
-  <div class="docidentifier">
-    <p><b>
-    {{doctype_display}} : {{ docnumber }} {%if stage_display %} - <span style="color:red">{{stage_display}}{% if bibdata.status.stage.abbreviation %} ({{ bibdata.status.stage.abbreviation }}){% endif %}</span>{% endif %}
-    </b></p>
   </div>
+
   <hr/>
 </div>

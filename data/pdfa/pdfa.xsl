@@ -613,7 +613,8 @@
 					<xsl:call-template name="setIDforNamedDestinationInline"/>
 					<xsl:variable name="section-number" select="normalize-space(mn:tab[1]/preceding-sibling::node())"/>
 					<xsl:if test="$section-number != ''">
-						<xsl:value-of select="$section-number"/>&#x2003; <!-- EM space (wider than NBSP) -->
+						<xsl:value-of select="$section-number"/>
+						<fo:leader leader-pattern="space" leader-length.minimum="0.5em" leader-length.optimum="1em" leader-length.maximum="1em"/>
 					</xsl:if>
 					<xsl:call-template name="extractTitle"/> <!-- section title -->
 					<xsl:apply-templates select="following-sibling::*[1][self::mn:variant-title][@type = 'sub']" mode="subtitle"/>
@@ -720,6 +721,9 @@
 		<xsl:attribute name="margin-top">2mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">2mm</xsl:attribute>
 		<xsl:attribute name="padding">1mm</xsl:attribute>
+		<xsl:if test="ancestor::mn:li">
+			<xsl:attribute name="margin-left">8.5mm</xsl:attribute> <!-- List item notes need larger left indent to align with list item body, not bullet -->
+		</xsl:if>
 		<xsl:if test="ancestor::mn:bibitem">
 			<xsl:attribute name="keep-with-previous">always</xsl:attribute> <!-- keep biblio notes with their bibliographic reference -->
 			<xsl:attribute name="margin-left">8.5mm</xsl:attribute> <!-- Biblio notes need larger left indent to align with hanging para -->
@@ -1159,6 +1163,43 @@
 
 	<!-- CITATIONS AND CROSS-REFERENCES -->
 
+	<xsl:attribute-set name="bibliography-title-style"><?extend?>
+		<xsl:attribute name="margin-bottom">22pt</xsl:attribute>
+	</xsl:attribute-set>
+
+
+	<xsl:template match="mn:references[not(@normative='true')]" priority="3">
+		<fo:block break-after="page"/>
+		<fo:block id="{@id}" role="Sect">
+			<xsl:call-template name="addTagElementT"/>
+			
+			<fo:block xsl:use-attribute-sets="title-style"> <!-- Bibliography section title -->
+				<xsl:call-template name="refine_title-style"/>
+				<xsl:apply-templates select="mn:fmt-title/node()"/>
+			</fo:block>
+
+			<fo:block role="L">
+				<xsl:for-each select="node()[not(self::mn:fmt-title)]">
+					<xsl:choose>
+						<xsl:when test="self::mn:bibitem">
+							<xsl:apply-templates select="." />
+						</xsl:when>
+						<xsl:otherwise> <!-- for instance, self::mn:admonition -->
+							<xsl:variable name="item_content"><xsl:apply-templates select="." /></xsl:variable>
+							<xsl:if test="normalize-space($item_content) != ''">
+								<fo:block role="LI">
+									<fo:block role="LBody">
+										<xsl:copy-of select="$item_content"/>
+									</fo:block>
+								</fo:block>
+							</xsl:if>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:for-each>
+			</fo:block>
+		</fo:block>
+	</xsl:template>
+
 	<!-- Internal citation referencing styling (only H1s) - https://github.com/metanorma/metanorma-pdfa/issues/46 -->
 	<xsl:template match="mn:fmt-xref[ @style = 'full' ]/mn:semx[ @element = 'title' ]" mode="update_xml_step1">
 		<xsl:text>"</xsl:text>
@@ -1167,14 +1208,22 @@
 	</xsl:template>
 
 
+	<xsl:template match="mn:table[ancestor::*[local-name() = 'ol' or local-name() = 'ul'][1]/@class]" mode="update_xml_step1">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<xsl:copy-of select="ancestor::*[local-name() = 'ol' or local-name() = 'ul'][1]/@class"/>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+
 	<!-- SVG AND PLANTUML -->
 	<!-- Replace generic "sans-serif" font with precise Arial, "serif" with precise Times New Roman, and "monospace" with Courier New that were used by PlantUML diagrams -->
 	<!-- All PlantUML figures contain a plantuml processing instruction (whereas @data-diagram-type attribute is NOT always used) -->
 	<xsl:template match="*[processing-instruction('plantuml')]" mode="svg_update">
-			<!-- From the PI, select all sibling elements and all text descendants within them at any depth -->
-			<xsl:apply-templates select="processing-instruction('plantuml')/following-sibling::*/descendant-or-self::*[local-name() = 'text']" mode="svg_update"/>
-			<!-- Also catch text elements that are direct following siblings of the PI (not wrapped in another element) -->
-			<xsl:apply-templates select="processing-instruction('plantuml')/following-sibling::*[local-name() = 'text']" mode="svg_update"/>
+		<!-- From the PI, select all sibling elements and all text descendants within them at any depth -->
+		<xsl:apply-templates select="processing-instruction('plantuml')/following-sibling::*/descendant-or-self::*[local-name() = 'text']" mode="svg_update"/>
+		<!-- Also catch text elements that are direct following siblings of the PI (not wrapped in another element) -->
+		<xsl:apply-templates select="processing-instruction('plantuml')/following-sibling::*[local-name() = 'text']" mode="svg_update"/>
 	</xsl:template>
 
 	<xsl:template match="*[local-name() = 'text']" mode="svg_update">
@@ -1189,7 +1238,7 @@
 				<xsl:if test="@font-family = 'monospace'">
 					<xsl:attribute name="font-family">Courier New</xsl:attribute>
 				</xsl:if>
-			<xsl:apply-templates select="node()"/>
+			<xsl:apply-templates select="node()" mode="svg_update"/>
 		</xsl:copy>
 	</xsl:template>
 
