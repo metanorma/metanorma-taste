@@ -6,11 +6,22 @@ git_source(:github) { |repo| "https://github.com/#{repo}" }
 
 gemspec
 
+# TEMPORARY pin: the flavor/taste table (metanorma-core#18) merged to main on
+# 2026-09-06 but is unreleased (latest gem 0.2.3 predates it). Drop this pin
+# once metanorma-core > 0.2.3 is on rubygems.
+gem "metanorma-core", github: "metanorma/metanorma-core", branch: "main"
+# TEMPORARY pin for the compile fix (implicit presentation dependency +
+# non-mutating output_formats, metanorma#602, rebase-merged into
+# feat/flavors-table); drop when that branch reaches rubygems.
+gem "metanorma", github: "metanorma/metanorma", branch: "feat/flavors-table"
+
 group :development do
   gem "canon"
   gem "debug"
   gem "equivalent-xml", "~> 0.6"
 gem "metanorma", github: "metanorma/metanorma", branch: "main"
+
+group :development do
   gem "metanorma-cli", github: "metanorma/metanorma-cli", branch: "main"
   gem "metanorma-generic", github: "metanorma/metanorma-generic", branch: "fix/committees-string-entries" # generic#130; released crashes on string committees
   gem "metanorma-ieee", github: "metanorma/metanorma-ieee", branch: "main"
