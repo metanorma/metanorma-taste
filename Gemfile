@@ -68,6 +68,5 @@ gem "metanorma-gb", github: "metanorma/metanorma-gb", branch: "main"
 gem "metanorma-iho", github: "metanorma/metanorma-iho", branch: "main"
 gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "main"
 gem "metanorma-jis", github: "metanorma/metanorma-jis", branch: "main"
-# metanorma-nist resolves from the private Packages registry (repo is private; the org PAT is packages-scoped)
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
 gem "metanorma-plateau", github: "metanorma/metanorma-plateau", branch: "main"
