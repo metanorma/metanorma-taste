@@ -240,16 +240,25 @@ module Metanorma
       # final commit); the table is authoritative.
       #
       # register! may have run before Metanorma::Core::Flavors was defined
-      # (metanorma loads metanorma-taste early). Retry registration on demand
-      # and fall back to config-based aliases when the table is still empty.
+      # (metanorma loads metanorma-taste early), or flavor gems may have
+      # registered their entries into a table that still lacks the
+      # data-driven tastes. Retry registration whenever any taste config
+      # is missing from the table, not only when the table is empty —
+      # otherwise the table branch below silently drops those tastes and
+      # their resolution falls back to the raw name (load_flavor then
+      # fatal-aborts on the taste's non-processor gem, e.g. the oiml STS
+      # library).
       begin
         require "metanorma-core"
       rescue LoadError
         return config_based_aliases
       end
 
-      if defined?(Metanorma::Core::Flavors) &&
-          Metanorma::Core::Flavors.available_tastes.empty?
+      if defined?(Metanorma::Core::Flavors) && (
+          Metanorma::Core::Flavors.available_tastes.empty? ||
+          @taste_configs.keys.any? do |t|
+            Metanorma::Core::Flavors.find(t).nil?
+          end)
         Metanorma::Taste::FlavorRegistration.register!
       end
 

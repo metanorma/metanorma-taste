@@ -28,6 +28,11 @@ module Metanorma
           return unless defined?(Metanorma::Core::Flavors)
 
           TasteRegister.instance.available_tastes.each do |taste|
+            # The registry appends on every register; a retry after
+            # flavor gems registered their own entries must not
+            # duplicate the tastes already present.
+            next if Metanorma::Core::Flavors.find(taste)
+
             register_taste(taste)
           end
         end
