@@ -13,17 +13,15 @@ gem "metanorma-core", github: "metanorma/metanorma-core", branch: "main"
 # TEMPORARY pin for the compile fix (implicit presentation dependency +
 # non-mutating output_formats, metanorma#602, rebase-merged into
 # feat/flavors-table); drop when that branch reaches rubygems.
-gem "metanorma", github: "metanorma/metanorma", branch: "feat/flavors-table"
+gem "metanorma", github: "metanorma/metanorma", branch: "main"
 
 group :development do
   gem "canon"
   gem "debug"
   gem "equivalent-xml", "~> 0.6"
-gem "metanorma", github: "metanorma/metanorma", branch: "main"
-
-group :development do
+  gem "metanorma", github: "metanorma/metanorma", branch: "main"
   gem "metanorma-cli", github: "metanorma/metanorma-cli", branch: "main"
-  gem "metanorma-generic", github: "metanorma/metanorma-generic", branch: "fix/committees-string-entries" # generic#130; released crashes on string committees
+  gem "metanorma-generic", github: "metanorma/metanorma-generic", branch: "main" # generic#130 merged
   gem "metanorma-ieee", github: "metanorma/metanorma-ieee", branch: "main"
   gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "main" # released caps document at 0.2; oiml main needs 0.4+
   gem "metanorma-ribose", github: "metanorma/metanorma-ribose", branch: "main"
@@ -45,9 +43,14 @@ rescue StandardError
 end
 gem "metanorma-oiml", github: "metanorma/metanorma-oiml", branch: "main" # oiml taste specs lazy-require the STS adapter (main-only, unreleased)
 gem "relaton-iev", "2.0.2" # 2.0.1 and earlier cap relaton < 3, conflicting with the 3.x pre monogem
+# released suma (all >= 0.2.6) pins svg_conform ~> 0.1.0, incompatible
+# with standoc's ~> 0.2 (suma#127); main carries the fix
+gem "suma", github: "metanorma/suma", branch: "main"
+# released plugin-lutaml 0.7.50 dropped the preprocessor names standoc
+# registers (LutamlDataPreprocessor); main carries them (generic#133)
+gem "metanorma-plugin-lutaml", github: "metanorma/metanorma-plugin-lutaml", branch: "main"
 # canonical 3.x pre line (the oiml chain needs prerelease relaton-logger)
 gem "relaton", "= 3.0.0.pre.alpha.11"
-gem "relaton-bib", "2.2.0.pre.alpha.1"
 gem "relaton-render", ">= 3.0.0.pre.alpha.43"
 # coherent core mains: the α relaton line needs them (released ones cap render at 1.x)
 gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
