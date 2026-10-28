@@ -46,9 +46,10 @@ gem "suma", github: "metanorma/suma", branch: "main"
 # released plugin-lutaml 0.7.50 dropped the preprocessor names standoc
 # registers (LutamlDataPreprocessor); main carries them (generic#133)
 gem "metanorma-plugin-lutaml", github: "metanorma/metanorma-plugin-lutaml", branch: "main"
-# canonical 3.x pre line (the oiml chain needs prerelease relaton-logger)
-gem "relaton", "= 3.0.0.pre.alpha.11"
-gem "relaton-render", ">= 3.0.0.pre.alpha.43"
+# relaton 3.0.0 is released; the α-era exact pin sorts below it and
+# conflicts with released metanorma-document's `relaton ~> 3.0` floor
+gem "relaton", "~> 3.0"
+gem "relaton-render", "~> 3.0"
 # coherent core mains: the α relaton line needs them (released ones cap render at 1.x)
 gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
 gem "metanorma-document", github: "metanorma/metanorma-document", branch: "main"
