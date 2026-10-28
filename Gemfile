@@ -6,10 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}" }
 
 gemspec
 
-# TEMPORARY pin: the flavor/taste table (metanorma-core#18) merged to main on
-# 2026-09-06 but is unreleased (latest gem 0.2.3 predates it). Drop this pin
-# once metanorma-core > 0.2.3 is on rubygems.
-gem "metanorma-core", github: "metanorma/metanorma-core", branch: "main"
+gem "metanorma-core", "~> 0.2.5.pre.alpha" # published flavor/taste table (metanorma-core#18)
 # TEMPORARY pin for the compile fix (implicit presentation dependency +
 # non-mutating output_formats, metanorma#602, rebase-merged into
 # feat/flavors-table); drop when that branch reaches rubygems.
