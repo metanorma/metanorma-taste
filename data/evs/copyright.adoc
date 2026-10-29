@@ -1,0 +1,41 @@
+== copyright-statement
+=== {blank}
+
+*Standardite ja standardilaadsete dokumentide reprodutseerimise ja levitamise õigus kuulub Eesti Standardimis- ja
+Akrediteerimiskeskusele*
+
+Eesti standardid ja standardilaadsed dokumendid on Eesti Standardimis- ja Akrediteerimiskeskuse intellektuaalomand ning neid
+kasutatakse litsentsi alusel dokumentide kasutuslepingu tingimuste kohaselt.
+
+Ilma Eesti Standardimis- ja Akrediteerimiskeskuse eelneva kirjaliku loata on keelatud standardite ja standardilaadsete
+dokumentide täielik või osaline reprodutseerimine, levitamine, muutmine või kasutamine mis tahes kujul ja viisil - sealhulgas
+kopeerimise, skaneerimise, salvestamise või jagamise teel digiplatvormidel (k.a masinõppe ja tehisintellekti rakendustes). Loata
+kasutamine väljaspool litsentsi tingimusi käsitletakse õigusrikkumisena.
+
+Kui Teil on küsimusi standardite ja standardilaadsete dokumentide autoriõiguse kaitse kohta, võtke palun ühendust Eesti
+Standardimis- ja Akrediteerimiskeskusega:
+Veebileht www.evs.ee; telefon +372 6055050; e-post link:mailto:info@evs.ee[info@evs.ee]
+
+*The right to reproduce and distribute standards and standard-like documents belongs to the Estonian Centre for
+Standardisation and Accreditation*
+
+Estonian standards and standard-like documents are the intellectual property of the Estonian Centre for Standardisation and
+Accreditation and are made available under license in accordance with the terms and conditions of the document use agreement.
+
+Without the prior written permission of the Estonian Centre for Standardisation and Accreditation, the full or partial
+reproduction, distribution, modification, or use of standards and standard-like documents in any form or by any means -
+including photocopying, scanning, storing, or sharing via digital platforms (incl. in machine learning and artificial intelligence
+applications) - is strictly prohibited. Any unauthorized use beyond the scope of the granted license is prohibited and may result
+in legal action.
+
+If you have any questions about copyright, please contact Estonian Centre for Standardisation and Accreditation:
+Homepage www.evs.ee; phone +372 605 5050; e-mail link:mailto:info@evs.ee[info@evs.ee]
+
+
+
+== feedback-statement
+
+=== {blank}
+
+Tagasisidet standardi sisu kohta on võimalik edastada, kasutades EVS-i veebilehel asuvat tagasiside vormi
+või saates e-kirja meiliaadressile link:mailto:standardiosakond@evs.ee[standardiosakond@evs.ee].
