@@ -13,7 +13,7 @@ kopeerimise, skaneerimise, salvestamise või jagamise teel digiplatvormidel (k.a
 kasutamine väljaspool litsentsi tingimusi käsitletakse õigusrikkumisena.
 
 Kui Teil on küsimusi standardite ja standardilaadsete dokumentide autoriõiguse kaitse kohta, võtke palun ühendust Eesti
-Standardimis- ja Akrediteerimiskeskusega:
+Standardimis- ja Akrediteerimiskeskusega: +
 Veebileht www.evs.ee; telefon +372 6055050; e-post link:mailto:info@evs.ee[info@evs.ee]
 
 *The right to reproduce and distribute standards and standard-like documents belongs to the Estonian Centre for
@@ -28,7 +28,7 @@ including photocopying, scanning, storing, or sharing via digital platforms (inc
 applications) - is strictly prohibited. Any unauthorized use beyond the scope of the granted license is prohibited and may result
 in legal action.
 
-If you have any questions about copyright, please contact Estonian Centre for Standardisation and Accreditation:
+If you have any questions about copyright, please contact Estonian Centre for Standardisation and Accreditation: +
 Homepage www.evs.ee; phone +372 605 5050; e-mail link:mailto:info@evs.ee[info@evs.ee]
 
 
