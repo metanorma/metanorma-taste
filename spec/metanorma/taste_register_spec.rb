@@ -513,6 +513,18 @@ RSpec.describe Metanorma::TasteRegister do
       expect(result2).to include(":docstage-valid: draft,published")
     end
 
+    it "maps the enosema directive doctype as a pass-through" do
+      enosema = described_class.get(:enosema)
+      result = enosema.process_input_adoc_overrides([":doctype: directive"], options)
+      expect(result).to include(":doctype: directive")
+      expect(result).to include(":presentation-metadata-doctype-alias: directive")
+      expect(result).not_to include(":doctype: international-standard")
+
+      result = enosema.process_input_adoc_overrides([":doctype: standard"], options)
+      expect(result).to include(":doctype: international-standard")
+      expect(result).to include(":presentation-metadata-doctype-alias: standard")
+    end
+
     it "warns and falls back to the default stage on an unrecognised stage" do
       result = nil
       expect do

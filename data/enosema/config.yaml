@@ -19,3 +19,7 @@ doctypes:
   base: international-standard
 - taste: guide
   base: guide
+# pass-through: the registry keys on doctype=directive for category mapping,
+# so it must survive into the emitted XML/Relaton (isodoc styles it natively)
+- taste: directive
+  base: directive
