@@ -2,11 +2,12 @@
 === {blank}
 (c) {{ docyear }} Enosema Foundation.
 
-All rights reserved. Unless otherwise specified, or required in the context of
-its implementation, no part of this publication may be reproduced or utilized
-otherwise in any form or by any means, electronic or mechanical, including
-photocopying, or posting on the internet or an intranet, without prior written
-permission. Permission can be requested from the Enosema Foundation.
+This document is made available under the Creative Commons Attribution 4.0
+International (CC BY 4.0) license. Unless otherwise specified, or required in
+the context of its implementation, you are free to use, share, and adapt this
+document, provided that appropriate credit is given to the Enosema Foundation
+and that any changes are indicated. The full license text is available at
+https://creativecommons.org/licenses/by/4.0/.
 
 Enosema Foundation +
 2885 Sanford Ave Sw Suite 32361 +
