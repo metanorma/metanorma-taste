@@ -1,3 +1,4 @@
 doctype_dict:
   standard: Standard
   guide: Guide
+  directive: Directive
