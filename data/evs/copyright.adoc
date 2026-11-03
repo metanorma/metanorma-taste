@@ -14,7 +14,8 @@ kasutamine väljaspool litsentsi tingimusi käsitletakse õigusrikkumisena.
 
 Kui Teil on küsimusi standardite ja standardilaadsete dokumentide autoriõiguse kaitse kohta, võtke palun ühendust Eesti
 Standardimis- ja Akrediteerimiskeskusega: +
-Veebileht www.evs.ee; telefon +372 6055050; e-post link:mailto:info@evs.ee[info@evs.ee]
+Veebileht www.evs.ee; telefon +372 6055050; e-post link:mailto:info@evs.ee[info@evs.ee] +
+
 
 *The right to reproduce and distribute standards and standard-like documents belongs to the Estonian Centre for
 Standardisation and Accreditation*
