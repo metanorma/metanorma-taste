@@ -13,9 +13,8 @@ gem "metanorma-core", "~> 0.2.5.pre.alpha" # published flavor/taste table (metan
 gem "metanorma", github: "metanorma/metanorma", branch: "main"
 
 group :development do
-  gem "canon"
+  gem "canon", "~> 0.3"
   gem "debug"
-  gem "equivalent-xml", "~> 0.6"
   gem "metanorma", github: "metanorma/metanorma", branch: "main"
   gem "metanorma-cli", github: "metanorma/metanorma-cli", branch: "main"
   gem "metanorma-generic", github: "metanorma/metanorma-generic", branch: "main" # generic#130 merged
