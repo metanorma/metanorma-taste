@@ -50,7 +50,6 @@
 	<xsl:template name="cover-page">
 		<xsl:param name="num"/>
 		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" initial-page-number="1">
-			<!-- Logo -->
 			<fo:static-content flow-name="cover-page-header" role="SKIP">
 				<fo:block font-size="19pt" font-weight="bold" text-align-last="justify" color="{$color_blue}" margin-top="19mm" margin-right="2mm">
 					<fo:inline keep-together.within-line="always" role="SKIP">
@@ -64,6 +63,7 @@
 				</fo:block>
 			</fo:static-content>
 			
+			<!-- Logo -->
 			<fo:static-content flow-name="cover-page-footer" role="SKIP">
 				<fo:block text-align="center" font-size="0pt" margin-left="2mm">
 					<fo:external-graphic src="{normalize-space($EVS-Logo_cover)}" content-width="110mm" content-height="scale-to-fit" scaling="uniform" fox:alt-text="EVS Logo" fox:placement="Block"/>
@@ -74,8 +74,24 @@
 				<xsl:call-template name="insert_firstpage_id"><xsl:with-param name="num" select="$num"/></xsl:call-template>
 				<fo:block-container font-size="19pt" font-weight="bold" width="160mm" line-height="1.17" margin-left="2mm">
 					<fo:block-container margin-left="0mm">
-						<fo:block text-transform="uppercase">DIGITAALNE TOOTEPASS. ANDMEVAHETUSE PROTOKOLLID</fo:block>
-						<fo:block margin-top="14mm">Digital product passport - Data exchange protocols</fo:block>
+						<fo:block text-transform="uppercase">
+							<!-- Title in Estonian, for example:
+								DIGITAALNE TOOTEPASS. ANDMEVAHETUSE PROTOKOLLID -->
+							<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:title[@language = 'et' and @type = 'title-intro'] | 
+									/mn:metanorma/mn:bibdata/mn:title[@language = 'et' and @type = 'title-main']">
+								<xsl:apply-templates select="node()"/>
+								<xsl:if test="position() != last()"><xsl:text>. </xsl:text></xsl:if>
+							</xsl:for-each>
+						</fo:block>
+						<fo:block margin-top="14mm">
+							<!-- Title in English, for example:
+								Digital product passport - Data exchange protocols -->
+							<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:title[@language = 'en' and @type = 'title-intro'] | 
+									/mn:metanorma/mn:bibdata/mn:title[@language = 'en' and @type = 'title-main']">
+								<xsl:apply-templates select="node()"/>
+								<xsl:if test="position() != last()"><xsl:text>&#xa0;-&#xa0;</xsl:text></xsl:if>
+							</xsl:for-each>
+						</fo:block>
 					</fo:block-container>
 				</fo:block-container>
 			</fo:flow>
@@ -160,7 +176,10 @@
 					<fo:table-body role="SKIP">
 						<fo:table-row role="SKIP">
 							<fo:table-cell role="SKIP" padding-top="5.5mm">
-								<fo:block>© 2026 CEN/CENELEC</fo:block> <!-- To do -->
+								<!-- Example: © 2026 CEN/CENELEC -->
+								<fo:block>
+									<xsl:value-of select="concat('© ', /mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:copyright/mn:from, ' CEN/CENELEC')"/>
+								</fo:block>
 							</fo:table-cell>
 							<fo:table-cell role="SKIP" padding-top="5.5mm">
 								<fo:block>All rights of exploitation in any form and by any means
@@ -168,7 +187,17 @@
 									CENELEC Members.</fo:block> <!-- To do -->
 							</fo:table-cell>
 							<fo:table-cell role="SKIP" padding-top="5.5mm" text-align="right">
-								<fo:block>Ref. No. EN 18216:2026 E</fo:block> <!-- To do -->
+								<!-- Example: Ref. No. EN 18216:2026 E -->
+								<fo:block>
+									<xsl:value-of select="concat(
+										'Ref. No. ',
+										/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:docidentifier[@type = 'EN'],
+										':',
+										/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:copyright/mn:from,
+										' ',
+										java:toUpperCase(java:java.lang.String.new(substring(/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:language, 1, 1)))
+										)"/>
+								</fo:block>
 							</fo:table-cell>
 						</fo:table-row>
 					</fo:table-body>
@@ -185,7 +214,8 @@
 								<fo:block>EUROPEAN STANDARD</fo:block>
 							</fo:table-cell>
 							<fo:table-cell role="SKIP" font-size="20pt" font-weight="bold">
-								<fo:block>EN 18216</fo:block> <!-- To do -->
+								<!-- Example: EN 18216 -->
+								<fo:block><xsl:value-of select="/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:docidentifier[@type = 'EN']"/></fo:block>
 							</fo:table-cell>
 						</fo:table-row>
 						<fo:table-row role="SKIP" height="10mm">
@@ -203,7 +233,8 @@
 							<fo:table-cell role="SKIP" display-align="after" font-size="11pt">
 								<fo:block>
 									<xsl:call-template name="convertDate">
-										<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:version"/>
+										<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:date/mn:on"/>
+										<xsl:with-param name="type">short</xsl:with-param>
 									</xsl:call-template>
 								</fo:block>
 							</fo:table-cell>
@@ -213,7 +244,7 @@
 				<fo:block font-size="10pt" margin-top="3.5mm"><xsl:value-of select="$variables/mnx:doc[@num = $num]/ics"/></fo:block>
 				<fo:block text-align="center" margin-top="10mm" font-size="11pt">English version</fo:block><!-- To do -->
 				<fo:block text-align="center" font-size="16pt" margin-top="7mm">
-					<xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'main']/node()"/>
+					<xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:title[@language = 'en' and @type = 'main']/node()"/>
 				</fo:block>
 				
 				<!-- Titles in French and German -->
@@ -223,20 +254,41 @@
 					<fo:table-column column-width="proportional-column-width(77)"/>
 					<fo:table-body role="SKIP">
 						<fo:table-row role="SKIP">
-							<fo:table-cell role="SKIP" text-align="center">
-								<fo:block>Passeport numérique des produits - Protocoles d'échange de données</fo:block><!-- To do -->
+							<fo:table-cell role="SKIP" text-align="center" padding-left="6mm">
+								<fo:block>
+									<!-- Title in French, for example:
+									Passeport numérique des produits - Protocoles d'échange de données -->
+									<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:title[@language = 'fr' and @type = 'title-intro'] | 
+											/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:title[@language = 'fr' and @type = 'title-main']">
+										<xsl:apply-templates select="node()"/>
+										<xsl:if test="position() != last()"><xsl:text>&#xa0;-&#xa0;</xsl:text></xsl:if>
+									</xsl:for-each>
+								</fo:block>
 							</fo:table-cell>
 							<fo:table-cell role="SKIP">
 								<fo:block>&#xa0;</fo:block>
 							</fo:table-cell>
-							<fo:table-cell role="SKIP" text-align="center">
-								<fo:block>Digitaler Produktpass - Protokolle zum Datenaustausch</fo:block><!-- To do -->
+							<fo:table-cell role="SKIP" text-align="center" padding-right="6mm">
+								<fo:block>
+									<!-- Title in German, for example:
+									Digitaler Produktpass - Protokolle zum Datenaustausch -->
+									<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:title[@language = 'de' and @type = 'title-intro'] | 
+											/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:title[@language = 'de' and @type = 'title-main']">
+										<xsl:apply-templates select="node()"/>
+										<xsl:if test="position() != last()"><xsl:text>&#xa0;-&#xa0;</xsl:text></xsl:if>
+									</xsl:for-each>
+								</fo:block>
 							</fo:table-cell>
 						</fo:table-row>
 					</fo:table-body>
 				</fo:table>
 				
 				<fo:block-container line-height="1.17">
+					<xsl:variable name="date">
+						<xsl:call-template name="convertDate">
+							<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:date/mn:on"/>
+						</xsl:call-template>
+					</xsl:variable>
 					<fo:block space-after="9.3pt">This European Standard was approved by CEN on 3 May 2026.</fo:block>
 					<fo:block space-after="9.3pt">CEN and CENELEC members are bound to comply with the CEN/CENELEC Internal Regulations which stipulate the conditions for giving this European Standard the status of a national standard without any alteration. Up-to-date lists and bibliographical references concerning such national standards may be obtained on application to the CEN-CENELEC Management Centre or to any CEN and CENELEC member.</fo:block>
 					<fo:block space-after="9.3pt">This European Standard exists in three official versions (English, French, German). A version in any other language made by translation under the responsibility of a CEN and CENELEC member into its own language and notified to the CEN-CENELEC Management Centre has the same status as the official versions.</fo:block>
