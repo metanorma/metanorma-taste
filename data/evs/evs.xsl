@@ -101,9 +101,10 @@
 	<xsl:template name="inner-cover-page">
 		<xsl:param name="num"/>
 		
-		<fo:page-sequence force-page-count="no-force" xsl:use-attribute-sets="page-sequence-preface" master-reference="preface_first" format="I">
+		<fo:page-sequence force-page-count="no-force" xsl:use-attribute-sets="page-sequence-preface" master-reference="preface_first">
 			<xsl:call-template name="refinePageSequenceCommon"/>
 			<xsl:call-template name="refine_page-sequence-preface"/>
+			<xsl:attribute name="format">I</xsl:attribute>
 			
 			<xsl:call-template name="insertHeaderFooter">
 				<xsl:with-param name="num" select="$num"/>
@@ -111,15 +112,17 @@
 			
 			<fo:flow flow-name="xsl-region-body" role="SKIP" font-size="11pt">
 			
-				<xsl:if test="/mn:metanorma/mn:preface/mn:clause[@type = 'national-foreword']">
+				<!-- <xsl:if test="/mn:metanorma/mn:preface/mn:clause[@type = 'national-foreword']"> -->
+				<xsl:if test="/mn:metanorma/mn:preface/mn:foreword[@type = 'national-foreword']">
 					<fo:table table-layout="fixed" width="100%" line-height="1.2" role="SKIP">
 						<fo:table-column column-width="proportional-column-width(1)"/>
-						<xsl:if test="/mn:metanorma/mn:preface/mn:clause[@type = 'national-foreword'][2]">
+						<!-- <xsl:if test="/mn:metanorma/mn:preface/mn:clause[@type = 'national-foreword'][2]"> -->
+						<xsl:for-each select="/mn:metanorma/mn:preface/mn:foreword[@type = 'national-foreword'][position() &gt; 1]">
 							<fo:table-column column-width="proportional-column-width(1)"/>
-						</xsl:if>
+						</xsl:for-each>
 						<fo:table-body role="P">
 							<fo:table-row role="SKIP" height="22mm" font-size="13pt" font-weight="bold">
-								<fo:table-cell role="SKIP" padding-left="3mm">
+								<!-- <fo:table-cell role="SKIP" padding-left="3mm">
 									<fo:block text-transform="uppercase">
 										<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'national-foreword'][1]/mn:fmt-title/node()"/>
 									</fo:block>
@@ -130,10 +133,17 @@
 											<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'national-foreword'][2]/mn:fmt-title/node()"/>
 										</fo:block>
 									</fo:table-cell>
-									</xsl:if>
+								</xsl:if> -->
+								<xsl:for-each select="/mn:metanorma/mn:preface/mn:foreword[@type = 'national-foreword']">
+									<fo:table-cell role="SKIP" padding-left="3mm">
+										<fo:block text-transform="uppercase">
+											<xsl:apply-templates select="mn:fmt-title"/>
+										</fo:block>
+									</fo:table-cell>
+								</xsl:for-each>	
 							</fo:table-row>
 							<fo:table-row role="SKIP">
-								<fo:table-cell role="SKIP" padding="2mm" padding-left="3mm" padding-right="3mm" border="0.5pt solid black">
+								<!-- <fo:table-cell role="SKIP" padding="2mm" padding-left="3mm" padding-right="3mm" border="0.5pt solid black">
 									<fo:block>
 										<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'national-foreword'][1]/*[not(self::mn:fmt-title)]"/>
 									</fo:block>
@@ -144,7 +154,14 @@
 											<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'national-foreword'][2]/*[not(self::mn:fmt-title)]"/>
 										</fo:block>
 									</fo:table-cell>
-								</xsl:if>
+								</xsl:if> -->
+								<xsl:for-each select="/mn:metanorma/mn:preface/mn:foreword[@type = 'national-foreword']">
+									<fo:table-cell role="SKIP" padding="2mm" padding-left="3mm" padding-right="3mm" border="0.5pt solid black">
+										<fo:block>
+											<xsl:apply-templates select="*[not(self::mn:fmt-title)]"/>
+										</fo:block>
+									</fo:table-cell>
+								</xsl:for-each>	
 							</fo:table-row>
 						</fo:table-body>
 					</fo:table>
@@ -167,7 +184,7 @@
 		</fo:page-sequence>
 		
 		
-		<fo:page-sequence force-page-count="no-force" master-reference="european-standard">
+		<fo:page-sequence force-page-count="no-force" master-reference="european-standard" initial-page-number="1">
 			<fo:static-content flow-name="footer" role="Artifact">
 				<fo:table table-layout="fixed" width="100%" role="SKIP" border-top="2pt solid black" font-size="8.5pt">
 					<fo:table-column column-width="proportional-column-width(32)"/>
@@ -338,7 +355,31 @@
 	</xsl:template> <!-- END: inner-cover-page -->
 
 	<!-- National Foreword(s) render in the template inner-cover-page -->
-	<xsl:template match="mn:preface//mn:clause[@type = 'national-foreword']" priority="3"/>
+	<!-- <xsl:template match="mn:preface//mn:clause[@type = 'national-foreword']" priority="3"/> -->
+	<xsl:template match="mn:preface//mn:foreword[@type = 'national-foreword']" priority="3"/>
+
+	<!-- all <foreword have 'Foreword` in the fmt-title -->
+	<xsl:template match="mn:preface/mn:foreword[@type]/mn:fmt-title" priority="3">
+		<xsl:choose>
+			<xsl:when test="ancestor::mn:foreword[@type = 'national-foreword' and @language = 'et']">Eesti standardi eessõna</xsl:when>
+			<!-- @type = 'national-foreword' to National foreword
+				@type = 'european-foreword' to European foreword -->
+			<xsl:otherwise>
+				<xsl:call-template name="capitalize">
+					<xsl:with-param name="str" select="translate(ancestor::mn:foreword/@type, '-', ' ')"/>
+				</xsl:call-template>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="refine_page-sequence-preface"><?extend?>
+		<xsl:attribute name="format">1</xsl:attribute>
+	</xsl:template>
+	
+	<xsl:template name="refine_page-sequence-main"><?extend?>
+		<xsl:attribute name="initial-page-number">auto</xsl:attribute>
+	</xsl:template>
+	
 
 	<xsl:template name="refine_p-style"><?extend?>
 		<xsl:if test="ancestor::mn:clause[@type = 'national-foreword']">
@@ -454,5 +495,40 @@
 	<xsl:variable name="CENELEC-Logo">
 		<xsl:text>data:image/png;base64,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</xsl:text>
 	</xsl:variable>
+	
+	<!-- no need National Foreword in ToC -->
+	<xsl:template match="mn:foreword[@type = 'national-foreword']" mode="contents" priority="3"/>
+	
+	<!-- <mnx:title>Foreword</mnx:title>European foreword</mnx:item> -->
+	<xsl:template match="mn:foreword[@type and not (@type = 'national-foreword')]/mn:fmt-title" mode="contents" priority="3">
+		<xsl:call-template name="capitalize">
+			<xsl:with-param name="str" select="translate(ancestor::mn:foreword/@type, '-', ' ')"/>
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template match="mnx:item[@type = 'foreword']/mnx:title" priority="2">
+		<!-- <mnx:title>Foreword</mnx:title>European foreword</mnx:item> -->
+		<!-- Foreword to European foreword -->
+		<xsl:apply-templates select="following-sibling::node()"/>
+	</xsl:template>
+	<xsl:template match="mnx:item[@type = 'foreword']/mnx:title/node()" priority="2" mode="bookmarks">
+		<!-- <mnx:title>Foreword</mnx:title>European foreword</mnx:item> -->
+		<!-- Foreword to European foreword -->
+		<xsl:apply-templates select="../following-sibling::node()"/>
+	</xsl:template>
+	
+	<xsl:template match="mn:foreword[@type and not (@type = 'national-foreword')]/mn:fmt-title" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:call-template name="capitalize">
+				<xsl:with-param name="str" select="translate(ancestor::mn:foreword/@type, '-', ' ')"/>
+			</xsl:call-template>
+		</xsl:copy>
+	</xsl:template>
+	
+	<!-- ignore empty foreword -->
+	<xsl:template match="mn:foreword[count(mn:p) = 0]" mode="contents" priority="3"/>
+	<xsl:template match="mn:foreword[count(mn:p) = 0]" mode="update_xml_step1" priority="3"/>
+	
+	<xsl:template match="mn:p[@class = 'zzSTDTitle1']" mode="update_xml_step1" priority="3"/>
 	
 </xsl:stylesheet>
