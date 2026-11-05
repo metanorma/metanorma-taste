@@ -28,9 +28,9 @@
 		
 			<!-- EUROPEAN STANDARD page -->
 			<fo:simple-page-master master-name="european-standard" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
-				<fo:region-body margin-top="16mm" margin-bottom="27.5mm" margin-left="25mm" margin-right="9.4mm"/>
-				<fo:region-before region-name="header" extent="16mm"/>
-				<fo:region-after region-name="footer" extent="27.5mm"/>
+				<fo:region-body margin-top="15mm" margin-bottom="28.5mm" margin-left="25mm" margin-right="9.4mm"/>
+				<fo:region-before region-name="header" extent="15mm"/>
+				<fo:region-after region-name="footer" extent="28.5mm"/>
 				<fo:region-start region-name="left-region" extent="25mm"/>
 				<fo:region-end region-name="right-region" extent="9.4mm"/>
 			</fo:simple-page-master>
@@ -175,18 +175,18 @@
 					<fo:table-column column-width="proportional-column-width(70)"/>
 					<fo:table-body role="SKIP">
 						<fo:table-row role="SKIP">
-							<fo:table-cell role="SKIP" padding-top="5.5mm">
+							<fo:table-cell role="SKIP" padding-top="4.5mm">
 								<!-- Example: © 2026 CEN/CENELEC -->
 								<fo:block>
 									<xsl:value-of select="concat('© ', /mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:copyright/mn:from, ' CEN/CENELEC')"/>
 								</fo:block>
 							</fo:table-cell>
-							<fo:table-cell role="SKIP" padding-top="5.5mm">
+							<fo:table-cell role="SKIP" padding-top="4.5mm">
 								<fo:block>All rights of exploitation in any form and by any means
 									reserved worldwide for CEN national Members and for
 									CENELEC Members.</fo:block> <!-- To do -->
 							</fo:table-cell>
-							<fo:table-cell role="SKIP" padding-top="5.5mm" text-align="right">
+							<fo:table-cell role="SKIP" padding-top="4.5mm" text-align="right">
 								<!-- Example: Ref. No. EN 18216:2026 E -->
 								<fo:block>
 									<xsl:value-of select="concat(
@@ -243,12 +243,12 @@
 				</fo:table>
 				<fo:block font-size="10pt" margin-top="3.5mm"><xsl:value-of select="$variables/mnx:doc[@num = $num]/ics"/></fo:block>
 				<fo:block text-align="center" margin-top="10mm" font-size="11pt">English version</fo:block><!-- To do -->
-				<fo:block text-align="center" font-size="16pt" margin-top="7mm">
+				<fo:block text-align="center" font-size="16pt" margin-top="4mm">
 					<xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:title[@language = 'en' and @type = 'main']/node()"/>
 				</fo:block>
 				
 				<!-- Titles in French and German -->
-				<fo:table table-layout="fixed" width="100%" role="SKIP" margin-top="8mm" margin-bottom="8mm">
+				<fo:table table-layout="fixed" width="100%" role="SKIP" margin-top="6mm" margin-bottom="7mm">
 					<fo:table-column column-width="proportional-column-width(77)"/>
 					<fo:table-column column-width="proportional-column-width(22)"/>
 					<fo:table-column column-width="proportional-column-width(77)"/>
@@ -289,7 +289,7 @@
 							<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:date/mn:on"/>
 						</xsl:call-template>
 					</xsl:variable>
-					<fo:block space-after="9.3pt">This European Standard was approved by CEN on 3 May 2026.</fo:block>
+					<fo:block space-after="9.3pt">This European Standard was approved by CEN on <xsl:value-of select="$date"/>.</fo:block>
 					<fo:block space-after="9.3pt">CEN and CENELEC members are bound to comply with the CEN/CENELEC Internal Regulations which stipulate the conditions for giving this European Standard the status of a national standard without any alteration. Up-to-date lists and bibliographical references concerning such national standards may be obtained on application to the CEN-CENELEC Management Centre or to any CEN and CENELEC member.</fo:block>
 					<fo:block space-after="9.3pt">This European Standard exists in three official versions (English, French, German). A version in any other language made by translation under the responsibility of a CEN and CENELEC member into its own language and notified to the CEN-CENELEC Management Centre has the same status as the official versions.</fo:block>
 					<fo:block space-after="9.3pt">CEN and CENELEC members are the national standards bodies and national electrotechnical committees of Austria, Belgium, Bulgaria, Croatia, Cyprus, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Iceland, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Norway, Poland, Portugal, Republic of North Macedonia, Romania, Serbia, Slovakia, Slovenia, Spain, Sweden, Switzerland, Türkiye and United Kingdom.</fo:block>
@@ -326,7 +326,7 @@
 						</fo:table-body>
 					</fo:table>
 					
-					<fo:block text-align="center" font-weight="bold" margin-bottom="9mm">
+					<fo:block text-align="center" font-weight="bold" margin-bottom="7mm">
 						<fo:block>CEN-CENELEC Management Centre:</fo:block>
 						<fo:block>Rue de la Science 23, B-1040 Brussels</fo:block>
 					</fo:block>
