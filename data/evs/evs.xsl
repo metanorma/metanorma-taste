@@ -137,7 +137,7 @@
 								<xsl:for-each select="/mn:metanorma/mn:preface/mn:foreword[@type = 'national-foreword']">
 									<fo:table-cell role="SKIP" padding-left="3mm">
 										<fo:block text-transform="uppercase">
-											<xsl:apply-templates select="mn:fmt-title"/>
+											<xsl:apply-templates select="mn:fmt-title/node()"/>
 										</fo:block>
 									</fo:table-cell>
 								</xsl:for-each>	
@@ -355,22 +355,7 @@
 	</xsl:template> <!-- END: inner-cover-page -->
 
 	<!-- National Foreword(s) render in the template inner-cover-page -->
-	<!-- <xsl:template match="mn:preface//mn:clause[@type = 'national-foreword']" priority="3"/> -->
 	<xsl:template match="mn:preface//mn:foreword[@type = 'national-foreword']" priority="3"/>
-
-	<!-- all <foreword have 'Foreword` in the fmt-title -->
-	<xsl:template match="mn:preface/mn:foreword[@type]/mn:fmt-title" priority="3">
-		<xsl:choose>
-			<xsl:when test="ancestor::mn:foreword[@type = 'national-foreword' and @language = 'et']">Eesti standardi eessõna</xsl:when>
-			<!-- @type = 'national-foreword' to National foreword
-				@type = 'european-foreword' to European foreword -->
-			<xsl:otherwise>
-				<xsl:call-template name="capitalize">
-					<xsl:with-param name="str" select="translate(ancestor::mn:foreword/@type, '-', ' ')"/>
-				</xsl:call-template>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
 
 	<xsl:template name="refine_page-sequence-preface"><?extend?>
 		<xsl:attribute name="format">1</xsl:attribute>
@@ -498,32 +483,6 @@
 	
 	<!-- no need National Foreword in ToC -->
 	<xsl:template match="mn:foreword[@type = 'national-foreword']" mode="contents" priority="3"/>
-	
-	<!-- <mnx:title>Foreword</mnx:title>European foreword</mnx:item> -->
-	<xsl:template match="mn:foreword[@type and not (@type = 'national-foreword')]/mn:fmt-title" mode="contents" priority="3">
-		<xsl:call-template name="capitalize">
-			<xsl:with-param name="str" select="translate(ancestor::mn:foreword/@type, '-', ' ')"/>
-		</xsl:call-template>
-	</xsl:template>
-	
-	<xsl:template match="mnx:item[@type = 'foreword']/mnx:title" priority="2">
-		<!-- <mnx:title>Foreword</mnx:title>European foreword</mnx:item> -->
-		<!-- Foreword to European foreword -->
-		<xsl:apply-templates select="following-sibling::node()"/>
-	</xsl:template>
-	<xsl:template match="mnx:item[@type = 'foreword']/mnx:title/node()" priority="2" mode="bookmarks">
-		<!-- <mnx:title>Foreword</mnx:title>European foreword</mnx:item> -->
-		<!-- Foreword to European foreword -->
-		<xsl:apply-templates select="../following-sibling::node()"/>
-	</xsl:template>
-	
-	<xsl:template match="mn:foreword[@type and not (@type = 'national-foreword')]/mn:fmt-title" mode="update_xml_step1" priority="3">
-		<xsl:copy>
-			<xsl:call-template name="capitalize">
-				<xsl:with-param name="str" select="translate(ancestor::mn:foreword/@type, '-', ' ')"/>
-			</xsl:call-template>
-		</xsl:copy>
-	</xsl:template>
 	
 	<!-- ignore empty foreword -->
 	<xsl:template match="mn:foreword[count(mn:p) = 0]" mode="contents" priority="3"/>
