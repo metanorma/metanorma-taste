@@ -13,11 +13,13 @@ module Metanorma
       attribute :filename_attributes, FilenameAttributes
       attribute :value_attributes, ValueAttributes
       attribute :bibliography_sort, BiblioSortItem, collection: true
+      attribute :doc_engine, :string
 
       key_value do
         map "filename-attributes", to: :filename_attributes
         map "value-attributes", to: :value_attributes
         map "bibliography-sort", to: :bibliography_sort
+        map "doc-engine", to: :doc_engine
       end
     end
   end
