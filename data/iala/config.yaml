@@ -6,16 +6,16 @@ base-override:
   # Word output is the uniword DOCX package (metanorma-iso#1728 ruling:
   # uniword is the only DOCX engine; the legacy isodoc MHTML path retires)
   doc-engine: uniword
+  # Bibdata URN: generated via Pubid::Iala from the identifier fields
+  # (series + docnumber + edition); a hand :urn: attribute wins as the
+  # transcription fallback (metanorma-taste#250)
+  urn-generator: pubid-iala
   filename-attributes:
     customize: metanorma.yml
     copyright-notice: copyright.adoc
     i18n-dictionary: i18n.yaml
     publisher-logo: iala-logo.svg
     pdf-stylesheet-override: iala.xsl
-    # Bibdata URN: generated via Pubid::Iala from the identifier fields
-    # (series + docnumber + edition); a hand :urn: attribute wins as the
-    # transcription fallback (metanorma-taste#250)
-    urn-generator: pubid-iala
     htmlcoverpage: html_iala_titlepage.html
     htmlstylesheet: htmlstyle.scss
   value-attributes:
