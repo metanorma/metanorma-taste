@@ -8,6 +8,9 @@ html_headerfont: 'Carlito, Calibri, Arial, sans-serif'
 html_monospacefont: '"Source Code Pro", Menlo, Monaco, Consolas, monospace'
 html_normalfontsize: "15px"
 html_footnotefontsize: "0.9em"
+# IALA-branded HTML furniture; mirrored in config.yaml filename-attributes
+htmlcoverpage: html_iala_titlepage.html
+htmlstylesheet: htmlstyle.scss
 i18nyaml: i18n.yaml
 boilerplate: copyright.adoc
 # Style Guide filename form: S1040 / G1199 / R1026 / C0103-1

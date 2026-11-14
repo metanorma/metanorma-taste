@@ -1,0 +1,772 @@
+/*
+    IALA HTML presentation stylesheet (metanorma-taste data/iala)
+
+    Palette per the IALA Style Guide (G1115) and the taste's iala.xsl
+    CORPORATE COLOURS: corporate blue rgb(0, 85, 140), light blue
+    rgb(103, 135, 196), yellow rgb(254, 219, 0). Per-doctype band
+    colours mirror the iala.xsl cover branches.
+
+    0 CSS RESET
+*/
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+@use 'base_style/all' as *;
+
+body {
+  @include bodyStyle1($normalfontsize, 1.4em, #212529, #ffffff, 300);
+  // @include sidebarNavContainer(323px);
+}
+
+main {
+  margin: 0 3em 0 6em;
+}
+
+#toc, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6)  {
+  @include toc(#00558C, #FEDB00, #00558C);
+  @include sidebarToc();
+
+  .toc-active a {
+    color: #00558C;
+  }
+
+  li a {
+    text-transform: uppercase;
+  }
+
+  ul {
+    a:hover {
+      box-shadow: none;
+      color: #00558C;
+    }
+  }
+}
+
+#toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) {
+   margin-top: 0;
+   margin-bottom: 0;
+   font-size: 100%;
+ }
+
+nav {
+  @include sidebarNav(#f7f7f7, 323px, 30px);
+}
+
+#toggle {
+  @include sidebarNavToggle(white, #00558C)
+}
+
+#myBtn {
+  @include toTopBtn(white, #00558C);
+  text-transform: uppercase;
+
+  a.anchorjs-link {
+    @include anchorLink(#00558C)
+  }
+}
+
+/*
+    2. Responsive navigation layout
+*/
+
+@media screen and (min-width: 768px) {
+  .container {
+    padding-left: 360px;
+  }
+
+  .rule.toc {
+    display: none;
+  }
+
+  h1.toc-contents {
+    margin-top: 1em;
+  }
+
+  ul#toc-list, ul#toc-list > :is(.h1, .h2, .h3, .h4, .h5, .h6) {
+    padding: 0;
+    margin: 0;
+  }
+}
+
+figure {
+  @include figureBlock();
+}
+
+table figure {
+  padding: 0;
+  margin: 0;
+}
+
+
+/*
+    Document types + stages
+
+    Doctype band colours mirror the iala.xsl cover branches:
+    standard -> corporate blue, recommendation -> recommendation_50,
+    model-course -> model course, default (guideline and the rest) ->
+    corporate light blue.
+*/
+
+// div-level rules outrank the base stylesheet's
+// div.document-type-band default; the per-doctype IDs then override.
+div.document-type-band {
+  background-color: #6787C4;
+  color: #ffffff;
+  font-family: $headerfont;
+  font-size: 1.6em;
+  font-weight: 700;
+  padding: 1.2em 2em;
+  margin: 1.5em 0 0 0;
+  text-align: left;
+  text-transform: uppercase;
+
+  p.document-type {
+    margin: 0;
+  }
+}
+
+#standard-band {
+  background-color: #00558C;
+}
+
+#recommendation-band {
+  background-color: #83D0F5;
+}
+
+#model-course-band {
+  background-color: #00AFAA;
+}
+
+.document-stage-band {
+  @include docBand($order: 1, $textLength: 160px, $fontWeight: 300);
+}
+
+p.document-stage {
+  font-weight: 300;
+  height: 160px;
+}
+
+// Stage band default (drafts) + published/withdrawn overrides. IDs
+// outrank the base stylesheet's per-stage colour table; the div-level
+// default comes after it in the cascade. The id list below resets the
+// base stylesheet's inherited stage colours to the IALA light blue.
+div.document-stage-band {
+  background-color: #6787C4;
+}
+
+#administrative-band,
+#advisory-band,
+#amendment-band,
+#cancelled-band,
+#committee-draft-band,
+#corrigendum-band,
+#directive-band,
+#draft-band,
+#draft-standard-band,
+#final-draft-band,
+#guide-band,
+#proposal-band,
+#report-band,
+#specification-band,
+#working-draft-band {
+  background-color: #6787C4;
+}
+
+#published-band,
+#in-force-band {
+  background-color: #00558C;
+}
+
+#withdrawn-band,
+#retired-band {
+  background-color: #575756;
+}
+
+.coverpage-maturity {
+  @include coverpageStageBlock();
+}
+
+/*
+    3. TYPOGRAPHY
+*/
+
+/*
+    3.1 Titles
+*/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: $headerfont;
+  color: #00558C;
+  font-weight: 300;
+  margin-top: 1.6em;
+  margin-bottom: 0.3em;
+}
+
+h1, .h1 {
+  font-size: 1.6em;
+  text-transform: uppercase;
+  margin-top: 2em;
+}
+
+h1#content, .h1#content {
+  margin-top: 2em;
+}
+
+h2, .h2 {
+  margin-top: 1.3em;
+  font-size: 1.3em;
+  font-weight: 400;
+}
+
+h3, .h3 {
+  margin-top: 1.1em;
+  font-size: 1.1em;
+  font-weight: 100;
+}
+
+.TermNum,
+.Terms,
+.AltTerms {
+  color: #00558C;
+}
+
+.TermNum {
+  font-weight: 100;
+}
+
+span.TermNum {
+  font-weight: bold;
+}
+
+h2.TermNum {
+  margin-bottom: 0;
+}
+
+p.Terms {
+  font-size: 1.1em;
+  line-height: 1.5em;
+  margin: 0;
+}
+
+p.AltTerms {
+  font-size: 1.1em;
+  margin: 0;
+}
+
+.contact-info a:hover {
+  color: #00558C;
+  text-decoration: underline;
+  background: none;
+  box-shadow: 0 0 0 0;
+}
+
+/*
+  3.2 Links
+*/
+@include elementStyles(#00558C, #FEDB00, #00558C);
+
+/*
+    3.3 Lists
+*/
+
+ul,
+ol {
+  margin-left: 1.2em;
+}
+
+ul li {
+  list-style: none;
+}
+
+ul>li::before {
+  content: "\2014";
+  display: inline-block;
+  width: 1em;
+  margin-left: -1.2em;
+}
+
+ul>li p:first-child {
+  display: inline;
+}
+
+ul>li:first-child {
+  margin-top: 1em;
+}
+
+ul ul > li:first-child {
+      margin-top: 0;
+}
+ol ul > li:first-child {
+      margin-top: 0;
+}
+
+#toc-list ul {
+  margin-bottom: 0.25em;
+}
+
+#toc-list li {
+  list-style-type: none;
+}
+
+#toc li::before {
+  content: " ";
+  display: none;
+}
+
+/*
+    3.4 Rules
+*/
+
+.rule {
+  @include rule(1px, #00558C)
+}
+
+/*
+    3.5 Bibliograhy
+*/
+
+p.Biblio,
+p.NormRef, div.Biblio, div.NormRef {
+  margin-top: 1em;
+  margin-left: 2em;
+}
+
+.Biblio.note, .Biblio.Note, .NormRef.note, .NormRef.Note {
+  margin-left: 3em;
+}
+
+/*
+    3.6 Source Code + figures
+*/
+
+figure,
+pre,
+.pseudocode {
+  @include pseudocodeBlock(#f7f7f7);
+}
+
+pre {
+  @include monospaceBlockStyle()
+}
+
+@include admonitionBlock();
+@include recommendationBlock();
+@include listBlock();
+
+figcaption,
+.SourceTitle {
+  @include blockTitle()
+}
+
+/*
+    3.7 Notes
+*/
+
+.Note {
+  background-color: #FEDB00;
+  color: #47430c;
+  padding: 1.2em;
+  margin: 1em 0 1em 0;
+
+  p {
+    margin: 0;
+  }
+}
+
+.Admonition {
+  background-color: #ffcccc;
+  color: #47430c;
+  padding: 1.2em;
+  margin: 1em 0 1em 0;
+
+  p {
+    margin: 0;
+  }
+}
+
+/*
+    3.8 Examples
+*/
+
+.example {
+  @include exampleBlock(#DADFF6, #424242, 1.2em);
+
+  .example-title {
+    margin-top: 0;
+  }
+
+  pre,
+  .pseudocode {
+    background: none;
+  }
+}
+
+/*
+    3.9 Tables
+*/
+
+table {
+  @include table(1px solid black);
+}
+
+table > caption {
+  text-align: center;
+  margin-top: 2.5em;
+  font-weight: 400;
+}
+
+/*
+  3.10 Footnotes
+*/
+
+a.footnote-number {
+  vertical-align: super;
+  font-size: 0.8em;
+}
+
+.footnote {
+  font-size: $footnotefontsize;
+}
+
+/*
+    3.11 Blockquotes
+*/
+
+.Quote {
+  @include blockquoteBlock(#f7f7f7);
+}
+
+/*
+    3.12 Formulas
+*/
+
+.formula {
+  @include formulaBlock(#f7f7f7)
+}
+
+/*
+    3.13 Contact Info
+*/
+
+.contact-info {
+  padding: 2em;
+  margin-top: 5em;
+  width: 250px;
+
+  text-align: left;
+  border: #00558C solid 2px;
+  color: #00558C !important;
+  border-radius: 25px;
+
+}
+
+.contact-info a,
+.contact-info a:hover {
+  color: #00558C;
+}
+
+.contact-info p,
+.contact-info a {
+  @include monospaceBlockStyle();
+  font-weight: 400;
+}
+
+.contact-info .name {
+  font-weight: 700;
+  font-size: 1.2em;
+  margin-bottom: 0;
+}
+
+.contact-info .address {
+  font-size: 1em;
+  line-height: 1.3em;
+  margin-top: 0;
+}
+
+/*
+    Keywords
+*/
+
+span.keyword {
+  font-weight: 600;
+}
+
+/*
+    Paragraphs
+*/
+
+p {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+h2 p, .h2 p {
+  display: inline;
+}
+
+
+/*
+    4.0 Page header
+*/
+
+/*
+    4.1 Cover
+
+    White cover per the published IALA documents: full logo lockup,
+    organisation line, yellow arc, doctype banner, identity in
+    corporate blue.
+*/
+
+.icon-svg {
+  width: 100%;
+  color: #00558C;
+}
+
+.coverpage {
+  text-align: center;
+  padding-left: 1.5em;
+
+  img {
+    height: auto;
+    width: 400px;
+  }
+}
+
+.logo-img {
+  max-width: 600px;
+  margin: auto;
+  padding: 0.5em;
+
+  svg,
+  img {
+    width: 300px;
+    height: auto;
+  }
+}
+
+.coverpage-organisation span {
+  font-family: $bodyfont;
+  text-transform: none;
+  font-weight: 600;
+  color: #00558C;
+  font-size: 1em;
+}
+
+.coverpage-arc svg {
+  display: block;
+  width: 100%;
+  height: 12px;
+  margin-top: 1em;
+}
+
+.doc-number {
+  font-size: 0.5em;
+  font-family: $bodyfont;
+}
+
+.coverpage-title {
+  padding-bottom: 0.5em;
+  font-family: $headerfont;
+  font-size: 1.2em;
+  line-height: 1.5em;
+  font-weight: 100;
+  padding-left: 1em;
+  padding-right: 1em;
+  text-transform: uppercase;
+}
+
+.WordSection11 {
+  padding: 0 2em 0 3em;
+}
+
+.info-section {
+  padding: 0 2em 0 5em;
+}
+
+.prefatory-section {
+  padding: 0 3em 0 6em;
+}
+
+
+.zzSTDTitle1,
+.MsoCommentText {
+  display: none;
+}
+
+.coverpage-logo span,
+.coverpage-tc-name span {
+  font-family: $bodyfont;
+  text-transform: none;
+  font-weight: 300;
+}
+
+.coverpage-tc-name {
+  font-size: 1.2em;
+  line-height: 1.2em;
+  margin: 0.25em 0;
+  color: #00558C;
+}
+
+/*
+    4.2 Document Identity
+*/
+
+.coverpage-doc-identity {
+  font-size: 2em;
+  line-height: 2em;
+  color: #00558C;
+}
+
+.coverpage-title .title-second {
+  display: none;
+}
+
+.coverpage-stage-block {
+  font-family: $bodyfont;
+  font-weight: 600;
+  font-size: 1.25em;
+  margin: 2em 0em 2em 0em;
+  text-transform: uppercase;
+  color: #00558C;
+}
+
+/*
+    4.3 Draft Warning
+*/
+
+.coverpage-warning {
+  border: #f36f36 solid 2px;
+  color: #f36f36 !important;
+  margin: 1em 2em;
+  padding: 2em 1em 1em 1em;
+  border-radius: 25px;
+}
+
+.coverpage-warning .title {
+  font-family: $headerfont;
+  font-weight: 300;
+  text-transform: uppercase;
+  font-size: 1.2em;
+}
+
+
+/*
+    4.4 Copyright
+*/
+
+.boilerplate-copyright {
+  padding: 1em;
+  font-size: 0.9em;
+  text-align: left;
+}
+
+
+/*
+    5.0 Other styles
+*/
+
+
+/*
+To top button
+*/
+
+@page {
+  margin: 2cm 1cm;
+}
+
+@media print {
+
+
+  .document-info,
+  nav,
+  .copyright {
+    page-break-before: always;
+  }
+
+  nav {
+    page-break-after: always;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .h1, .h2, .h3, .h4 {
+    page-break-after: avoid;
+    margin-top: 1.2em;
+  }
+
+  .note,
+  figure,
+  pre,
+  .pseudocode,
+  table {
+    page-break-inside: avoid;
+  }
+
+  .info-section {
+    display: none;
+  }
+
+  .coverpage {
+    height: 23cm;
+  }
+
+  button#myBtn {
+    background-color: white;
+  }
+
+  .container {
+    padding-left: 0;
+  }
+
+  h1.content, .h1.content {
+    margin-top: 2em;
+    line-height: 2.5em;
+  }
+
+  h1, .h1 {
+    font-size: 1.5em;
+    line-height: 1.5;
+  }
+
+  h2, .h2 {
+    font-size: 1.2em
+  }
+
+  h3, .h3 {
+    font-size: 1em;
+  }
+
+  .Note {
+    background-color: #FEDB00;
+    color: #47430c;
+    padding: 5px;
+    margin: 2em 0 1em 0;
+  }
+
+  .Note p {
+    padding: 0 5px 0 5px;
+  }
+
+  .Admonition {
+    background-color: #ffcccc;
+    color: #47430c;
+    padding: 5px;
+    margin: 2em 0 1em 0;
+  }
+
+  .Admonition p {
+    padding: 0 5px 0 5px;
+  }
+
+}
