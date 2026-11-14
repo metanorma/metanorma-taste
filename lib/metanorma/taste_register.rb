@@ -475,6 +475,11 @@ module Metanorma
 
       # Create instance of the dynamic class
       dynamic_class = Taste.const_get(class_name)
+      # Install the taste's output-engine overrides into the base flavor's
+      # Processor (DocEngine#install prepends there). Runs at first use, so
+      # the base flavor's gem is already loaded and its Processor
+      # registered; skipped without error when no processor exists.
+      Taste::DocEngine.install(config) if config.base_override&.doc_engine
       dynamic_class.new(flavor, config, directory: directory,
                                         directory_search_path: search_path)
     end

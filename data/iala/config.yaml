@@ -3,6 +3,9 @@ flavor: iala
 owner: International Organization for Marine Aids to Navigation
 base-flavor: iho
 base-override:
+  # Word output is the uniword DOCX package (metanorma-iso#1728 ruling:
+  # uniword is the only DOCX engine; the legacy isodoc MHTML path retires)
+  doc-engine: uniword
   filename-attributes:
     customize: metanorma.yml
     copyright-notice: copyright.adoc
