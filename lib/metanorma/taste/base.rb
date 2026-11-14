@@ -152,6 +152,7 @@ module Metanorma
         add_file_based_overrides(override_attrs)
         add_base_configuration_overrides(override_attrs, attrs)
         add_bibliography_sort_overrides(override_attrs)
+        add_urn_generation_overrides(override_attrs, attrs)
         apply_doctype_overrides(attrs, override_attrs)
         apply_stage_overrides(attrs, override_attrs)
         apply_committee_overrides(attrs, override_attrs)
@@ -288,6 +289,54 @@ module Metanorma
           old_val = attrs.delete_at(idx)
           delim + old_val.sub(":#{attr_key}: ", "").strip
         else ""
+        end
+      end
+
+      # Generate the document's bibdata URN when the taste configures a
+      # generator (+base-override.urn-generator+) and emits it as the
+      # +:urn:+ document attribute; the base flavour's urn propagation
+      # carries it into bibdata (metanorma-iho#579).
+      #
+      # An explicit +:urn:+ in the document wins: generation runs only on
+      # its absence, so documents whose printed URN differs from the
+      # generated form keep their transcribed value. When the generator
+      # yields nothing (the document lacks the identifier fields), no
+      # attribute is added and the bibdata carries no URN.
+      def add_urn_generation_overrides(override_attrs, attrs)
+        generator = @config.base_override&.urn_generator
+        return if generator.to_s.empty?
+        return if attrs.any? { |a| a =~ /\A:urn:(\s|$)/i }
+
+        load_urn_generator_shim(generator)
+        urn = Taste::UrnGenerator.generate(generator, document_attributes(attrs))
+        return if urn.to_s.empty?
+
+        override_attrs << ":urn: #{urn}"
+      end
+
+      # Require the taste's optional data/<taste>/urn_generator.rb shim
+      # once; it registers the generator named by the config. Only the
+      # generator's artefact gem is required, and only for builds that
+      # use the generator.
+      def load_urn_generator_shim(_generator_name)
+        path = File.join(@directory, "urn_generator.rb")
+        return unless File.exist?(path)
+
+        require path
+      rescue LoadError => e
+        raise Taste::UrnGenerator::GeneratorLoadError,
+              "Taste #{@flavor} declares urn-generator " \
+              "'#{@config.base_override.urn_generator}' but its shim " \
+              "could not be loaded (#{e.message}); add the gem it needs " \
+              "to your bundle."
+      end
+
+      # The document's header attributes as a lowercased name => value
+      # hash (Asciidoctor treats attribute names case-insensitively).
+      def document_attributes(attrs)
+        attrs.each_with_object({}) do |line, hash|
+          match = /\A:([^:]+):(?:[ \t]*(.*))?\z/.match(line)
+          hash[match[1].downcase] = match[2].to_s.strip if match
         end
       end
 

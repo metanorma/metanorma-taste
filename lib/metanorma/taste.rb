@@ -9,6 +9,9 @@ module Metanorma
     autoload :DocEngine, "metanorma/taste/doc_engine"
     autoload :UniwordDocRender, "metanorma/taste/uniword_doc_render"
 
+    # Taste-contributed bibdata URN generators (see Taste::UrnGenerator).
+    autoload :UrnGenerator, "metanorma/taste/urn_generator"
+
     # Convenience method for aliases
     def self.aliases
       TasteRegister.instance.aliases
