@@ -12,6 +12,8 @@ base-override:
     i18n-dictionary: i18n.yaml
     publisher-logo: iala-logo.svg
     pdf-stylesheet-override: iala.xsl
+    htmlcoverpage: html_iala_titlepage.html
+    htmlstylesheet: htmlstyle.scss
   value-attributes:
     publisher: International Organization for Marine Aids to Navigation
     publisher_abbr: IALA
