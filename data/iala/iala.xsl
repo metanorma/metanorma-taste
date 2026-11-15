@@ -1057,39 +1057,6 @@
 	</xsl:template>
 
 	<xsl:template name="insertFooter">
-		<fo:static-content flow-name="footer" role="artifact">
-			<fo:block-container font-size="7.56pt" font-weight="bold" color="{$color_corporate_blue}" border-top="0.2pt solid black" line-height="1.43">
-				<fo:block margin-top="4.5mm">
-					<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
-					<xsl:text> </xsl:text>
-					<xsl:call-template name="getVariable"><xsl:with-param name="variable">docidentifier</xsl:with-param></xsl:call-template>
-					<xsl:text> </xsl:text>
-					<xsl:variable name="title">
-						<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
-					</xsl:variable>
-					<xsl:for-each select="xalan:nodeset($title)/item">
-						<xsl:text> </xsl:text>
-						<xsl:copy-of select="node()"/>
-					</xsl:for-each>
-				</fo:block>
-				<fo:block text-align-last="justify">
-					<xsl:call-template name="getVariable"><xsl:with-param name="variable">edition</xsl:with-param></xsl:call-template>
-					<xsl:text> </xsl:text>
-					<fo:inline text-transform="lowercase"><xsl:call-template name="getVariable"><xsl:with-param name="variable">urn</xsl:with-param></xsl:call-template></fo:inline>
-					<fo:leader leader-pattern="space"/>
-					<xsl:text>P&#xa0;</xsl:text><fo:page-number />
-				</fo:block>
-			</fo:block-container>
-		</fo:static-content>
-	</xsl:template>
-
-	<!-- ============================================================ -->
-	<!-- Resolutions + circular letters: footer                        -->
-	<!-- ============================================================ -->
-	<!-- The published PDFs carry no footer text for these doctypes (the
-	     address block at the foot is a graphic), except the 2014-era
-	     assembly resolutions, which print the IALA-AISM address. -->
-	<xsl:template name="insertFooter">
 		<xsl:choose>
 			<xsl:when test="$iala_is_rescirc and number(substring(normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on), 1, 4)) &lt; 2016">
 				<fo:static-content flow-name="footer" role="artifact">
@@ -1102,6 +1069,8 @@
 				</fo:static-content>
 			</xsl:when>
 			<xsl:when test="$iala_is_rescirc">
+				<!-- the published PDFs carry no footer text for resolutions
+				     and circular letters: the address block is a graphic -->
 				<fo:static-content flow-name="footer" role="artifact">
 					<fo:block-container border-top="0.2pt solid black" font-size="0pt" margin-top="4.5mm" role="SKIP">
 						<fo:block role="SKIP"><fo:wrapper role="artifact">&#xa0;</fo:wrapper></fo:block>
@@ -1109,33 +1078,56 @@
 				</fo:static-content>
 			</xsl:when>
 			<xsl:otherwise>
-				<fo:static-content flow-name="footer" role="artifact">
-					<fo:block-container font-size="7.56pt" font-weight="bold" color="{$color_corporate_blue}" border-top="0.2pt solid black" line-height="1.43">
-						<fo:block margin-top="4.5mm">
-							<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
-							<xsl:text> </xsl:text>
-							<xsl:call-template name="getVariable"><xsl:with-param name="variable">docidentifier</xsl:with-param></xsl:call-template>
-							<xsl:text> </xsl:text>
-							<xsl:variable name="title">
-								<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
-							</xsl:variable>
-							<xsl:for-each select="xalan:nodeset($title)/item">
-								<xsl:text> </xsl:text>
-								<xsl:copy-of select="node()"/>
-							</xsl:for-each>
-						</fo:block>
-						<fo:block text-align-last="justify">
-							<xsl:call-template name="getVariable"><xsl:with-param name="variable">edition</xsl:with-param></xsl:call-template>
-							<xsl:text> </xsl:text>
-							<fo:inline text-transform="lowercase"><xsl:call-template name="getVariable"><xsl:with-param name="variable">urn</xsl:with-param></xsl:call-template></fo:inline>
-							<fo:leader leader-pattern="space"/>
-							<xsl:text>P&#xa0;</xsl:text><fo:page-number/>
-						</fo:block>
-					</fo:block-container>
-				</fo:static-content>
-			</xsl:otherwise>
+
+		<fo:static-content flow-name="footer" role="artifact">
+			<fo:block-container font-size="7.56pt" font-weight="bold" color="{$color_corporate_blue}" border-top="0.2pt solid black" line-height="1.43">
+				<fo:block margin-top="4.5mm">
+					<!-- Legacy-era standards and recommendations open with the
+						"IALA" association prefix; standards join the title with
+						an en dash, recommendations with a space -->
+					<xsl:if test="$iala_era_old and ($iala_is_standard or $iala_is_recommendation)">
+						<xsl:text>IALA </xsl:text>
+					</xsl:if>
+					<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
+					<xsl:text> </xsl:text>
+					<xsl:call-template name="getVariable"><xsl:with-param name="variable">docidentifier</xsl:with-param></xsl:call-template>
+					<xsl:choose>
+						<xsl:when test="$iala_is_standard"><xsl:text> – </xsl:text></xsl:when>
+						<xsl:otherwise><xsl:text> </xsl:text></xsl:otherwise>
+					</xsl:choose>
+					<xsl:variable name="title">
+						<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
+					</xsl:variable>
+					<xsl:for-each select="xalan:nodeset($title)/item">
+						<xsl:text> </xsl:text>
+						<xsl:copy-of select="node()"/>
+					</xsl:for-each>
+				</fo:block>
+				<fo:block text-align-last="justify">
+					<xsl:call-template name="getVariable"><xsl:with-param name="variable">edition</xsl:with-param></xsl:call-template>
+					<xsl:text> </xsl:text>
+					<fo:inline text-transform="lowercase"><xsl:call-template name="getVariable"><xsl:with-param name="variable">urn</xsl:with-param></xsl:call-template></fo:inline>
+					<!-- Legacy standards carry the page number on a third,
+						publication-date line -->
+					<xsl:if test="not($iala_is_standard and $iala_era_old)">
+						<fo:leader leader-pattern="space"/>
+						<xsl:text>P&#xa0;</xsl:text><fo:page-number />
+					</xsl:if>
+				</fo:block>
+				<xsl:if test="$iala_is_standard and $iala_era_old">
+					<fo:block text-align-last="justify">
+						<xsl:call-template name="getVariable"><xsl:with-param name="variable">date</xsl:with-param></xsl:call-template>
+						<fo:leader leader-pattern="space"/>
+						<xsl:text>P&#xa0;</xsl:text><fo:page-number />
+					</fo:block>
+				</xsl:if>
+			</fo:block-container>
+		</fo:static-content>
+				</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
+
+
 
 	<xsl:variable name="IALA-Logo">
 		<xsl:copy-of select="//mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'publisher']/mn:organization/mn:logo/mn:image/*[local-name() = 'svg']"/>
