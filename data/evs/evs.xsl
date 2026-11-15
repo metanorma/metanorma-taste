@@ -1,15 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?><xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:mn="https://www.metanorma.org/ns/standoc" xmlns:mnx="https://www.metanorma.org/ns/xslt" xmlns:mathml="http://www.w3.org/1998/Math/MathML" xmlns:xalan="http://xml.apache.org/xalan" xmlns:fox="http://xmlgraphics.apache.org/fop/extensions" xmlns:pdf="http://xmlgraphics.apache.org/fop/extensions/pdf" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:java="http://xml.apache.org/xalan/java" xmlns:barcode="http://barcode4j.krysalis.org/ns" xmlns:redirect="http://xml.apache.org/xalan/redirect" exclude-result-prefixes="java" extension-element-prefixes="redirect" version="1.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+		xmlns:fo="http://www.w3.org/1999/XSL/Format"
+		xmlns:mn="https://www.metanorma.org/ns/standoc"
+		xmlns:mnx="https://www.metanorma.org/ns/xslt"
+		xmlns:mathml="http://www.w3.org/1998/Math/MathML"
+		xmlns:xalan="http://xml.apache.org/xalan"
+		xmlns:fox="http://xmlgraphics.apache.org/fop/extensions"
+		xmlns:pdf="http://xmlgraphics.apache.org/fop/extensions/pdf"
+		xmlns:xlink="http://www.w3.org/1999/xlink"
+		xmlns:java="http://xml.apache.org/xalan/java"
+		xmlns:barcode="http://barcode4j.krysalis.org/ns"
+		xmlns:redirect="http://xml.apache.org/xalan/redirect"
+		exclude-result-prefixes="java"
+		extension-element-prefixes="redirect"
+		version="1.0">
 
-	<xsl:variable name="marginLeftRight1">25.4</xsl:variable>
-	<xsl:variable name="marginLeftRight2">12.7</xsl:variable>
+	<!-- margins for EN document, no need redefine for ISO -->
+	<!-- <xsl:variable name="marginLeftRight1">25.4</xsl:variable>
+	<xsl:variable name="marginLeftRight2">12.7</xsl:variable> -->
 
 	<xsl:variable name="color_blue">rgb(6, 85, 162)</xsl:variable>
 
 	<xsl:template name="layout-master-set">
 		<fo:layout-master-set>
 				
-			<!-- Cover page -->
-			<fo:simple-page-master master-name="cover-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+			<!-- EVS Cover page -->
+			<fo:simple-page-master master-name="cover-page-evs" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
 				<fo:region-body margin-top="110mm" margin-bottom="17mm" margin-left="20mm" margin-right="14.9mm"/>
 				<fo:region-before region-name="cover-page-header" extent="110mm" />
 				<fo:region-after region-name="cover-page-footer" extent="17mm"/>
@@ -17,11 +33,11 @@
 				<fo:region-end extent="14.9mm"/>
 			</fo:simple-page-master>
 		
-			<!-- first page -->
-			<fo:simple-page-master master-name="preface_firstpage" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
-				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="20mm" margin-right="12mm"/>
-				<fo:region-before region-name="header-even" extent="{$marginTop}mm"/>
-				<fo:region-after region-name="footer-even" extent="{$marginBottom - 2}mm"/>
+			<!-- EVS inner page -->
+			<fo:simple-page-master master-name="inner-cover-page-evs" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="32.5mm" margin-bottom="24.3mm" margin-left="20mm" margin-right="12mm"/>
+				<fo:region-before region-name="header" extent="22mm"/>
+				<fo:region-after region-name="footer" extent="24.3mm"/>
 				<fo:region-start region-name="left-region" extent="20mm"/>
 				<fo:region-end region-name="right-region" extent="12mm"/>
 			</fo:simple-page-master>
@@ -47,15 +63,26 @@
 		</fo:layout-master-set>
 	</xsl:template><!-- END layout-master-set -->
 
-	<xsl:template name="cover-page">
+	<xsl:template name="cover-pages">
 		<xsl:param name="num"/>
-		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" initial-page-number="1">
+		<xsl:call-template name="evs-cover-pages">
+			<xsl:with-param name="num" select="$num"/>
+		</xsl:call-template>
+		<xsl:call-template name="cover-page">
+			<xsl:with-param name="num" select="$num"/>
+		</xsl:call-template>
+	</xsl:template>
+
+	<xsl:template name="evs-cover-pages">
+		<xsl:param name="num"/>
+		<fo:page-sequence master-reference="cover-page-evs" force-page-count="no-force" initial-page-number="1">
 			<fo:static-content flow-name="cover-page-header" role="SKIP">
 				<fo:block font-size="19pt" font-weight="bold" text-align-last="justify" color="{$color_blue}" margin-top="19mm" margin-right="2mm">
 					<fo:inline keep-together.within-line="always" role="SKIP">
-						<xsl:text>EESTI STANDARD</xsl:text>
+						<!-- EESTI STANDARD -->
+						<fo:inline text-transform="uppercase"><xsl:value-of select="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) != '']"/></fo:inline>
 						<fo:leader leader-pattern="space"/>
-						<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier[1]"/>
+						<xsl:value-of select="concat(/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'EVS'], ':', /mn:metanorma/mn:bibdata/mn:copyright/mn:from)"/>
 					</fo:inline>
 				</fo:block>
 				<fo:block font-size="0pt" margin-top="-0.5mm">
@@ -71,7 +98,6 @@
 			</fo:static-content>
 			
 			<fo:flow flow-name="xsl-region-body">
-				<xsl:call-template name="insert_firstpage_id"><xsl:with-param name="num" select="$num"/></xsl:call-template>
 				<fo:block-container font-size="19pt" font-weight="bold" width="160mm" line-height="1.17" margin-left="2mm">
 					<fo:block-container margin-left="0mm">
 						<fo:block text-transform="uppercase">
@@ -96,19 +122,22 @@
 				</fo:block-container>
 			</fo:flow>
 		</fo:page-sequence>
-	</xsl:template> <!-- END cover-page -->
-
-	<xsl:template name="inner-cover-page">
-		<xsl:param name="num"/>
 		
-		<fo:page-sequence force-page-count="no-force" xsl:use-attribute-sets="page-sequence-preface" master-reference="preface_first">
-			<xsl:call-template name="refinePageSequenceCommon"/>
-			<xsl:call-template name="refine_page-sequence-preface"/>
-			<xsl:attribute name="format">I</xsl:attribute>
+		<fo:page-sequence force-page-count="no-force" master-reference="inner-cover-page-evs" format="I">
 			
-			<xsl:call-template name="insertHeaderFooter">
-				<xsl:with-param name="num" select="$num"/>
-			</xsl:call-template>
+			<fo:static-content flow-name="header" role="artifact">
+				<fo:block-container height="100%" display-align="after">
+					<fo:block font-size="11pt" line-height="1.2">
+						<xsl:variable name="docidentifier" select="concat($variables/mnx:doc[@num = $num]/mn:bibdata/mn:docidentifier[@type = 'EVS'], ':', $variables/mnx:doc[@num = $num]/copyrightYear)"/>
+						<xsl:value-of select="$docidentifier"/>
+					</fo:block>
+				</fo:block-container>
+			</fo:static-content>
+			<fo:static-content flow-name="footer" role="artifact">
+				<fo:block-container height="100%">
+					<fo:block font-size="11pt" line-height="1.2"><fo:page-number/></fo:block>
+				</fo:block-container>
+			</fo:static-content>
 			
 			<fo:flow flow-name="xsl-region-body" role="SKIP" font-size="11pt">
 			
@@ -170,12 +199,14 @@
 				<fo:block-container position="absolute" height="{$pageHeight - $marginTop - $marginBottom - 2}mm" width="176mm" display-align="after" role="SKIP">
 					<fo:block><xsl:apply-templates select="/mn:metanorma/mn:boilerplate/mn:feedback-statement"/></fo:block>
 					<!-- ICS -->
-					<fo:block><xsl:value-of select="$variables/mnx:doc[@num = $num]/ics"/></fo:block>
+					<fo:block><xsl:value-of select="translate($variables/mnx:doc[@num = $num]/ics, ';:', ',')"/></fo:block>
 					<fo:block>&#xa0;</fo:block>
 					<fo:block-container margin-left="-2mm">
 						<fo:block-container margin-left="0mm">
-							<fo:block border="0.5pt solid black" role="SKIP" font-size="9pt" padding-top="1mm" padding-left="0.5mm" padding-bottom="1mm">
-								<xsl:apply-templates select="/mn:metanorma/mn:boilerplate/mn:copyright-statement"/>
+							<fo:block border="0.5pt solid black" role="SKIP" font-size="9pt" padding-top="1mm" padding-left="0.5mm" padding-bottom="1mm" line-height="1.17">
+								<!-- <xsl:apply-templates select="/mn:metanorma/mn:boilerplate/mn:copyright-statement"/> -->
+								<!-- <xsl:apply-templates select="$copyright-statement-evs/mn:copyright-statement-evs"/> -->
+								<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'copyright-evs']/node()"/>
 							</fo:block>
 						</fo:block-container>
 					</fo:block-container>
@@ -185,7 +216,7 @@
 		
 		
 		<fo:page-sequence force-page-count="no-force" master-reference="european-standard" initial-page-number="1">
-			<fo:static-content flow-name="footer" role="Artifact">
+			<fo:static-content flow-name="footer" role="artifact">
 				<fo:table table-layout="fixed" width="100%" role="SKIP" border-top="2pt solid black" font-size="8.5pt">
 					<fo:table-column column-width="proportional-column-width(32)"/>
 					<fo:table-column column-width="proportional-column-width(70)"/>
@@ -258,10 +289,23 @@
 						</fo:table-row>
 					</fo:table-body>
 				</fo:table>
-				<fo:block font-size="10pt" margin-top="3.5mm"><xsl:value-of select="$variables/mnx:doc[@num = $num]/ics"/></fo:block>
+				<fo:block font-size="10pt" margin-top="3.5mm" text-align-last="justify">
+					<xsl:value-of select="translate($variables/mnx:doc[@num = $num]/ics, ';:', ',')"/>
+					<fo:leader leader-pattern="space"/>
+					<xsl:text>&#xa0;</xsl:text>
+					<xsl:if test="/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:relation[mn:description = 'supersedes']">
+						<xsl:value-of select="concat('Supersedes ', /mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']
+						/mn:bibitem/mn:relation[mn:description = 'supersedes']
+						/mn:bibitem/mn:docidentifier[@primary = 'true'])"/>
+					</xsl:if>
+				</fo:block>
 				<fo:block text-align="center" margin-top="10mm" font-size="11pt">English version</fo:block><!-- To do -->
 				<fo:block text-align="center" font-size="16pt" margin-top="4mm">
-					<xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:title[@language = 'en' and @type = 'main']/node()"/>
+					<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:title[@language = 'en' and @type = 'title-intro'] | 
+							/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:title[@language = 'en' and @type = 'title-main']">
+						<xsl:apply-templates select="node()"/>
+						<xsl:if test="position() != last()"><xsl:text>&#xa0;-&#xa0;</xsl:text></xsl:if>
+					</xsl:for-each>
 				</fo:block>
 				
 				<!-- Titles in French and German -->
@@ -300,16 +344,9 @@
 					</fo:table-body>
 				</fo:table>
 				
+				<!-- Endorsement text: This European Standard was approved by CEN on ... -->
 				<fo:block-container line-height="1.17">
-					<xsl:variable name="date">
-						<xsl:call-template name="convertDate">
-							<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:relation[@type = 'derivedFrom']/mn:bibitem/mn:date/mn:on"/>
-						</xsl:call-template>
-					</xsl:variable>
-					<fo:block space-after="9.3pt">This European Standard was approved by CEN on <xsl:value-of select="$date"/>.</fo:block>
-					<fo:block space-after="9.3pt">CEN and CENELEC members are bound to comply with the CEN/CENELEC Internal Regulations which stipulate the conditions for giving this European Standard the status of a national standard without any alteration. Up-to-date lists and bibliographical references concerning such national standards may be obtained on application to the CEN-CENELEC Management Centre or to any CEN and CENELEC member.</fo:block>
-					<fo:block space-after="9.3pt">This European Standard exists in three official versions (English, French, German). A version in any other language made by translation under the responsibility of a CEN and CENELEC member into its own language and notified to the CEN-CENELEC Management Centre has the same status as the official versions.</fo:block>
-					<fo:block space-after="9.3pt">CEN and CENELEC members are the national standards bodies and national electrotechnical committees of Austria, Belgium, Bulgaria, Croatia, Cyprus, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Iceland, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Norway, Poland, Portugal, Republic of North Macedonia, Romania, Serbia, Slovakia, Slovenia, Spain, Sweden, Switzerland, Türkiye and United Kingdom.</fo:block>
+					<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:clause[@type = 'endorsement']/node()"/>
 				</fo:block-container>
 				
 				<!-- CEN/CENELEC Logos -->
@@ -352,10 +389,14 @@
 			</fo:flow>
 		</fo:page-sequence>
 			
-	</xsl:template> <!-- END: inner-cover-page -->
+	</xsl:template> <!-- END: evs-cover-pages -->
 
 	<!-- National Foreword(s) render in the template inner-cover-page -->
 	<xsl:template match="mn:preface//mn:foreword[@type = 'national-foreword']" priority="3"/>
+	
+	<!-- renders in the template inner-cover-page -->
+	<xsl:template match="mn:preface//mn:clause[@type = 'endorsement']" priority="3"/>
+	<xsl:template match="mn:preface//mn:clause[@type = 'copyright-evs']" priority="3"/>
 
 	<xsl:template name="refine_page-sequence-preface"><?extend?>
 		<xsl:attribute name="format">1</xsl:attribute>
@@ -367,26 +408,36 @@
 	
 
 	<xsl:template name="refine_p-style"><?extend?>
-		<xsl:if test="ancestor::mn:clause[@type = 'national-foreword']">
+		<xsl:if test="ancestor::mn:foreword[@type = 'national-foreword']">
 			<xsl:attribute name="line-height">1.17</xsl:attribute>
 			<xsl:if test="following-sibling::*">
 				<xsl:attribute name="margin-bottom">18pt</xsl:attribute>
 			</xsl:if>
 		</xsl:if>
+		<xsl:if test="ancestor::mn:clause[@type = 'endorsement']">
+			<xsl:attribute name="text-align">left</xsl:attribute>
+			<xsl:attribute name="space-after">9.3pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="ancestor::mn:clause[@type = 'copyright-evs']">
+			<xsl:if test="following-sibling::mn:p">
+				<xsl:attribute name="margin-bottom">4pt</xsl:attribute>
+			</xsl:if>
+		</xsl:if>
 	</xsl:template>
 	
-	<xsl:template name="refine_copyright-statement-p-style"><?extend?>
+	<!-- <xsl:template name="refine_copyright-statement-p-style"><?extend?>
 		<xsl:attribute name="line-height">1.17</xsl:attribute>
 		<xsl:if test="following-sibling::mn:p">
 			<xsl:attribute name="margin-bottom">4pt</xsl:attribute>
 		</xsl:if>
-	</xsl:template>
+	</xsl:template> -->
 	
-	<xsl:template name="insertHeaderEven">
+	<xsl:template name="insertHeaderEven2">
 		<xsl:param name="num"/>
 		<xsl:param name="is_header">true</xsl:param>
 		<xsl:param name="header_region_name">header-even</xsl:param>
-		<xsl:variable name="docidentifier" select="$variables/mnx:doc[@num = $num]/docidentifier_iso"/>
+		<!-- <xsl:variable name="docidentifier" select="$variables/mnx:doc[@num = $num]/docidentifier_iso"/> -->
+		<xsl:variable name="docidentifier" select="concat($variables/mnx:doc[@num = $num]/mn:bibdata/mn:docidentifier[@type = 'EVS'], ':', $variables/mnx:doc[@num = $num]/copyrightYear)"/>
 		<fo:static-content flow-name="{$header_region_name}">
 			<fo:block-container height="23mm">
 				<fo:block font-size="11pt" padding-top="12.5mm" line-height="1.2">
@@ -395,9 +446,10 @@
 			</fo:block-container>
 		</fo:static-content>
 	</xsl:template> <!-- END: insertHeaderEven -->
-	<xsl:template name="insertHeaderFirst">
+	<xsl:template name="insertHeaderFirst2">
 		<xsl:param name="num"/>
-		<xsl:variable name="docidentifier" select="$variables/mnx:doc[@num = $num]/docidentifier_iso"/>
+		<!-- <xsl:variable name="docidentifier" select="$variables/mnx:doc[@num = $num]/docidentifier_iso"/> -->
+		<xsl:variable name="docidentifier" select="concat($variables/mnx:doc[@num = $num]/mn:bibdata/mn:docidentifier[@type = 'EVS'], ':', $variables/mnx:doc[@num = $num]/copyrightYear)"/>
 		<!-- The first instance of a running page header should be tagged - later instances should be marked as Artifact. -->
 		<fo:static-content flow-name="header-first" role="SKIP"> <!-- role="artifact" -->
 			<fo:block-container height="23mm">
@@ -407,9 +459,10 @@
 			</fo:block-container>
 		</fo:static-content>
 	</xsl:template> <!-- END: insertHeaderFirst -->
-	<xsl:template name="insertHeaderOdd">
+	<xsl:template name="insertHeaderOdd2">
 		<xsl:param name="num"/>
-		<xsl:variable name="docidentifier" select="$variables/mnx:doc[@num = $num]/docidentifier_iso"/>
+		<!-- <xsl:variable name="docidentifier" select="$variables/mnx:doc[@num = $num]/docidentifier_iso"/> -->
+		<xsl:variable name="docidentifier" select="concat($variables/mnx:doc[@num = $num]/mn:bibdata/mn:docidentifier[@type = 'EVS'], ':', $variables/mnx:doc[@num = $num]/copyrightYear)"/>
 		<fo:static-content flow-name="header-odd" role="artifact">
 			<fo:block-container height="23mm">
 				<fo:block font-size="11pt" text-align="right" padding-top="12.5mm" line-height="1.2">
@@ -419,7 +472,7 @@
 		</fo:static-content>
 	</xsl:template> <!-- END: insertHeaderOdd -->
 
-	<xsl:template name="insertFooterEven">
+	<xsl:template name="insertFooterEven2">
 		<xsl:param name="num" />
 		<xsl:param name="font-weight" select="'bold'"/>
 		<fo:static-content flow-name="footer-even" role="artifact">
@@ -428,7 +481,7 @@
 			</fo:block-container>
 		</fo:static-content>
 	</xsl:template> <!-- END: insertFooterEven -->
-	<xsl:template name="insertFooterOdd">
+	<xsl:template name="insertFooterOdd2">
 		<xsl:param name="num"/>
 		<xsl:param name="font-weight" select="'bold'"/>
 		<fo:static-content flow-name="footer-odd" role="artifact">
@@ -489,5 +542,12 @@
 	<xsl:template match="mn:foreword[count(mn:p) = 0]" mode="update_xml_step1" priority="3"/>
 	
 	<xsl:template match="mn:p[@class = 'zzSTDTitle1']" mode="update_xml_step1" priority="3"/>
+	
+	<!-- <xsl:template name="refine_link-style"><?extend?>
+		<xsl:if test="ancestor::mn:copyright-statement">
+			<xsl:attribute name="color">blue</xsl:attribute>
+			<xsl:attribute name="text-decoration">underline</xsl:attribute>
+		</xsl:if>
+	</xsl:template> -->
 	
 </xsl:stylesheet>
