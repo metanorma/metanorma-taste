@@ -598,8 +598,15 @@
 		</xsl:if>
 	</xsl:template>
 
-	<!-- Resolutions and circular letters carry no Foreword in the published
-	     PDFs: remove the generated boilerplate foreword from the tree -->
+	<!-- Resolutions and circular letters carry no "Foreword" heading in
+	     the published PDFs - and in the GA resolutions the resolution body
+	     itself rides the generated foreword. Keep the content, drop the
+	     heading. -->
+	<!-- Resolutions and circular letters carry no "Foreword" heading in
+	     the published PDFs. In the GA resolutions the resolution body
+	     itself rides the generated foreword: the sections update below
+	     hoists that content into the body flow, so the whole foreword is
+	     dropped here. -->
 	<xsl:template match="mn:preface/mn:foreword | mn:foreword" mode="update_xml_step1" priority="4">
 		<xsl:if test="not($iala_is_rescirc)">
 			<xsl:copy>
@@ -608,16 +615,35 @@
 		</xsl:if>
 	</xsl:template>
 
-	<!-- the published resolutions number their operative lists "1." "2." ...;
-	     the autonum label does not survive to text, so compute it -->
-	<xsl:template match="mn:ol/mn:li" mode="update_xml_step1" priority="3">
+	<!-- the published resolutions print no table caption -->
+	<xsl:template match="mn:table/mn:fmt-name" mode="update_xml_step1" priority="5">
+		<xsl:if test="not($iala_is_rescirc)">
+			<xsl:copy>
+				<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
+			</xsl:copy>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- rescirc annexes set the leading the published resolutions print:
+	     the declaration spreads over the page like the reference PDF -->
+	<xsl:template name="refine_p-style">
+		<xsl:param name="element-name"/>
+		<xsl:param name="margin"/>
+		<?extend?>
+		<xsl:if test="$iala_is_rescirc and ancestor::mn:annex">
+			<xsl:attribute name="line-height">150%</xsl:attribute>
+			<xsl:attribute name="space-after">10pt</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- rescirc: hoist the foreword content into sections. These documents
+	     have no bibliography, so a plain copy of the section children plus
+	     the hoisted foreword content matches the base update for them. -->
+	<xsl:template match="mn:sections[$iala_is_rescirc]" mode="update_xml_step1" priority="3">
 		<xsl:copy>
-			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
-			<xsl:if test="$iala_is_rescirc">
-				<xsl:attribute name="label"><xsl:value-of select="count(preceding-sibling::mn:li) + 1"/>.</xsl:attribute>
-				<xsl:attribute name="full">true</xsl:attribute>
-			</xsl:if>
+			<xsl:copy-of select="@*"/>
 			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+			<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:foreword/node()[not(self::mn:title or self::mn:fmt-title)] | /mn:metanorma/mn:preface/mn:foreword/mn:title/node() | /mn:metanorma/mn:preface/mn:foreword/mn:fmt-title/node()" mode="update_xml_step1"/>
 		</xsl:copy>
 	</xsl:template>
 
@@ -707,6 +733,8 @@
 	
 	<!-- li/fmt-name -->
 	<xsl:template match="mn:ol/mn:li/mn:fmt-name" priority="2" mode="update_xml_step1">
+		<!-- rescirc lists take the computed position label (see mn:ol/mn:li) -->
+		<xsl:if test="not($iala_is_rescirc)">
 		<xsl:variable name="label_" select="normalize-space()"/>
 		<xsl:variable name="label_last_char" select="substring($label_, string-length($label_), 1)"/>
 		<!-- label without . or ) at the end -->
@@ -722,6 +750,7 @@
 		</xsl:variable>
 		<xsl:attribute name="label"><xsl:value-of select="$label"/></xsl:attribute>
 		<xsl:attribute name="full">true</xsl:attribute>
+			</xsl:if>
 	</xsl:template>
 	
 	<!-- ============================================================ -->
@@ -776,7 +805,7 @@
 	     the same page (no cover page-sequence, no Contents, no Foreword).
 	     The first sections element carries the letterhead ahead of its
 	     normal rendering. -->
-	<xsl:template match="/*/mn:sections/mn:page_sequence/*[1][$iala_is_rescirc]" priority="4">
+<xsl:template match="/*/mn:sections/mn:page_sequence/*[1][$iala_is_rescirc]" priority="4">
 		<xsl:call-template name="rescirc_letterhead"/>
 		<xsl:choose>
 			<xsl:when test="self::mn:ol or self::mn:ul">
@@ -910,8 +939,8 @@
 							<fo:table-body role="SKIP">
 								<fo:table-row role="SKIP">
 									<fo:table-cell role="SKIP">
-										<fo:block text-align="left">
-											<fo:instream-foreign-object content-width="26mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+										<fo:block text-align="left" margin-top="4mm">
+											<fo:instream-foreign-object content-width="30mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
 												<xsl:copy-of select="$IALA-Logo-full"/>
 											</fo:instream-foreign-object>
 										</fo:block>
@@ -924,18 +953,18 @@
 								</fo:table-row>
 							</fo:table-body>
 						</fo:table>
-						<fo:block text-align="right" font-weight="bold" margin-top="10mm" margin-right="2mm">
+						<fo:block text-align="right" font-weight="bold" margin-top="16mm" margin-right="2mm">
 							<xsl:text>IALA General Assembly Resolution </xsl:text>
 							<xsl:value-of select="$iala_docidentifier"/>
 						</fo:block>
-						<fo:block text-align="right" margin-top="4pt" margin-right="2mm">
+						<fo:block text-align="right" margin-top="6pt" margin-right="2mm">
 							<xsl:text>Adopted on </xsl:text>
 							<xsl:call-template name="rescirc_date"/>
 						</fo:block>
-						<fo:block font-weight="bold" font-size="11pt" text-transform="uppercase" color="{$color_primary_recommendation}" margin-top="10mm">
+						<fo:block font-weight="bold" font-size="11pt" text-transform="uppercase" color="{$color_primary_recommendation}" margin-top="16mm">
 							<xsl:value-of select="$iala_title_en"/>
 						</fo:block>
-						<fo:block font-size="0pt" margin-bottom="5mm">&#xa0;</fo:block>
+						<fo:block font-size="0pt" margin-bottom="10mm">&#xa0;</fo:block>
 					</xsl:when>
 					<xsl:otherwise>
 						<!-- A1x assembly resolutions (A13): docidentifier
@@ -1106,8 +1135,6 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-
-
 
 	<xsl:variable name="IALA-Logo">
 		<xsl:copy-of select="//mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'publisher']/mn:organization/mn:logo/mn:image/*[local-name() = 'svg']"/>
