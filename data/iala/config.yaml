@@ -36,7 +36,7 @@ base-override:
     presentation-metadata-annex-delim: "<br/>"
     presentation-metadata-middle-title: ""
     # PDF deferred until the IALA XSL is built (generic ships no default XSL)
-    output-extensions: xml,html,doc,rxl
+    output-extensions: xml,html,doc,pdf,rxl
   bibliography-sort:
   - abbrev: IALA
     rank: 1
