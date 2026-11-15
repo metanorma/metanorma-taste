@@ -1082,19 +1082,10 @@
 		<fo:static-content flow-name="footer" role="artifact">
 			<fo:block-container font-size="7.56pt" font-weight="bold" color="{$color_corporate_blue}" border-top="0.2pt solid black" line-height="1.43">
 				<fo:block margin-top="4.5mm">
-					<!-- Legacy-era standards and recommendations open with the
-						"IALA" association prefix; standards join the title with
-						an en dash, recommendations with a space -->
-					<xsl:if test="$iala_era_old and ($iala_is_standard or $iala_is_recommendation)">
-						<xsl:text>IALA </xsl:text>
-					</xsl:if>
 					<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
 					<xsl:text> </xsl:text>
 					<xsl:call-template name="getVariable"><xsl:with-param name="variable">docidentifier</xsl:with-param></xsl:call-template>
-					<xsl:choose>
-						<xsl:when test="$iala_is_standard"><xsl:text> – </xsl:text></xsl:when>
-						<xsl:otherwise><xsl:text> </xsl:text></xsl:otherwise>
-					</xsl:choose>
+					<xsl:text> </xsl:text>
 					<xsl:variable name="title">
 						<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
 					</xsl:variable>
@@ -1107,23 +1098,12 @@
 					<xsl:call-template name="getVariable"><xsl:with-param name="variable">edition</xsl:with-param></xsl:call-template>
 					<xsl:text> </xsl:text>
 					<fo:inline text-transform="lowercase"><xsl:call-template name="getVariable"><xsl:with-param name="variable">urn</xsl:with-param></xsl:call-template></fo:inline>
-					<!-- Legacy standards carry the page number on a third,
-						publication-date line -->
-					<xsl:if test="not($iala_is_standard and $iala_era_old)">
-						<fo:leader leader-pattern="space"/>
-						<xsl:text>P&#xa0;</xsl:text><fo:page-number />
-					</xsl:if>
+					<fo:leader leader-pattern="space"/>
+					<xsl:text>P&#xa0;</xsl:text><fo:page-number />
 				</fo:block>
-				<xsl:if test="$iala_is_standard and $iala_era_old">
-					<fo:block text-align-last="justify">
-						<xsl:call-template name="getVariable"><xsl:with-param name="variable">date</xsl:with-param></xsl:call-template>
-						<fo:leader leader-pattern="space"/>
-						<xsl:text>P&#xa0;</xsl:text><fo:page-number />
-					</fo:block>
-				</xsl:if>
 			</fo:block-container>
 		</fo:static-content>
-				</xsl:otherwise>
+			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 
