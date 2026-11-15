@@ -900,7 +900,7 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:choose>
-					<xsl:when test="number($iala_year) &lt; 2016">
+					<xsl:when test="number(substring(normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on), 1, 4)) &lt; 2016">
 						<!-- Legacy assembly resolutions (A12 era): logo left,
 						     association name block right, resolution and
 						     adoption lines, then the title -->
