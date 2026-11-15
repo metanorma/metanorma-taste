@@ -126,6 +126,38 @@
 	<xsl:variable name="iala_is_standard" select="$iala_doctype_full = 'Standard'"/>
 	<xsl:variable name="iala_is_recommendation" select="$iala_doctype_full = 'Recommendation'"/>
 
+	<!-- Recital qualifier printed under the doctype banner on recommendation
+			covers ("(NORMATIVE)" / "(INFORMATIVE)" / "(Normative)", as printed
+			per document), carried by the typed normativity clause; the running
+			footer prints it sentence-cased. -->
+	<xsl:variable name="iala_normativity" select="normalize-space((//mn:clause[@type = 'normativity'])[1]/mn:p[1])"/>
+	<!-- The running footer title as printed, carried by the typed
+			running-title clause (R1026 "Marine AtoN", R1027 lower-case
+			"payload"); absent, the footer prints the main title. -->
+	<xsl:variable name="iala_running_title" select="normalize-space((//mn:clause[@type = 'running-title'])[1]/mn:p[1])"/>
+
+	<xsl:variable name="iala_lower" select="'abcdefghijklmnopqrstuvwxyz'"/>
+	<xsl:variable name="iala_upper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
+
+	<!-- "(NORMATIVE)" as encoded on the cover prints "(Normative)" in the
+			running footer: sentence-case the string inside the parentheses. -->
+	<xsl:template name="iala_sentence_case">
+		<xsl:param name="str"/>
+		<xsl:variable name="paren" select="normalize-space(substring-after($str, '('))"/>
+		<xsl:variable name="word" select="normalize-space(substring-before($paren, ')'))"/>
+		<xsl:choose>
+			<xsl:when test="$word != ''">
+				<xsl:text>(</xsl:text>
+				<xsl:value-of select="translate(substring($word, 1, 1), $iala_lower, $iala_upper)"/>
+				<xsl:value-of select="translate(substring($word, 2), $iala_upper, $iala_lower)"/>
+				<xsl:text>)</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$str"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
 	<xsl:attribute-set name="root-style">
 		<xsl:attribute name="font-family">Calibri, Cambria Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
 		<xsl:attribute name="font-family-generic">Sans</xsl:attribute>
@@ -148,10 +180,13 @@
 					
 					<!-- Example: G1199 -->
 					<docidentifier><xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier[@primary = 'true']"/></docidentifier>
-					
+
 					<!-- Example: VTS DIGITAL COMMUNICATIONS -->
+					<!-- The main title only: the recommendation recital
+						qualifier and the running footer title ride their own
+						typed clauses and print in their own slots. -->
 					<title>
-						<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:title">
+						<xsl:for-each select="/mn:metanorma/mn:bibdata/mn:title[@type = 'main']">
 							<item>
 								<xsl:apply-templates />
 							</item>
@@ -352,6 +387,13 @@
 						</xsl:if>
 						<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
 					</fo:block>
+					<!-- Published recommendations print the recital qualifier as the
+							second banner line, in the case the document prints -->
+					<xsl:if test="$iala_is_recommendation and $iala_normativity != ''">
+						<fo:block font-size="25pt" font-weight="bold" margin-left="17mm" margin-right="17mm">
+							<xsl:value-of select="$iala_normativity"/>
+						</fo:block>
+					</xsl:if>
 				</fo:block-container>
 				
 				<fo:block-container height="10mm" role="SKIP"><fo:block role="SKIP"><fo:wrapper role="artifact">&#xa0;</fo:wrapper></fo:block></fo:block-container>
@@ -414,26 +456,43 @@
 	<xsl:template name="inner-cover-page">
 		<!-- ============ THE GENERAL ASSEMBLY approval page ============ -->
 		<!-- Legacy-era standards open with the General Assembly recitals,
-			printed between the cover and the contents. The recitals are
-			house boilerplate; only the APPROVES line is document specific
-			(docnumber + title from bibdata). The page carries no header or
-			footer in the published PDF. -->
+			printed between the cover and the contents. When the source
+			encodes the page as a real recitals clause it prints verbatim;
+			the fallback renders the house boilerplate with only the APPROVES
+			line document specific (docnumber + title from bibdata). The page
+			carries no header or footer in the published PDF. -->
 		<xsl:if test="$iala_is_standard and $iala_era_old">
 			<fo:page-sequence master-reference="page" format="1" force-page-count="no-force">
 				<fo:flow flow-name="xsl-region-body">
 					<fo:block-container margin-left="7mm" margin-right="4mm">
-						<fo:block font-size="15pt" color="{$color_corporate_blue}" margin-top="17mm" margin-bottom="12mm">
-							THE GENERAL ASSEMBLY
-						</fo:block>
-						<fo:block font-size="10pt" line-height="1.4" text-align="justify">
-							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">BEARING IN MIND</fo:inline> the provisions of the United Nations Convention on the Law of the Sea (UNCLOS) and the International Convention for the Safety of Life at Sea (SOLAS),</fo:block>
-							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">RECOGNIZING</fo:inline> that the aim of IALA is to foster the safe, economic and efficient movement of vessels, through improvement and harmonization of Marine Aids to Navigation world-wide,</fo:block>
-							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">RECALLING</fo:inline> article 7 of the IALA Constitution regarding the authority, duties and functions of the General Assembly,</fo:block>
-							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">RECALLING ALSO</fo:inline> that a goal of the work of IALA is that Marine Aids to Navigation are developed and harmonized through international cooperation and the provision of standards as described in the Strategic Vision,</fo:block>
-							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">HAVING CONSIDERED</fo:inline> the advice of the Council provided to General Assembly at its 13th Session,</fo:block>
-							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">APPROVES</fo:inline> the IALA Standard <xsl:value-of select="normalize-space(/mn:metanorma/mn:bibdata/mn:docnumber)"/>&#160;<xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'main']/node()"/>, and</fo:block>
-							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">INVITES</fo:inline> members and Marine Aids to Navigation authorities world-wide to undertake to implement the provisions of the Standard.</fo:block>
-						</fo:block>
+						<xsl:choose>
+							<xsl:when test="/mn:metanorma/mn:preface/mn:clause[@type = 'recitals'] | /mn:metanorma/mn:sections/mn:clause[@type = 'recitals']">
+								<fo:block font-size="15pt" color="{$color_corporate_blue}" margin-top="17mm" margin-bottom="12mm" text-transform="uppercase">
+									<xsl:apply-templates select="(/mn:metanorma/mn:preface/mn:clause[@type = 'recitals'] | /mn:metanorma/mn:sections/mn:clause[@type = 'recitals'])[1]/mn:fmt-title" mode="iala_recitals_title"/>
+								</fo:block>
+								<fo:block font-size="10pt" line-height="1.4" text-align="justify">
+									<xsl:for-each select="(/mn:metanorma/mn:preface/mn:clause[@type = 'recitals'] | /mn:metanorma/mn:sections/mn:clause[@type = 'recitals'])[1]/mn:p">
+										<fo:block margin-bottom="2.5mm">
+											<xsl:apply-templates select="."/>
+										</fo:block>
+									</xsl:for-each>
+								</fo:block>
+							</xsl:when>
+							<xsl:otherwise>
+							<fo:block font-size="15pt" color="{$color_corporate_blue}" margin-top="17mm" margin-bottom="12mm">
+								THE GENERAL ASSEMBLY
+							</fo:block>
+							<fo:block font-size="10pt" line-height="1.4" text-align="justify">
+								<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">BEARING IN MIND</fo:inline> the provisions of the United Nations Convention on the Law of the Sea (UNCLOS) and the International Convention for the Safety of Life at Sea (SOLAS),</fo:block>
+								<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">RECOGNIZING</fo:inline> that the aim of IALA is to foster the safe, economic and efficient movement of vessels, through improvement and harmonization of Marine Aids to Navigation world-wide,</fo:block>
+								<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">RECALLING</fo:inline> article 7 of the IALA Constitution regarding the authority, duties and functions of the General Assembly,</fo:block>
+								<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">RECALLING ALSO</fo:inline> that a goal of the work of IALA is that Marine Aids to Navigation are developed and harmonized through international cooperation and the provision of standards as described in the Strategic Vision,</fo:block>
+								<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">HAVING CONSIDERED</fo:inline> the advice of the Council provided to General Assembly at its 13th Session,</fo:block>
+								<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">APPROVES</fo:inline> the IALA Standard <xsl:value-of select="normalize-space(/mn:metanorma/mn:bibdata/mn:docnumber)"/>&#160;<xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'main']/node()"/>, and</fo:block>
+								<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">INVITES</fo:inline> members and Marine Aids to Navigation authorities world-wide to undertake to implement the provisions of the Standard.</fo:block>
+							</fo:block>
+							</xsl:otherwise>
+						</xsl:choose>
 					</fo:block-container>
 				</fo:flow>
 			</fo:page-sequence>
@@ -442,9 +501,12 @@
 		<!-- ============ DOCUMENT REVISION page ============ -->
 		<!-- Recommendations open with the DOCUMENT REVISION page (no contents
 			page in the published PDF; the contents clause is dropped for them
-			in update_xml_step1 below). The revision row data is not carried by
-			bibdata, so the table prints the header row over the house height. -->
-		<xsl:if test="$iala_is_recommendation">
+			in update_xml_step1 below). When the source carries a real revision
+			clause it renders from the sections flow (first clause, first page
+			after the cover) through the revision-clause template below; this
+			synthetic placeholder only fills the slot when no rows are
+			encoded. -->
+		<xsl:if test="$iala_is_recommendation and not(/mn:metanorma/mn:sections/mn:clause[@type = 'revision'] | /mn:metanorma/mn:preface/mn:clause[@type = 'revision'])">
 			<fo:page-sequence master-reference="page" format="1" force-page-count="no-force">
 				<xsl:call-template name="insertHeaderFooter"/>
 				<fo:flow flow-name="xsl-region-body">
@@ -521,11 +583,84 @@
 		</xsl:if>
 	</xsl:template>
 
+	<!-- Published recital lists run a slightly wider item gap (the base
+			list-item style is tighter); table cells keep the base zero. -->
+	<xsl:template name="refine_list-item-style">
+		<xsl:if test="ancestor::mn:table">
+			<xsl:attribute name="margin-bottom">0pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="ancestor::mn:clause[mn:fmt-title[normalize-space(.) = 'The Council']][$iala_is_recommendation]">
+			<xsl:attribute name="margin-bottom">5pt</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+
 	<xsl:attribute-set name="page-sequence-preface"><?extend?>
 		<xsl:attribute name="format">1</xsl:attribute>
 		<xsl:attribute name="force-page-count">no-force</xsl:attribute>
 	</xsl:attribute-set>
 
+	<!-- ANNEX CONTENTS page (R1024): the published recommendation prints a
+			contents page for its annex ahead of the annex itself. The source
+			encodes the page as a typed clause; the entry list renders from the
+			annex headings with dot leaders and live page references, in the
+			case the printed entries carry (top-level clause titles upper
+			case, sub-clause titles as typed). -->
+	<xsl:template match="mn:clause[@type = 'annex-contents']" mode="contents"/>
+	<xsl:template match="mn:clause[@type = 'annex-contents']" priority="3">
+		<fo:block role="Sect" break-before="page">
+			<xsl:apply-templates select="mn:fmt-title"/>
+			<fo:block font-size="11pt" line-height="1.6" margin-top="8mm" margin-bottom="4mm">
+				<xsl:apply-templates select="//mn:annex" mode="iala_annex_contents"/>
+			</fo:block>
+		</fo:block>
+	</xsl:template>
+	<xsl:template match="mn:clause[@type = 'annex-contents']/mn:fmt-title" priority="3">
+		<!-- the printed annex contents title is 20pt, one step below the
+			section-title style -->
+		<fo:block xsl:use-attribute-sets="toc-title-style" font-size="20pt" margin-top="13mm" margin-bottom="8mm">
+			<xsl:call-template name="refine_toc-title-style"/>
+			<fo:block-container width="100%" border-bottom="1.25pt solid {$color_corporate_blue}" role="SKIP">
+				<fo:block margin-bottom="2mm" role="SKIP">
+					<xsl:apply-templates />
+				</fo:block>
+			</fo:block-container>
+		</fo:block>
+	</xsl:template>
+	<xsl:template match="mn:annex" mode="iala_annex_contents">
+		<xsl:apply-templates select="mn:clause" mode="iala_annex_contents"/>
+	</xsl:template>
+	<!-- Annex clause entry: the caption label as rewritten for print
+			("1." / "2.1.") plus the clause title; depth-2 titles upper case,
+			sub-clause titles as typed. -->
+	<xsl:template match="mn:annex/mn:clause | mn:annex/mn:clause/mn:clause" mode="iala_annex_contents">
+		<fo:block text-align-last="justify" margin-bottom="1.5mm">
+			<xsl:choose>
+				<xsl:when test="mn:fmt-title[@depth = '3']">
+					<!-- sub-clause entries: 11pt regular, titles as typed -->
+					<fo:inline font-size="11pt" color="{$color_corporate_blue}">
+						<xsl:copy-of select="mn:fmt-title/mn:span[@class = 'fmt-caption-label']/node()"/>
+						<xsl:text>&#160;</xsl:text>
+						<xsl:copy-of select="mn:fmt-title/node()[not(self::mn:span[@class = 'fmt-caption-label'] or self::mn:span[@class = 'fmt-caption-delim'])]"/>
+					</fo:inline>
+				</xsl:when>
+				<xsl:otherwise>
+					<!-- top-level annex clause entries: 12pt bold, titles upper case -->
+					<fo:inline font-size="12pt" font-weight="bold" color="{$color_corporate_blue}">
+						<xsl:copy-of select="mn:fmt-title/mn:span[@class = 'fmt-caption-label']/node()"/>
+						<xsl:text>&#160;&#160;</xsl:text>
+						<fo:inline text-transform="uppercase">
+							<xsl:copy-of select="mn:fmt-title/node()[not(self::mn:span[@class = 'fmt-caption-label'] or self::mn:span[@class = 'fmt-caption-delim'])]"/>
+						</fo:inline>
+					</fo:inline>
+				</xsl:otherwise>
+			</xsl:choose>
+			<fo:leader leader-pattern="dots" font-size="11pt" color="{$color_corporate_blue}"/>
+			<fo:page-number-citation ref-id="{@id}"/>
+		</fo:block>
+		<xsl:apply-templates select="mn:clause" mode="iala_annex_contents"/>
+	</xsl:template>
+	<!-- deeper annex nesting prints no contents entries -->
+	<xsl:template match="mn:annex/mn:clause/mn:clause/mn:clause" mode="iala_annex_contents"/>
 	<xsl:attribute-set name="page-sequence-main"><?extend?>
 		<xsl:attribute name="force-page-count">no-force</xsl:attribute>
 	</xsl:attribute-set>
@@ -544,8 +679,80 @@
 	<xsl:template match="mn:clause[@type = 'revision']" mode="contents"/>
 	<xsl:template match="mn:clause[@type = 'revision']" priority="3">
 		<fo:block role="Sect" break-after="page">
-			<xsl:apply-templates/>
+			<xsl:choose>
+				<xsl:when test="$iala_is_recommendation">
+					<!-- Published recommendations print the revision page with
+						the house table: the first encoded row sits under the
+						header, the remaining rows pad to the house height. -->
+					<xsl:apply-templates select="mn:fmt-title"/>
+					<fo:block font-size="11pt" line-height="1.4" margin-bottom="5mm">
+						<xsl:apply-templates select="mn:p[1]" mode="iala_revision_intro"/>
+					</fo:block>
+					<xsl:call-template name="iala_recommendation_revision_table"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates/>
+				</xsl:otherwise>
+			</xsl:choose>
 		</fo:block>
+	</xsl:template>
+	<xsl:template match="mn:clause[@type = 'revision']/mn:p" mode="iala_revision_intro">
+		<xsl:value-of select="."/>
+	</xsl:template>
+
+	<!-- The house revision table (18% / 58% / 24% columns, ruled cells,
+			blue bold header): the source clause supplies the header labels
+			and the first data row, exactly as printed; empty rows pad the
+			table to the house height. -->
+	<xsl:template name="iala_recommendation_revision_table">
+		<fo:table table-layout="fixed" width="100%">
+			<fo:table-column column-width="18%"/>
+			<fo:table-column column-width="58%"/>
+			<fo:table-column column-width="24%"/>
+			<fo:table-header>
+				<fo:table-row>
+					<xsl:for-each select="mn:table/mn:thead/mn:tr[1]/*">
+						<fo:table-cell border="0.5pt solid black" padding-left="2mm" padding-top="1.5mm" padding-bottom="1.5mm" display-align="center">
+							<fo:block font-size="10pt" font-weight="bold" color="{$color_corporate_blue}"><xsl:value-of select="normalize-space(.)"/></fo:block>
+						</fo:table-cell>
+					</xsl:for-each>
+				</fo:table-row>
+			</fo:table-header>
+			<fo:table-body>
+				<fo:table-row min-height="12mm">
+					<xsl:for-each select="mn:table/mn:tbody/mn:tr[1]/*">
+						<fo:table-cell border="0.5pt solid black" padding-left="2mm" padding-top="1.5mm" display-align="center">
+							<fo:block font-size="10pt"><xsl:value-of select="normalize-space(.)"/></fo:block>
+						</fo:table-cell>
+					</xsl:for-each>
+				</fo:table-row>
+				<fo:table-row min-height="12mm">
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+				</fo:table-row>
+				<fo:table-row min-height="12mm">
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+				</fo:table-row>
+				<fo:table-row min-height="12mm">
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+				</fo:table-row>
+				<fo:table-row min-height="12mm">
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+				</fo:table-row>
+				<fo:table-row min-height="12mm">
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+				</fo:table-row>
+			</fo:table-body>
+		</fo:table>
 	</xsl:template>
 	<xsl:template match="mn:clause[@type = 'revision']/mn:fmt-title" priority="3">
 		<fo:block xsl:use-attribute-sets="toc-title-style"  margin-top="13mm" margin-bottom="4.5mm">
@@ -558,6 +765,32 @@
 		</fo:block>
 	</xsl:template>
 	
+	<!-- The normativity qualifier and the running footer title print from
+			their typed clauses on the cover and in the footer; the clauses
+			themselves are suppressed from every flow and the contents. The
+			update-stage rewrite leaves a whitespace-only paragraph so the
+			preface page_sequence they sit in tests empty and is skipped
+			outright - suppressing at render time alone would leave an empty
+			fo:flow, which FOP rejects. -->
+	<xsl:template match="mn:clause[@type = 'normativity'] | mn:clause[@type = 'running-title']" mode="update_xml_step1" priority="4">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<mn:p> </mn:p>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match="mn:clause[@type = 'normativity'] | mn:clause[@type = 'running-title']" mode="contents"/>
+	<xsl:template match="mn:clause[@type = 'normativity'] | mn:clause[@type = 'running-title']" priority="3"/>
+
+	<!-- THE GENERAL ASSEMBLY recitals page (legacy-era standards): when the
+			source encodes it as a real recitals clause, the clause is printed
+			on the furniture-less page after the cover (see inner-cover-page)
+			and suppressed from every other flow, the contents included. -->
+	<xsl:template match="mn:clause[@type = 'recitals']" mode="contents"/>
+	<xsl:template match="mn:clause[@type = 'recitals']" priority="3"/>
+	<xsl:template match="mn:clause[@type = 'recitals']/mn:fmt-title" mode="iala_recitals_title">
+		<xsl:value-of select="."/>
+	</xsl:template>
+
 	<xsl:attribute-set name="toc-title-style"><?extend?>
 		<xsl:attribute name="font-size">28pt</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_toc_title"/></xsl:attribute>
@@ -776,8 +1009,7 @@
 	<!--   recommendations number only annex clauses (the Council      -->
 	<!--   recital page heading prints unnumbered).                   -->
 	<!-- ============================================================ -->
-	<xsl:template match="mn:fmt-title[@depth = '1']/mn:span[@class = 'fmt-caption-label']" mode="update_xml_step1" priority="3">
-		<xsl:choose>
+	<xsl:template match="mn:fmt-title[@depth = '1']/mn:span[@class = 'fmt-caption-label']" mode="update_xml_step1" priority="3">		<xsl:choose>
 			<xsl:when test="$iala_is_recommendation and not(ancestor::mn:annex)"/>
 			<xsl:otherwise>
 				<xsl:copy>
@@ -789,6 +1021,49 @@
 				</xsl:copy>
 			</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+
+	<!-- Published recommendations number their annex clauses without the
+			annex letter and with a trailing dot ("1.", "2.", "2.1."): the
+			"A." prefix computed by Metanorma is dropped here. -->
+	<xsl:template match="mn:fmt-title[@depth = '2' or @depth = '3']/mn:span[@class = 'fmt-caption-label'][$iala_is_recommendation][ancestor::mn:annex]" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<xsl:copy-of select="node()[position() &gt; 2]"/>
+			<xsl:text>.</xsl:text>
+		</xsl:copy>
+	</xsl:template>
+
+	<!-- THE COUNCIL recital page: the published recommendations print the
+			recitals indented off the left margin at 12pt under a 24pt
+			heading (indent and body size are the printed deltas between
+			the house eras; the lead-in words are bold in the source). -->
+	<xsl:variable name="iala_council_clause" select="/mn:metanorma/mn:sections/mn:clause[mn:fmt-title[normalize-space(.) = 'The Council']][$iala_is_recommendation]"/>
+	<xsl:variable name="iala_council_indent">
+		<xsl:choose>
+			<xsl:when test="number($iala_year) &gt;= 2026">0mm</xsl:when>
+			<xsl:when test="number($iala_year) = 2024">17.6mm</xsl:when>
+			<xsl:otherwise>10mm</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+
+	<xsl:template match="mn:sections/mn:clause[mn:fmt-title[normalize-space(.) = 'The Council']][$iala_is_recommendation]" priority="3">
+		<fo:block role="Sect">
+			<fo:block font-size="24pt" font-weight="bold" color="{$color_toc_title}" text-transform="uppercase" margin-bottom="20pt" role="H1">
+				<xsl:copy-of select="mn:fmt-title/node()[not(self::mn:span[@class = 'fmt-caption-label'] or self::mn:span[@class = 'fmt-caption-delim'])]"/>
+			</fo:block>
+			<fo:block font-size="12pt" margin-left="{$iala_council_indent}" margin-right="10mm">
+				<xsl:apply-templates select="*[not(self::mn:fmt-title)]"/>
+			</fo:block>
+		</fo:block>
+	</xsl:template>
+
+	<!-- Council recital paragraphs and list items run at 12pt with the
+			published line pitch (the base p style is tighter) -->
+	<xsl:template match="mn:p[ancestor::mn:clause[mn:fmt-title[normalize-space(.) = 'The Council']][$iala_is_recommendation]]" priority="4">
+		<fo:block line-height="1.275" text-align="justify" margin-bottom="5.5pt" role="P">
+			<xsl:apply-templates/>
+		</fo:block>
 	</xsl:template>
 
 	<!-- ============================================================ -->
@@ -1930,6 +2205,14 @@
 						<xsl:text>IALA </xsl:text>
 					</xsl:if>
 					<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
+					<!-- Recommendations carry the recital qualifier in the running
+							title, sentence-cased as printed -->
+					<xsl:if test="$iala_is_recommendation and $iala_normativity != ''">
+						<xsl:text> </xsl:text>
+						<xsl:call-template name="iala_sentence_case">
+							<xsl:with-param name="str" select="$iala_normativity"/>
+						</xsl:call-template>
+					</xsl:if>
 					<xsl:text> </xsl:text>
 					<xsl:call-template name="getVariable"><xsl:with-param name="variable">docidentifier</xsl:with-param></xsl:call-template>
 					<xsl:choose>
@@ -1937,7 +2220,14 @@
 						<xsl:otherwise><xsl:text> </xsl:text></xsl:otherwise>
 					</xsl:choose>
 					<xsl:variable name="title">
-						<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
+						<xsl:choose>
+							<xsl:when test="$iala_running_title != ''">
+								<item><xsl:value-of select="$iala_running_title"/></item>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
+							</xsl:otherwise>
+						</xsl:choose>
 					</xsl:variable>
 					<xsl:for-each select="xalan:nodeset($title)/item">
 						<xsl:text> </xsl:text>
