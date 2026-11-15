@@ -787,11 +787,14 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<!-- date as printed: 08 January 2025 -->
+	<!-- date as printed: 08 January 2025 (or January 2025 when the
+	     bibdata date carries no day) -->
 	<xsl:template name="rescirc_date">
 		<xsl:if test="$iala_docdate != ''">
-			<xsl:value-of select="substring($iala_docdate, 9, 2)"/>
-			<xsl:text> </xsl:text>
+			<xsl:if test="substring($iala_docdate, 9, 2) != ''">
+				<xsl:value-of select="substring($iala_docdate, 9, 2)"/>
+				<xsl:text> </xsl:text>
+			</xsl:if>
 			<xsl:call-template name="getMonthByNum">
 				<xsl:with-param name="num" select="substring($iala_docdate, 6, 2)"/>
 			</xsl:call-template>
