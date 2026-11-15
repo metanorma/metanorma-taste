@@ -1403,12 +1403,15 @@
 					<xsl:text>true</xsl:text>
 				</xsl:if>
 			</xsl:when>
-			<!-- standards family: the published guideline/model-course form -->
-			<xsl:otherwise>
+			<!-- the guide family (guidelines, model courses): the published
+					guideline/model-course form. Recommendations were verified
+					without rotation (the stdrec brand-era layout keeps every
+					table portrait), and every other doctype defaults to none. -->
+			<xsl:when test="$iala_guide_family">
 				<xsl:if test="$cols &gt;= 5 or contains($name, 'Summary of') or contains($name, 'Taxonomy')">
 					<xsl:text>true</xsl:text>
 				</xsl:if>
-			</xsl:otherwise>
+			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
 
