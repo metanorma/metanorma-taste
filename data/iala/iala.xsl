@@ -861,19 +861,19 @@
 			<xsl:when test="$iala_is_letter">
 				<!-- Circular letter: centered logo, then the letter number
 				     and the date right-aligned, as printed -->
-				<fo:block text-align="center" margin-top="3mm">
+				<fo:block text-align="center" margin-top="6mm">
 					<fo:instream-foreign-object content-width="34mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
 						<xsl:copy-of select="$IALA-Logo-full"/>
 					</fo:instream-foreign-object>
 				</fo:block>
-				<fo:block text-align="right" margin-top="10mm" margin-right="2mm">
+				<fo:block text-align="right" margin-top="14mm" margin-right="2mm">
 					<xsl:text>Circular Letter </xsl:text>
 					<xsl:value-of select="$iala_docidentifier"/>
 				</fo:block>
-				<fo:block text-align="right" margin-top="4mm" margin-right="2mm">
+				<fo:block text-align="right" margin-top="6mm" margin-right="2mm">
 					<xsl:call-template name="rescirc_date"/>
 				</fo:block>
-				<fo:block font-size="0pt" margin-bottom="16mm">&#xa0;</fo:block>
+				<fo:block font-size="0pt" margin-bottom="26mm">&#xa0;</fo:block>
 			</xsl:when>
 			<xsl:when test="starts-with($iala_docidentifier, 'GA')">
 				<!-- GA resolutions: docidentifier top left, language top
