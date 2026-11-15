@@ -627,8 +627,6 @@
 	<!-- rescirc annexes set the leading the published resolutions print:
 	     the declaration spreads over the page like the reference PDF -->
 	<xsl:template name="refine_p-style">
-		<xsl:param name="element-name"/>
-		<xsl:param name="margin"/>
 		<?extend?>
 		<xsl:if test="$iala_is_rescirc and ancestor::mn:annex">
 			<xsl:attribute name="line-height">150%</xsl:attribute>
