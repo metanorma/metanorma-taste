@@ -53,7 +53,7 @@
 	<!-- The language-tagged ext/doctype carries the full name: resolutions
 	     are "General Assembly Resolution" (base doctype "standard"),
 	     letters are "Circular Letter" / "Letter" (base doctype "letter") -->
-	<xsl:variable name="iala_doctype_full_lc" select="translate($iala_doctype_full, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+	<xsl:variable name="iala_doctype_full_lc" select="translate(normalize-space(/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) != '']), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
 	<xsl:variable name="iala_is_letter" select="contains($iala_doctype_full_lc, 'letter')"/>
 	<xsl:variable name="iala_is_resolution" select="not($iala_is_letter) and (contains($iala_doctype_full_lc, 'assembly') or contains($iala_doctype_full_lc, 'resolution'))"/>
 	<xsl:variable name="iala_is_rescirc" select="$iala_is_letter or $iala_is_resolution"/>
