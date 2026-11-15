@@ -92,6 +92,15 @@
 	<xsl:variable name="iala_lang" select="normalize-space(/mn:metanorma/mn:bibdata/mn:language[@current = 'true'])"/>
 	<xsl:variable name="iala_title_en" select="normalize-space(/mn:metanorma/mn:bibdata/mn:title[@type = 'main' and (@language = 'en' or normalize-space(@language) = '')])"/>
 
+	<!-- The standards family (guidelines, model courses, recommendations,
+			standards) carries the published clause numbering model and the
+			base-size landscape tables; the reports, manuals and rescirc
+			doctypes were tuned without them. -->
+	<xsl:variable name="iala_std_numbering" select="not($iala_is_report) and not($iala_is_manual) and not($iala_is_rescirc)"/>
+	<!-- the compact landscape rendering (7.5pt, tight paddings, equal
+			column shares) is the reports/manuals published form -->
+	<xsl:variable name="iala_compact_landscape" select="$iala_is_report or $iala_is_manual"/>
+
 	<xsl:attribute-set name="root-style">
 		<xsl:attribute name="font-family">Calibri, Cambria Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
 		<xsl:attribute name="font-family-generic">Sans</xsl:attribute>
@@ -138,8 +147,18 @@
 						</xsl:call-template>
 					</date>
 
-					<!-- Example: urn:mrn:iala:pub:g1199:ed1.0 -->
-					<urn>urn:<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'urn']"/></urn>
+					<!-- The URN is normally carried by bibdata/uri[@type='urn']; the
+						 docidentifier[@type='urn'] slot is the legacy fallback. -->
+					<urn>
+						<xsl:choose>
+							<xsl:when test="/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'urn']">
+								<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'urn']"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:uri[@type = 'urn']"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</urn>
 
 				</mnx:doc>
 			</xsl:for-each>
@@ -617,6 +636,17 @@
 				</xsl:variable>
 				<xsl:apply-templates select="xalan:nodeset($synth_revision)/mn:clause" mode="update_xml_step1"/>
 			</xsl:when>
+			<xsl:when test="not($iala_is_rescirc)">
+				<!-- The standards family (guidelines, model courses) prints a
+						DOCUMENT REVISION page before the contents; synthesise
+						it when the source carries no revision clause (the
+						table is padded to the house height by the
+						document_revision mode below). -->
+				<xsl:variable name="synth_revision">
+					<xsl:call-template name="make_document_revision_clause"/>
+				</xsl:variable>
+				<xsl:apply-templates select="xalan:nodeset($synth_revision)/mn:clause" mode="update_xml_step1"/>
+			</xsl:when>
 		</xsl:choose>
 		<!-- resolutions and circular letters carry no Contents page -->
 		<xsl:if test="not($iala_is_rescirc)">
@@ -669,6 +699,48 @@
 			</mn:table>
 		</mn:clause>
 	</xsl:template>
+
+	<!-- Synthesised DOCUMENT REVISION clause: Date / Revision details / Approval
+			with the current edition as the only populated row. -->
+	<xsl:template name="make_document_revision_clause">
+		<mn:clause type="revision" id="__iala_synth_document_revision" displayorder="-1">
+			<mn:title>Document revision</mn:title>
+			<mn:fmt-title>Document revision</mn:fmt-title>
+			<mn:p>
+				<xsl:choose>
+					<xsl:when test="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] = 'model-course'">
+						<xsl:text>Revisions to this IALA document are to be noted in the table prior to the issue of a revised document.</xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>Revisions to this document are to be noted in the table prior to the issue of a revised document. The latest edition of the Guideline is the only version in force unless the Guideline is explicitly revoked by the Council.</xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+			</mn:p>
+			<mn:table id="__iala_synth_document_revision_table" unnumbered="true">
+				<mn:thead>
+					<mn:tr>
+						<mn:td>Date</mn:td>
+						<mn:td>Revision details</mn:td>
+						<mn:td>Approval</mn:td>
+					</mn:tr>
+				</mn:thead>
+				<mn:tbody>
+					<mn:tr>
+						<mn:td>
+							<xsl:call-template name="convertDate">
+								<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on"/>
+							</xsl:call-template>
+						</mn:td>
+						<mn:td>
+							<xsl:text>Edition </xsl:text>
+							<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) != '' or not(@language)][1]"/>
+						</mn:td>
+						<mn:td>Council</mn:td>
+					</mn:tr>
+				</mn:tbody>
+			</mn:table>
+		</mn:clause>
+	</xsl:template>
 	<xsl:template match="mn:preface/mn:clause[@type = 'revision']" mode="update_xml_step1" priority="4">
 		<xsl:param name="process">false</xsl:param>
 		<xsl:if test="$process = 'true'">
@@ -698,23 +770,81 @@
 		</xsl:if>
 	</xsl:template>
 
-	<!-- the published resolutions print no table caption -->
+	<!-- the published resolutions print no table caption; the other
+			doctypes keep the base caption handling (including the named
+			destination attribute for caption links) -->
 	<xsl:template match="mn:table/mn:fmt-name" mode="update_xml_step1" priority="5">
-		<xsl:if test="not($iala_is_rescirc)">
-			<xsl:copy>
-				<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
-			</xsl:copy>
-		</xsl:if>
+		<xsl:choose>
+			<xsl:when test="$iala_is_rescirc"><!-- no caption, as published --></xsl:when>
+			<xsl:otherwise>
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+					<xsl:call-template name="addNamedDestinationAttribute"/>
+					<xsl:apply-templates mode="update_xml_step1"/>
+				</xsl:copy>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<!-- rescirc annexes set the leading the published resolutions print:
-	     the declaration spreads over the page like the reference PDF -->
+	     the declaration spreads over the page like the reference PDF.
+	     The base paragraph refinement is preserved for every other
+	     paragraph (justification, keeps, spacing rules). -->
 	<xsl:template name="refine_p-style">
-		<?extend?>
+		<xsl:param name="element-name"/>
+		<xsl:param name="margin"/>
 		<xsl:if test="$iala_is_rescirc and ancestor::mn:annex">
 			<xsl:attribute name="line-height">150%</xsl:attribute>
 			<xsl:attribute name="space-after">10pt</xsl:attribute>
 		</xsl:if>
+		<xsl:attribute name="text-align">
+			<xsl:choose>
+				<xsl:when test="ancestor::mn:quote">justify</xsl:when>
+				<xsl:when test="ancestor::mn:feedback-statement">right</xsl:when>
+				<xsl:when test="ancestor::mn:boilerplate and not(@align)">justify</xsl:when>
+				<xsl:when test="@align = 'justified'">justify</xsl:when>
+				<xsl:when test="@align"><xsl:value-of select="@align"/></xsl:when>
+				<xsl:when test="ancestor::mn:td/@align"><xsl:value-of select="ancestor::mn:td/@align"/></xsl:when>
+				<xsl:when test="ancestor::mn:th/@align"><xsl:value-of select="ancestor::mn:th/@align"/></xsl:when>
+				<xsl:otherwise>justify</xsl:otherwise>
+			</xsl:choose>
+		</xsl:attribute>
+		<xsl:call-template name="setKeepAttributes"/>
+
+		<xsl:if test="parent::mn:dd">
+			<xsl:attribute name="margin-bottom">6pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="ancestor::*[2][self::mn:license-statement] and not(following-sibling::mn:p)">
+			<xsl:attribute name="space-after">0pt</xsl:attribute>
+		</xsl:if>
+
+		<xsl:if test="ancestor::mn:boilerplate and not(ancestor::mn:feedback-statement)">
+			<xsl:attribute name="line-height">125%</xsl:attribute>
+			<xsl:attribute name="space-after">14pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="following-sibling::*[1][self::mn:ol or self::mn:ul or self::mn:note or self::mn:termnote or self::mn:example or self::mn:dl]">
+			<xsl:attribute name="space-after">3pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="following-sibling::*[1][self::mn:dl]">
+			<xsl:attribute name="space-after">6pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="ancestor::mn:quote">
+			<xsl:attribute name="line-height">130%</xsl:attribute>
+		</xsl:if>
+
+		<xsl:if test="ancestor::*[self::mn:recommendation or self::mn:requirement or self::mn:permission] and    not(following-sibling::*)">
+			<xsl:attribute name="space-after">0pt</xsl:attribute>
+		</xsl:if>
+
+		<xsl:if test="ancestor::mn:li and ancestor::mn:table">
+			<xsl:attribute name="space-after">0pt</xsl:attribute>
+		</xsl:if>
+
+		<xsl:if test=".//mn:fn">
+			<xsl:attribute name="line-height-shift-adjustment">disregard-shifts</xsl:attribute>
+		</xsl:if>
+
+		<xsl:copy-of select="@id"/>
 	</xsl:template>
 
 	<!-- rescirc: hoist the foreword content into sections. These documents
@@ -796,7 +926,7 @@
 			</xsl:call-template>
 		</xsl:if>
 	</xsl:template>
-	
+
 	<xsl:template match="mn:tbody//mn:td" mode="document_revision">
 		<xsl:copy>
 			<xsl:copy-of select="@*"/>
@@ -804,6 +934,200 @@
 			<xsl:apply-templates select="node()" mode="document_revision"/>
 		</xsl:copy>
 	</xsl:template>
+
+	<!-- ============================================================ -->
+	<!-- Published numbering model                                    -->
+	<!-- ============================================================ -->
+	<!-- The published IALA documents number the Introduction as clause 1
+			and print the bibliography collected at the end as "References"
+			(and "Further reading"), numbered after the last body clause.
+			The reports, manuals and rescirc doctypes were tuned without
+			this model; it applies to the standards family only. -->
+
+	<!-- Introduction: receives number 1 -->
+	<xsl:template match="mn:introduction/mn:fmt-title[not(mn:span[@class = 'fmt-caption-label'])][$iala_std_numbering]" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<mn:span class="fmt-caption-label"><mn:semx element="autonum">1</mn:semx></mn:span>
+			<mn:span class="fmt-caption-delim"><mn:tab/></mn:span>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+
+	<!-- Normative references: move to the end of the document, retitle
+			"References", number after the last body clause -->
+	<xsl:template match="mn:sections/mn:references[@normative = 'true'][$iala_std_numbering]" mode="update_xml_step1" priority="3">
+		<xsl:variable name="num" select="count(../*[not(self::mn:references)]) + 2"/>
+		<!-- wrap as a clause so the heading renders through the normal
+				clause path exactly once -->
+		<mn:clause id="{@id}">
+			<xsl:attribute name="displayorder">998</xsl:attribute>
+			<mn:title>References</mn:title>
+			<mn:fmt-title depth="1">
+				<mn:span class="fmt-caption-label"><mn:semx element="autonum"><xsl:value-of select="$num"/></mn:semx></mn:span>
+				<mn:span class="fmt-caption-delim"><mn:tab/></mn:span>
+				<mn:semx element="title">References</mn:semx>
+			</mn:fmt-title>
+			<mn:fmt-xref-label><mn:span class="fmt-element-name">Clause</mn:span><xsl:text> </xsl:text><mn:semx element="autonum"><xsl:value-of select="$num"/></mn:semx></mn:fmt-xref-label>
+			<xsl:apply-templates select="node()[not(self::mn:title or self::mn:fmt-title or self::mn:fmt-xref-label)]" mode="update_xml_step1"/>
+		</mn:clause>
+	</xsl:template>
+
+	<!-- Further reading: follows References, numbered after it -->
+	<xsl:template match="mn:sections/mn:references[not(@normative = 'true')][$iala_std_numbering]" mode="update_xml_step1" priority="3">
+		<xsl:variable name="num" select="count(../*[not(self::mn:references)]) + 3"/>
+		<mn:clause id="{@id}">
+			<xsl:attribute name="displayorder">999</xsl:attribute>
+			<mn:title>Further reading</mn:title>
+			<mn:fmt-title depth="1">
+				<mn:span class="fmt-caption-label"><mn:semx element="autonum"><xsl:value-of select="$num"/></mn:semx></mn:span>
+				<mn:span class="fmt-caption-delim"><mn:tab/></mn:span>
+				<mn:semx element="title">Further reading</mn:semx>
+			</mn:fmt-title>
+			<mn:fmt-xref-label><mn:span class="fmt-element-name">Clause</mn:span><xsl:text> </xsl:text><mn:semx element="autonum"><xsl:value-of select="$num"/></mn:semx></mn:fmt-xref-label>
+			<xsl:apply-templates select="node()[not(self::mn:title or self::mn:fmt-title or self::mn:fmt-xref-label)]" mode="update_xml_step1"/>
+		</mn:clause>
+	</xsl:template>
+
+	<!-- Published model courses carry no List of Tables / Figures in
+			their contents; the other doctypes keep them (rendered through
+			the base collection logic, alt-texts included). -->
+	<xsl:template name="processTables_Contents">
+		<xsl:choose>
+			<xsl:when test="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] = 'model-course'">
+				<!-- published model courses carry no List of Tables -->
+			</xsl:when>
+			<xsl:otherwise>
+				<mnx:tables>
+					<xsl:for-each select="//mn:table[not(ancestor::mn:metanorma-extension)][@id and mn:fmt-name and normalize-space(@id) != '']">
+						<xsl:variable name="root">
+							<xsl:if test="ancestor-or-self::mn:preface">preface</xsl:if>
+							<xsl:if test="ancestor-or-self::mn:annex">annex</xsl:if>
+						</xsl:variable>
+						<xsl:variable name="fmt_name">
+							<xsl:apply-templates select="mn:fmt-name" mode="update_xml_step1"/>
+						</xsl:variable>
+						<xsl:variable name="alt_text_">
+							<xsl:apply-templates select="xalan:nodeset($fmt_name)/node()" mode="bookmarks"/>
+						</xsl:variable>
+						<xsl:variable name="alt_text" select="normalize-space(translate(normalize-space($alt_text_), concat($nbsp,$zero_width_space,$hair_space), ' '))"/>
+						<mnx:table id="{@id}" alt-text="{$alt_text}" root="{$root}">
+							<xsl:copy-of select="$fmt_name"/>
+						</mnx:table>
+					</xsl:for-each>
+				</mnx:tables>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="processFigures_Contents">
+		<xsl:choose>
+			<xsl:when test="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] = 'model-course'">
+				<!-- published model courses carry no List of Figures -->
+			</xsl:when>
+			<xsl:otherwise>
+				<mnx:figures>
+					<xsl:for-each select="//mn:figure[@id and mn:fmt-name and not(@unnumbered = 'true') and normalize-space(@id) != ''] | //*[@id and starts-with(mn:name, 'Figure ') and normalize-space(@id) != '']">
+						<xsl:variable name="root">
+							<xsl:if test="ancestor-or-self::mn:preface">preface</xsl:if>
+							<xsl:if test="ancestor-or-self::mn:annex">annex</xsl:if>
+						</xsl:variable>
+						<xsl:variable name="fmt_name">
+							<xsl:apply-templates select="mn:fmt-name" mode="update_xml_step1"/>
+						</xsl:variable>
+						<xsl:variable name="alt_text_">
+							<xsl:apply-templates select="xalan:nodeset($fmt_name)/node()" mode="bookmarks"/>
+						</xsl:variable>
+						<xsl:variable name="alt_text" select="normalize-space(translate(normalize-space($alt_text_), concat($nbsp,$zero_width_space,$hair_space), ' '))"/>
+						<mnx:figure id="{@id}" alt-text="{$alt_text}" root="{$root}">
+							<xsl:copy-of select="$fmt_name"/>
+						</mnx:figure>
+					</xsl:for-each>
+				</mnx:figures>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- The published contents never list deeper than three levels. -->
+	<xsl:variable name="toc_level">
+		<xsl:variable name="pdftoclevels" select="normalize-space(//mn:metanorma-extension/mn:presentation-metadata/mn:pdf-toc-heading-levels)"/>
+		<xsl:variable name="toclevels" select="normalize-space(//mn:metanorma-extension/mn:presentation-metadata/mn:toc-heading-levels)"/>
+		<xsl:variable name="lvl">
+			<xsl:choose>
+				<xsl:when test="$pdftoclevels != ''"><xsl:value-of select="number($pdftoclevels)"/></xsl:when>
+				<xsl:when test="$toclevels != ''"><xsl:value-of select="number($toclevels)"/></xsl:when>
+				<xsl:otherwise>2</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="number($lvl) &gt; 3">3</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$lvl"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+
+	<!-- ============================================================ -->
+	<!-- getSection / getName overrides                               -->
+	<!-- ============================================================ -->
+	<!-- The contents listings are collected from the source tree, so
+			the relocations done in update_xml_step1 do not reach them;
+			teach the label resolution about the published numbering model. -->
+	<xsl:template name="getSection">
+		<xsl:choose>
+			<xsl:when test="$iala_std_numbering and self::mn:references[@normative = 'true']">
+				<xsl:value-of select="count(parent::mn:sections/*[not(self::mn:references)]) + 2"/>
+			</xsl:when>
+			<xsl:when test="$iala_std_numbering and self::mn:references[not(@normative = 'true')]">
+				<xsl:value-of select="count(parent::mn:sections/*[not(self::mn:references)]) + 3"/>
+			</xsl:when>
+			<xsl:when test="mn:fmt-title">
+				<xsl:variable name="fmt_title_section">
+					<xsl:copy-of select="mn:fmt-title//mn:span[@class = 'fmt-caption-delim'][mn:tab][1]/preceding-sibling::node()[not(self::mn:annotation)]"/>
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($fmt_title_section)"/>
+				<xsl:if test="normalize-space($fmt_title_section) = ''">
+					<xsl:value-of select="mn:fmt-title/mn:tab[1]/preceding-sibling::node()"/>
+				</xsl:if>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="mn:title/mn:tab[1]/preceding-sibling::node()"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="getName">
+		<xsl:choose>
+			<xsl:when test="$iala_std_numbering and self::mn:references[@normative = 'true']">References</xsl:when>
+			<xsl:when test="$iala_std_numbering and self::mn:references[not(@normative = 'true')]">Further reading</xsl:when>
+			<xsl:when test="mn:fmt-title//mn:span[@class = 'fmt-caption-delim'][mn:tab]">
+				<xsl:copy-of select="mn:fmt-title//mn:span[@class = 'fmt-caption-delim'][mn:tab][1]/following-sibling::node()"/>
+			</xsl:when>
+			<xsl:when test="mn:fmt-title/mn:tab">
+				<xsl:copy-of select="mn:fmt-title/mn:tab[1]/following-sibling::node()"/>
+			</xsl:when>
+			<xsl:when test="mn:fmt-title">
+				<xsl:copy-of select="mn:fmt-title/node()"/>
+			</xsl:when>
+			<xsl:when test="mn:title/mn:tab">
+				<xsl:copy-of select="mn:title/mn:tab[1]/following-sibling::node()"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="mn:title/node()"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- Published documents print reference entries as
+			"[n] <document identifier> <title>"; the formattedref built by the
+			presentation step carries the title only, so prepend the identifier. -->
+	<xsl:template match="mn:bibitem/mn:formattedref[parent::mn:bibitem/mn:docidentifier[not(@scope)]][$iala_std_numbering]" mode="update_xml_step1" priority="2">
+		<mn:formattedref>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<xsl:value-of select="../mn:docidentifier[not(@scope)][1]"/>
+			<xsl:text> </xsl:text>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+		</mn:formattedref>
+	</xsl:template>
+
 	<!-- ============================================================ -->
 	<!-- ============================================================ -->
 
@@ -815,11 +1139,14 @@
 			Inject source-level pagebreaks so the page-sequence splitting
 			machinery of the base stylesheet rotates those tables onto
 			their own landscape sequences.
-			A table is wide when it is a matrix of 10+ columns, a named
-			Taxonomy / Competence table, or a 4+ column table carrying at
-			least two long-text cells (>= 120 chars) - unless it sits in
-			an annex, where only 6+ column tables rotate (the annex
-			frequency-allocation tables stay portrait). -->
+			Each doctype family is tuned against its own published form:
+			reports and manuals rotate 10+ column matrices, named
+			Taxonomy / Competence tables, and 4+ column tables carrying at
+			least two long-text cells (>= 120 chars) - unless in an annex,
+			where only 6+ column tables rotate; the standards family
+			(guidelines, model courses) rotates every 5+ column table and
+			the named Summary / Taxonomy tables; the rescirc documents
+			print no rotated tables. -->
 	<xsl:template name="is_iala_wide_table">
 		<xsl:param name="table"/>
 		<xsl:variable name="cols">
@@ -846,11 +1173,24 @@
 		</xsl:variable>
 		<xsl:variable name="long_cells" select="count($table/mn:tbody//mn:td[string-length(normalize-space()) &gt;= 120] | $table/mn:tbody//mn:th[string-length(normalize-space()) &gt;= 120])"/>
 		<xsl:variable name="name" select="normalize-space($table/mn:fmt-name)"/>
-		<xsl:if test="$cols &gt;= 10
-				or contains($name, 'Taxonomy') or contains($name, 'Competence Table')
-				or ($cols &gt;= 4 and $long_cells &gt;= 2 and (not($table/ancestor::mn:annex) or $cols &gt;= 6))">
-			<xsl:text>true</xsl:text>
-		</xsl:if>
+		<xsl:choose>
+			<!-- rescirc documents print no rotated tables -->
+			<xsl:when test="$iala_is_rescirc"/>
+			<!-- reports and manuals: the published report/manual form -->
+			<xsl:when test="$iala_compact_landscape">
+				<xsl:if test="$cols &gt;= 10
+						or contains($name, 'Taxonomy') or contains($name, 'Competence Table')
+						or ($cols &gt;= 4 and $long_cells &gt;= 2 and (not($table/ancestor::mn:annex) or $cols &gt;= 6))">
+					<xsl:text>true</xsl:text>
+				</xsl:if>
+			</xsl:when>
+			<!-- standards family: the published guideline/model-course form -->
+			<xsl:otherwise>
+				<xsl:if test="$cols &gt;= 5 or contains($name, 'Summary of') or contains($name, 'Taxonomy')">
+					<xsl:text>true</xsl:text>
+				</xsl:if>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template match="mn:table[not(ancestor::mn:table)][not(ancestor::mn:clause[@type = 'revision'])]" mode="update_xml_step1" priority="1">
@@ -944,9 +1284,11 @@
 	<xsl:template name="refine_table-container-style"><?extend?>
 		<xsl:attribute name="font-size">
 			<xsl:choose>
-				<!-- wide tables rotate onto landscape pages at the compact
-						published size, so they keep the published pagination -->
-				<xsl:when test="@landscape = 'true'">7.5pt</xsl:when>
+				<!-- reports and manuals rotate their wide tables onto landscape
+						pages at the compact published size, so they keep the
+						published pagination; the standards family keeps the
+						base table size on landscape pages -->
+				<xsl:when test="@landscape = 'true' and $iala_compact_landscape">7.5pt</xsl:when>
 				<xsl:otherwise>10pt</xsl:otherwise>
 			</xsl:choose>
 		</xsl:attribute>
@@ -1181,7 +1523,7 @@
 	
 	<xsl:template name="refine_table-header-cell-style"><?extend?>
 		<xsl:attribute name="padding-left">4mm</xsl:attribute>
-		<xsl:if test="ancestor::mn:table[@landscape = 'true']">
+		<xsl:if test="ancestor::mn:table[@landscape = 'true'] and $iala_compact_landscape">
 			<xsl:attribute name="padding-left">2mm</xsl:attribute>
 			<xsl:attribute name="padding-right">2mm</xsl:attribute>
 		</xsl:if>
@@ -1198,7 +1540,7 @@
 	<xsl:template name="refine_table-cell-style"><?extend?>
 		<xsl:attribute name="padding-left">4mm</xsl:attribute>
 		<xsl:attribute name="display-align">center</xsl:attribute>
-		<xsl:if test="ancestor::mn:table[@landscape = 'true']">
+		<xsl:if test="ancestor::mn:table[@landscape = 'true'] and $iala_compact_landscape">
 			<xsl:attribute name="padding-left">2mm</xsl:attribute>
 			<xsl:attribute name="padding-right">2mm</xsl:attribute>
 			<xsl:attribute name="line-height">1.15</xsl:attribute>
@@ -1214,10 +1556,10 @@
 		<xsl:variable name="is_landscape_table" select="boolean(self::mn:table[@landscape = 'true'] or ancestor-or-self::mn:table[@landscape = 'true'])"/>
 		<xsl:for-each select="xalan:nodeset($colwidths)//column">
 			<xsl:choose>
-				<!-- on landscape tables the precomputed portrait proportions
-						starve the leading column; equal shares reproduce the
-						published layout -->
-				<xsl:when test="$is_landscape_table">
+				<!-- on the reports/manuals landscape tables the precomputed
+						portrait proportions starve the leading column; equal
+						shares reproduce the published layout -->
+				<xsl:when test="$is_landscape_table and $iala_compact_landscape">
 					<fo:table-column column-width="proportional-column-width(20)"/>
 				</xsl:when>
 				<xsl:when test=". = 1 or . = 0">
