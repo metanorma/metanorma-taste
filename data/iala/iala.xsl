@@ -101,6 +101,26 @@
 			column shares) is the reports/manuals published form -->
 	<xsl:variable name="iala_compact_landscape" select="$iala_is_report or $iala_is_manual"/>
 
+	<!-- ============================================================ -->
+	<!-- BRAND ERA HELPERS (published-PDF parity)                     -->
+	<!-- The published IALA corpus spans three brand eras, driven by  -->
+	<!-- the publication year on bibdata/date[@type='published']:     -->
+	<!--   legacy (<= 2023): "IALA ..." banner, iala-aism address     -->
+	<!--   transitional (2024-2025): same banner, iala.int address    -->
+	<!--   current (>= 2026): plain doctype banner, iala.int          -->
+	<!-- Recommendations keep the light-blue banner in every era; the -->
+	<!-- base doctype is 'standard' for them, so decisions key on the -->
+	<!-- language-tagged ext/doctype (Standard / Recommendation).     -->
+	<!-- ============================================================ -->
+	<xsl:variable name="iala_doctype_full" select="normalize-space(/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) != ''])"/>
+	<xsl:variable name="iala_year" select="substring(normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on), 1, 4)"/>
+	<!-- NaN comparisons are false, so unknown years stay out of every era -->
+	<xsl:variable name="iala_era_legacy" select="number($iala_year) &lt; 2024"/>
+	<xsl:variable name="iala_era_transitional" select="number($iala_year) &gt;= 2024 and number($iala_year) &lt; 2026"/>
+	<xsl:variable name="iala_era_old" select="number($iala_year) &lt; 2026"/>
+	<xsl:variable name="iala_is_standard" select="$iala_doctype_full = 'Standard'"/>
+	<xsl:variable name="iala_is_recommendation" select="$iala_doctype_full = 'Recommendation'"/>
+
 	<xsl:attribute-set name="root-style">
 		<xsl:attribute name="font-family">Calibri, Cambria Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
 		<xsl:attribute name="font-family-generic">Sans</xsl:attribute>
@@ -147,16 +167,16 @@
 						</xsl:call-template>
 					</date>
 
-					<!-- The URN is normally carried by bibdata/uri[@type='urn']; the
-						 docidentifier[@type='urn'] slot is the legacy fallback. -->
+					<!-- Example: urn:mrn:iala:pub:g1199:ed1.0 -->
+					<!-- IALA bibdata carries the URN in uri[@type='urn']; the
+						docidentifier[@type='urn'] slot is the fallback and lacks
+						the 'urn:' scheme prefix -->
 					<urn>
 						<xsl:choose>
-							<xsl:when test="/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'urn']">
-								<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'urn']"/>
+							<xsl:when test="normalize-space(/mn:metanorma/mn:bibdata/mn:uri[@type = 'urn']) != ''">
+								<xsl:value-of select="normalize-space(/mn:metanorma/mn:bibdata/mn:uri[@type = 'urn'])"/>
 							</xsl:when>
-							<xsl:otherwise>
-								<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:uri[@type = 'urn']"/>
-							</xsl:otherwise>
+							<xsl:otherwise>urn:<xsl:value-of select="normalize-space(/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'urn'])"/></xsl:otherwise>
 						</xsl:choose>
 					</urn>
 
@@ -255,14 +275,41 @@
 				<fo:block-container border-top="1pt solid {$color_corporate_blue}" font-size="0pt" margin-left="2.5mm" margin-right="-3.5mm" role="SKIP">
 					<fo:block role="SKIP"><fo:wrapper role="artifact">&#xa0;</fo:wrapper></fo:block>
 				</fo:block-container>
-				<fo:block text-align="center" font-size="10pt" role="SKIP">
-					<fo:block margin-top="9mm" font-weight="bold">
-						<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'publisher']/mn:organization/mn:name"/>
-					</fo:block>
-					<fo:block>
-						<fo:basic-link external-destination="http://www.iala.net" fox:alt-text="www.iala.net">www.iala.net</fo:basic-link>
-					</fo:block>
-				</fo:block>
+				<xsl:choose>
+					<!-- Legacy brand (<= 2023): Saint Germain address block and the
+						bilingual organization name of the former association -->
+					<xsl:when test="($iala_is_standard or $iala_is_recommendation) and $iala_era_legacy">
+						<fo:block text-align="center" font-size="6pt" role="SKIP">
+							<fo:block margin-top="4mm">10, rue des Gaudines – 78100 Saint Germain en Laye, France</fo:block>
+							<fo:block>Tél. +33 (0)1 34 51 70 01 – contact@iala-aism.org</fo:block>
+							<fo:block font-weight="bold" color="{$color_corporate_blue}">www.iala-aism.org</fo:block>
+							<fo:block color="{$color_corporate_blue}" margin-top="1.5mm">International Association of Marine Aids to Navigation and Lighthouse Authorities</fo:block>
+							<fo:block color="{$color_corporate_blue}">Association Internationale de Signalisation Maritime</fo:block>
+						</fo:block>
+					</xsl:when>
+					<!-- Transitional brand (2024-2025): legacy address block with the
+						new organization name and iala.int -->
+					<xsl:when test="($iala_is_standard or $iala_is_recommendation) and $iala_era_transitional">
+						<fo:block text-align="center" font-size="6pt" role="SKIP">
+							<fo:block margin-top="4mm">10, rue des Gaudines – 78100 Saint Germain en Laye, France</fo:block>
+							<fo:block>Tél. +33 (0)1 34 51 70 01 – <fo:basic-link external-destination="mailto:contact@iala.int" fox:alt-text="contact@iala.int">contact@iala.int</fo:basic-link></fo:block>
+							<fo:block font-weight="bold" color="{$color_corporate_blue}"><fo:basic-link external-destination="http://www.iala.int" fox:alt-text="www.iala.int">www.iala.int</fo:basic-link></fo:block>
+							<fo:block color="{$color_corporate_blue}" margin-top="1.5mm">
+								<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'publisher']/mn:organization/mn:name"/>
+							</fo:block>
+						</fo:block>
+					</xsl:when>
+					<xsl:otherwise>
+						<fo:block text-align="center" font-size="10pt" role="SKIP">
+							<fo:block margin-top="9mm" font-weight="bold">
+								<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:contributor[mn:role/@type = 'publisher']/mn:organization/mn:name"/>
+							</fo:block>
+							<fo:block>
+								<fo:basic-link external-destination="http://www.iala.int" fox:alt-text="www.iala.int">www.iala.int</fo:basic-link>
+							</fo:block>
+						</fo:block>
+					</xsl:otherwise>
+				</xsl:choose>
 			</fo:static-content>
 			
 			<fo:flow flow-name="xsl-region-body">
@@ -282,16 +329,22 @@
 					<xsl:variable name="doctype"><xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype</xsl:with-param></xsl:call-template></xsl:variable>
 					<xsl:attribute name="background-color">
 						<xsl:choose>
-							<xsl:when test="$doctype = 'standard'"><xsl:value-of select="$color_corporate_blue"/></xsl:when>
-							<xsl:when test="$doctype = 'recommendation'"><xsl:value-of select="$color_primary_recommendation_50"/></xsl:when>
+							<!-- Recommendations carry base doctype 'standard', so the
+								light-blue branch keys on the IALA doctype, not the base one -->
+							<xsl:when test="$iala_is_recommendation"><xsl:value-of select="$color_primary_recommendation_50"/></xsl:when>
+							<xsl:when test="$iala_is_standard or $doctype = 'standard'"><xsl:value-of select="$color_corporate_blue"/></xsl:when>
 							<xsl:when test="$doctype = 'model-course'"><xsl:value-of select="$color_primary_model_course"/></xsl:when>
 							<!-- default, for doctype 'guideline' -->
 							<xsl:otherwise><xsl:value-of select="$color_corporate_light_blue"/></xsl:otherwise>
 						</xsl:choose>
 					</xsl:attribute>
-					
-					
+
+
 					<fo:block font-size="25pt" font-weight="bold" margin-left="17mm" margin-right="17mm" margin-top="4pt" text-transform="uppercase">
+						<!-- Legacy era banners read "IALA STANDARD" / "IALA RECOMMENDATION" -->
+						<xsl:if test="$iala_era_old and ($iala_is_standard or $iala_is_recommendation)">
+							<xsl:text>IALA </xsl:text>
+						</xsl:if>
 						<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
 					</fo:block>
 				</fo:block-container>
@@ -354,7 +407,113 @@
 	</xsl:template> <!-- END cover-page -->
 
 	<xsl:template name="inner-cover-page">
-		<!-- empty -->
+		<!-- ============ THE GENERAL ASSEMBLY approval page ============ -->
+		<!-- Legacy-era standards open with the General Assembly recitals,
+			printed between the cover and the contents. The recitals are
+			house boilerplate; only the APPROVES line is document specific
+			(docnumber + title from bibdata). The page carries no header or
+			footer in the published PDF. -->
+		<xsl:if test="$iala_is_standard and $iala_era_old">
+			<fo:page-sequence master-reference="page" format="1" force-page-count="no-force">
+				<fo:flow flow-name="xsl-region-body">
+					<fo:block-container margin-left="7mm" margin-right="4mm">
+						<fo:block font-size="15pt" color="{$color_corporate_blue}" margin-top="17mm" margin-bottom="12mm">
+							THE GENERAL ASSEMBLY
+						</fo:block>
+						<fo:block font-size="10pt" line-height="1.4" text-align="justify">
+							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">BEARING IN MIND</fo:inline> the provisions of the United Nations Convention on the Law of the Sea (UNCLOS) and the International Convention for the Safety of Life at Sea (SOLAS),</fo:block>
+							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">RECOGNIZING</fo:inline> that the aim of IALA is to foster the safe, economic and efficient movement of vessels, through improvement and harmonization of Marine Aids to Navigation world-wide,</fo:block>
+							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">RECALLING</fo:inline> article 7 of the IALA Constitution regarding the authority, duties and functions of the General Assembly,</fo:block>
+							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">RECALLING ALSO</fo:inline> that a goal of the work of IALA is that Marine Aids to Navigation are developed and harmonized through international cooperation and the provision of standards as described in the Strategic Vision,</fo:block>
+							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">HAVING CONSIDERED</fo:inline> the advice of the Council provided to General Assembly at its 13th Session,</fo:block>
+							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">APPROVES</fo:inline> the IALA Standard <xsl:value-of select="normalize-space(/mn:metanorma/mn:bibdata/mn:docnumber)"/>&#160;<xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'main']/node()"/>, and</fo:block>
+							<fo:block margin-bottom="2.5mm"><fo:inline font-weight="bold">INVITES</fo:inline> members and Marine Aids to Navigation authorities world-wide to undertake to implement the provisions of the Standard.</fo:block>
+						</fo:block>
+					</fo:block-container>
+				</fo:flow>
+			</fo:page-sequence>
+		</xsl:if>
+
+		<!-- ============ DOCUMENT REVISION page ============ -->
+		<!-- Recommendations open with the DOCUMENT REVISION page (no contents
+			page in the published PDF; the contents clause is dropped for them
+			in update_xml_step1 below). The revision row data is not carried by
+			bibdata, so the table prints the header row over the house height. -->
+		<xsl:if test="$iala_is_recommendation">
+			<fo:page-sequence master-reference="page" format="1" force-page-count="no-force">
+				<xsl:call-template name="insertHeaderFooter"/>
+				<fo:flow flow-name="xsl-region-body">
+					<fo:block xsl:use-attribute-sets="toc-title-style" margin-top="13mm" margin-bottom="4.5mm">
+						<xsl:call-template name="refine_toc-title-style"/>
+						<fo:block-container width="100%" border-bottom="1.25pt solid {$color_corporate_blue}" role="SKIP">
+							<fo:block margin-bottom="2mm" role="SKIP">DOCUMENT REVISION</fo:block>
+						</fo:block-container>
+					</fo:block>
+					<fo:block font-size="10pt" margin-bottom="5mm">
+						<xsl:text>Revisions to this document are to be noted in the table prior to the issue of a revised document.</xsl:text>
+						<xsl:if test="not($iala_era_old)">
+							<xsl:text> The latest edition of the Recommendation is the only version in force unless the Recommendation is explicitly revoked by the Council.</xsl:text>
+						</xsl:if>
+					</fo:block>
+					<fo:table table-layout="fixed" width="100%">
+						<fo:table-column column-width="18%"/>
+						<fo:table-column column-width="58%"/>
+						<fo:table-column column-width="24%"/>
+						<fo:table-header>
+							<fo:table-row>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" padding-top="1.5mm" padding-bottom="1.5mm" display-align="center">
+									<fo:block font-size="10pt" font-weight="bold" color="{$color_corporate_blue}">Date</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" padding-top="1.5mm" padding-bottom="1.5mm" display-align="center">
+									<fo:block font-size="10pt" font-weight="bold" color="{$color_corporate_blue}">
+										<xsl:choose>
+											<xsl:when test="$iala_era_old">Details</xsl:when>
+											<xsl:otherwise>Revision details</xsl:otherwise>
+										</xsl:choose>
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" padding-top="1.5mm" padding-bottom="1.5mm" display-align="center">
+									<fo:block font-size="10pt" font-weight="bold" color="{$color_corporate_blue}">Approval</fo:block>
+								</fo:table-cell>
+							</fo:table-row>
+						</fo:table-header>
+						<fo:table-body>
+							<!-- six empty rows at the house revision-table height -->
+							<fo:table-row min-height="12mm">
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+							</fo:table-row>
+							<fo:table-row min-height="12mm">
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+							</fo:table-row>
+							<fo:table-row min-height="12mm">
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+							</fo:table-row>
+							<fo:table-row min-height="12mm">
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+							</fo:table-row>
+							<fo:table-row min-height="12mm">
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+							</fo:table-row>
+							<fo:table-row min-height="12mm">
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+								<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+							</fo:table-row>
+						</fo:table-body>
+					</fo:table>
+				</fo:flow>
+			</fo:page-sequence>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:attribute-set name="page-sequence-preface"><?extend?>
@@ -365,9 +524,15 @@
 	<xsl:attribute-set name="page-sequence-main"><?extend?>
 		<xsl:attribute name="force-page-count">no-force</xsl:attribute>
 	</xsl:attribute-set>
-	
+
 	<xsl:template name="refine_page-sequence-main"><?extend?>
 		<xsl:attribute name="initial-page-number">auto</xsl:attribute>
+		<!-- Published standards end on an even page number: a short document
+			history page is followed by a blank filler page carrying the
+			running footer (see the trailing page of S1050/S1060) -->
+		<xsl:if test="$iala_is_standard">
+			<xsl:attribute name="force-page-count">end-on-even</xsl:attribute>
+		</xsl:if>
 	</xsl:template>
 
 	<!-- DOCUMENT REVISION -->
@@ -599,6 +764,48 @@
 		<fo:inline font-size="11pt"><xsl:value-of select="."/></fo:inline>
 	</xsl:template>
 
+	<!-- ============================================================ -->
+	<!-- Published-PDF parity for clause numbering:                   -->
+	<!--   standards print clause numbers with a trailing dot         -->
+	<!--   ("1. INTRODUCTION") in headings and contents;              -->
+	<!--   recommendations number only annex clauses (the Council      -->
+	<!--   recital page heading prints unnumbered).                   -->
+	<!-- ============================================================ -->
+	<xsl:template match="mn:fmt-title[@depth = '1']/mn:span[@class = 'fmt-caption-label']" mode="update_xml_step1" priority="3">
+		<xsl:choose>
+			<xsl:when test="$iala_is_recommendation and not(ancestor::mn:annex)"/>
+			<xsl:otherwise>
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+					<xsl:apply-templates mode="update_xml_step1"/>
+					<xsl:if test="$iala_is_standard">
+						<xsl:text>.</xsl:text>
+					</xsl:if>
+				</xsl:copy>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- ============================================================ -->
+	<!-- Published standards carry no table captions (and therefore no -->
+	<!-- List of Tables in the contents); recommendations keep them.   -->
+	<!-- ============================================================ -->
+	<!-- List of Tables/Figures in the contents: suppressed for standards -->
+	<xsl:template name="processTablesFigures_Contents">
+		<xsl:param name="always"/>
+		<xsl:if test="not($iala_is_standard)">
+			<xsl:if test="(//mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:toc[@type='table']/mn:title) or normalize-space($always) = 'true'">
+				<xsl:call-template name="processTables_Contents"/>
+			</xsl:if>
+			<xsl:if test="(//mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:toc[@type='figure']/mn:title) or normalize-space($always) = 'true'">
+				<xsl:call-template name="processFigures_Contents"/>
+			</xsl:if>
+			<xsl:if test="(//mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:toc[@type='example']/mn:title)">
+				<xsl:call-template name="processExamples_Contents"/>
+			</xsl:if>
+		</xsl:if>
+	</xsl:template>
+
 	<xsl:attribute-set name="figure-name-style"><?extend?>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="font-style">italic</xsl:attribute>
@@ -636,20 +843,25 @@
 				</xsl:variable>
 				<xsl:apply-templates select="xalan:nodeset($synth_revision)/mn:clause" mode="update_xml_step1"/>
 			</xsl:when>
-			<xsl:when test="not($iala_is_rescirc)">
+			<xsl:when test="not($iala_is_rescirc) and not($iala_is_recommendation)">
 				<!-- The standards family (guidelines, model courses) prints a
 						DOCUMENT REVISION page before the contents; synthesise
 						it when the source carries no revision clause (the
 						table is padded to the house height by the
-						document_revision mode below). -->
+						document_revision mode below). Recommendations render
+						their DOCUMENT REVISION page from inner-cover-page
+						instead, and carry no Contents page at all. -->
 				<xsl:variable name="synth_revision">
 					<xsl:call-template name="make_document_revision_clause"/>
 				</xsl:variable>
 				<xsl:apply-templates select="xalan:nodeset($synth_revision)/mn:clause" mode="update_xml_step1"/>
 			</xsl:when>
 		</xsl:choose>
-		<!-- resolutions and circular letters carry no Contents page -->
-		<xsl:if test="not($iala_is_rescirc)">
+		<!-- resolutions, circular letters and recommendations carry no
+				Contents page (the recommendation DOCUMENT REVISION page takes
+				its slot), so the contents clause is dropped here rather than
+				blanked at render time, to keep the preface page_sequence away -->
+		<xsl:if test="not($iala_is_rescirc) and not($iala_is_recommendation)">
 			<xsl:copy>
 				<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
 			</xsl:copy>
@@ -770,12 +982,13 @@
 		</xsl:if>
 	</xsl:template>
 
-	<!-- the published resolutions print no table caption; the other
+	<!-- the published resolutions and standards print no table caption
+			(standards therefore carry no List of Tables either); the other
 			doctypes keep the base caption handling (including the named
 			destination attribute for caption links) -->
 	<xsl:template match="mn:table/mn:fmt-name" mode="update_xml_step1" priority="5">
 		<xsl:choose>
-			<xsl:when test="$iala_is_rescirc"><!-- no caption, as published --></xsl:when>
+			<xsl:when test="$iala_is_rescirc or $iala_is_standard"><!-- no caption, as published --></xsl:when>
 			<xsl:otherwise>
 				<xsl:copy>
 					<xsl:copy-of select="@*"/>
@@ -1535,6 +1748,17 @@
 			<!--not 15mm, because there are padding-top and padding-bottom -->
 			<xsl:attribute name="min-height">12mm</xsl:attribute>
 		</xsl:if>
+		<!-- Published standards print roomy table rows (~13mm); the generated
+			ones were text-height, squeezing sections 7-8 onto the previous page -->
+		<xsl:if test="$iala_is_standard and not(ancestor::mn:table[@type = 'revision'])">
+			<xsl:attribute name="min-height">12mm</xsl:attribute>
+		</xsl:if>
+		<!-- The document history table never splits: it moves whole to the
+			next page, leaving the clause heading at the bottom of the previous
+			one (S1060 published layout) -->
+		<xsl:if test="$iala_is_standard and ancestor::mn:table[ancestor::mn:clause[mn:fmt-title[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'document history')]]]">
+			<xsl:attribute name="keep-with-next">always</xsl:attribute>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template name="refine_table-cell-style"><?extend?>
@@ -1544,6 +1768,13 @@
 			<xsl:attribute name="padding-left">2mm</xsl:attribute>
 			<xsl:attribute name="padding-right">2mm</xsl:attribute>
 			<xsl:attribute name="line-height">1.15</xsl:attribute>
+		</xsl:if>
+		<!-- Published standards print roomy rows (~13mm) with the cell content
+			centred; padding (not row min-height, unsupported by FOP here)
+			reproduces the height and pushes the late sections to their own page -->
+		<xsl:if test="$iala_is_standard and not(ancestor::mn:table[@type = 'revision'])">
+			<xsl:attribute name="padding-top">3.2mm</xsl:attribute>
+			<xsl:attribute name="padding-bottom">3.2mm</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
 
@@ -1681,10 +1912,19 @@
 		<fo:static-content flow-name="footer" role="artifact">
 			<fo:block-container font-size="7.56pt" font-weight="bold" color="{$color_corporate_blue}" border-top="0.2pt solid black" line-height="1.43">
 				<fo:block margin-top="4.5mm">
+					<!-- Legacy-era standards and recommendations open with the
+						"IALA" association prefix; standards join the title with
+						an en dash, recommendations with a space -->
+					<xsl:if test="$iala_era_old and ($iala_is_standard or $iala_is_recommendation)">
+						<xsl:text>IALA </xsl:text>
+					</xsl:if>
 					<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
 					<xsl:text> </xsl:text>
 					<xsl:call-template name="getVariable"><xsl:with-param name="variable">docidentifier</xsl:with-param></xsl:call-template>
-					<xsl:text> </xsl:text>
+					<xsl:choose>
+						<xsl:when test="$iala_is_standard"><xsl:text> – </xsl:text></xsl:when>
+						<xsl:otherwise><xsl:text> </xsl:text></xsl:otherwise>
+					</xsl:choose>
 					<xsl:variable name="title">
 						<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
 					</xsl:variable>
@@ -1693,13 +1933,27 @@
 						<xsl:copy-of select="node()"/>
 					</xsl:for-each>
 				</fo:block>
-				<fo:block text-align-last="justify">
+				<fo:block>
+					<xsl:if test="not($iala_is_standard and $iala_era_old)">
+						<xsl:attribute name="text-align-last">justify</xsl:attribute>
+					</xsl:if>
 					<xsl:call-template name="getVariable"><xsl:with-param name="variable">edition</xsl:with-param></xsl:call-template>
 					<xsl:text> </xsl:text>
 					<fo:inline text-transform="lowercase"><xsl:call-template name="getVariable"><xsl:with-param name="variable">urn</xsl:with-param></xsl:call-template></fo:inline>
-					<fo:leader leader-pattern="space"/>
-					<xsl:text>P&#xa0;</xsl:text><fo:page-number />
+					<!-- Legacy standards carry the page number on a third,
+						publication-date line -->
+					<xsl:if test="not($iala_is_standard and $iala_era_old)">
+						<fo:leader leader-pattern="space"/>
+						<xsl:text>P&#xa0;</xsl:text><fo:page-number />
+					</xsl:if>
 				</fo:block>
+				<xsl:if test="$iala_is_standard and $iala_era_old">
+					<fo:block text-align-last="justify">
+						<xsl:call-template name="getVariable"><xsl:with-param name="variable">date</xsl:with-param></xsl:call-template>
+						<fo:leader leader-pattern="space"/>
+						<xsl:text>P&#xa0;</xsl:text><fo:page-number />
+					</fo:block>
+				</xsl:if>
 			</fo:block-container>
 		</fo:static-content>
 			</xsl:otherwise>
