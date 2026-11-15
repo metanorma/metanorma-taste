@@ -89,8 +89,18 @@
 						</xsl:call-template>
 					</date>
 
-					<!-- Example: urn:mrn:iala:pub:g1199:ed1.0 -->
-					<urn>urn:<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'urn']"/></urn>
+					<!-- The URN is normally carried by bibdata/uri[@type='urn']; the
+						 docidentifier[@type='urn'] slot is the legacy fallback. -->
+					<urn>
+						<xsl:choose>
+							<xsl:when test="/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'urn']">
+								<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:docidentifier[@type = 'urn']"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:uri[@type = 'urn']"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</urn>
 
 				</mnx:doc>
 			</xsl:for-each>
@@ -529,12 +539,68 @@
 	<!-- ============================================================ -->
 	<!-- change the order ToC and DOCUMENT REVISION -->
 	<xsl:template match="mn:preface/mn:clause[@type = 'toc']" mode="update_xml_step1" priority="4">
-		<xsl:apply-templates select="../mn:clause[@type = 'revision']" mode="update_xml_step1">
-			<xsl:with-param name="process">true</xsl:with-param>
-		</xsl:apply-templates>
+		<xsl:choose>
+			<xsl:when test="../mn:clause[@type = 'revision']">
+				<xsl:apply-templates select="../mn:clause[@type = 'revision']" mode="update_xml_step1">
+					<xsl:with-param name="process">true</xsl:with-param>
+				</xsl:apply-templates>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- IALA house layout prints a DOCUMENT REVISION page before the
+						contents; synthesise it when the source carries no revision
+						clause (the table is padded to the house height by the
+						document_revision mode below). -->
+				<xsl:variable name="synth_revision">
+					<xsl:call-template name="make_document_revision_clause"/>
+				</xsl:variable>
+				<xsl:apply-templates select="xalan:nodeset($synth_revision)/mn:clause" mode="update_xml_step1"/>
+			</xsl:otherwise>
+		</xsl:choose>
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
 		</xsl:copy>
+	</xsl:template>
+
+	<!-- Synthesised DOCUMENT REVISION clause: Date / Revision details / Approval
+			with the current edition as the only populated row. -->
+	<xsl:template name="make_document_revision_clause">
+		<mn:clause type="revision" id="__iala_synth_document_revision" displayorder="-1">
+			<mn:title>Document revision</mn:title>
+			<mn:fmt-title>Document revision</mn:fmt-title>
+			<mn:p>
+				<xsl:choose>
+					<xsl:when test="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] = 'model-course'">
+						<xsl:text>Revisions to this IALA document are to be noted in the table prior to the issue of a revised document.</xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>Revisions to this document are to be noted in the table prior to the issue of a revised document. The latest edition of the Guideline is the only version in force unless the Guideline is explicitly revoked by the Council.</xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+			</mn:p>
+			<mn:table id="__iala_synth_document_revision_table" unnumbered="true">
+				<mn:thead>
+					<mn:tr>
+						<mn:td>Date</mn:td>
+						<mn:td>Revision details</mn:td>
+						<mn:td>Approval</mn:td>
+					</mn:tr>
+				</mn:thead>
+				<mn:tbody>
+					<mn:tr>
+						<mn:td>
+							<xsl:call-template name="convertDate">
+								<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on"/>
+							</xsl:call-template>
+						</mn:td>
+						<mn:td>
+							<xsl:text>Edition </xsl:text>
+							<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) != '' or not(@language)][1]"/>
+						</mn:td>
+						<mn:td>Council</mn:td>
+					</mn:tr>
+				</mn:tbody>
+			</mn:table>
+		</mn:clause>
 	</xsl:template>
 	<xsl:template match="mn:preface/mn:clause[@type = 'revision']" mode="update_xml_step1" priority="4">
 		<xsl:param name="process">false</xsl:param>
@@ -624,6 +690,247 @@
 			<xsl:apply-templates select="node()" mode="document_revision"/>
 		</xsl:copy>
 	</xsl:template>
+	<!-- ============================================================ -->
+	<!-- Landscape pages for wide tables                              -->
+	<!-- ============================================================ -->
+	<!-- Published IALA documents print curriculum-wide tables (>= 5
+			columns, or a course Summary / Taxonomy table) on landscape
+			pages. Inject source-level pagebreaks so the page-sequence
+			splitting machinery rotates those tables onto their own
+			landscape sequences. -->
+	<xsl:template name="is_iala_wide_table">
+		<xsl:param name="table"/>
+		<xsl:variable name="cols">
+			<xsl:choose>
+				<xsl:when test="$table/mn:colgroup">
+					<xsl:value-of select="count($table/mn:colgroup/mn:col)"/>
+				</xsl:when>
+				<xsl:when test="$table/mn:thead/mn:tr[1]">
+					<xsl:value-of select="count($table/mn:thead/mn:tr[1]/*)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="count($table/mn:tbody/mn:tr[1]/*)"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="name" select="normalize-space($table/mn:fmt-name)"/>
+		<xsl:if test="$cols &gt;= 5 or contains($name, 'Summary of') or contains($name, 'Taxonomy')">
+			<xsl:text>true</xsl:text>
+		</xsl:if>
+	</xsl:template>
+
+	<xsl:template match="mn:table" mode="update_xml_step1" priority="1">
+		<xsl:variable name="wide">
+			<xsl:call-template name="is_iala_wide_table">
+				<xsl:with-param name="table" select="."/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:if test="normalize-space($wide) = 'true'">
+			<mn:pagebreak from_source_xml="true" orientation="landscape"/>
+		</xsl:if>
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
+		</xsl:copy>
+		<xsl:if test="normalize-space($wide) = 'true'">
+			<mn:pagebreak from_source_xml="true" orientation="portrait"/>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- ============================================================ -->
+	<!-- Published numbering model                                    -->
+	<!-- ============================================================ -->
+	<!-- The published IALA documents number the Introduction as clause 1
+			and print the bibliography collected at the end as "References"
+			(and "Further reading"), numbered after the last body clause. -->
+
+	<!-- Introduction: receives number 1 -->
+	<xsl:template match="mn:introduction/mn:fmt-title[not(mn:span[@class = 'fmt-caption-label'])]" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<mn:span class="fmt-caption-label"><mn:semx element="autonum">1</mn:semx></mn:span>
+			<mn:span class="fmt-caption-delim"><mn:tab/></mn:span>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+
+	<!-- Normative references: move to the end of the document, retitle
+			"References", number after the last body clause -->
+	<xsl:template match="mn:sections/mn:references[@normative = 'true']" mode="update_xml_step1" priority="3">
+		<xsl:variable name="num" select="count(../*[not(self::mn:references)]) + 2"/>
+		<!-- wrap as a clause so the heading renders through the normal
+				clause path exactly once -->
+		<mn:clause id="{@id}">
+			<xsl:attribute name="displayorder">998</xsl:attribute>
+			<mn:title>References</mn:title>
+			<mn:fmt-title depth="1">
+				<mn:span class="fmt-caption-label"><mn:semx element="autonum"><xsl:value-of select="$num"/></mn:semx></mn:span>
+				<mn:span class="fmt-caption-delim"><mn:tab/></mn:span>
+				<mn:semx element="title">References</mn:semx>
+			</mn:fmt-title>
+			<mn:fmt-xref-label><mn:span class="fmt-element-name">Clause</mn:span><xsl:text> </xsl:text><mn:semx element="autonum"><xsl:value-of select="$num"/></mn:semx></mn:fmt-xref-label>
+			<xsl:apply-templates select="node()[not(self::mn:title or self::mn:fmt-title or self::mn:fmt-xref-label)]" mode="update_xml_step1"/>
+		</mn:clause>
+	</xsl:template>
+
+	<!-- Further reading: follows References, numbered after it -->
+	<xsl:template match="mn:sections/mn:references[not(@normative = 'true')]" mode="update_xml_step1" priority="3">
+		<xsl:variable name="num" select="count(../*[not(self::mn:references)]) + 3"/>
+		<mn:clause id="{@id}">
+			<xsl:attribute name="displayorder">999</xsl:attribute>
+			<mn:title>Further reading</mn:title>
+			<mn:fmt-title depth="1">
+				<mn:span class="fmt-caption-label"><mn:semx element="autonum"><xsl:value-of select="$num"/></mn:semx></mn:span>
+				<mn:span class="fmt-caption-delim"><mn:tab/></mn:span>
+				<mn:semx element="title">Further reading</mn:semx>
+			</mn:fmt-title>
+			<mn:fmt-xref-label><mn:span class="fmt-element-name">Clause</mn:span><xsl:text> </xsl:text><mn:semx element="autonum"><xsl:value-of select="$num"/></mn:semx></mn:fmt-xref-label>
+			<xsl:apply-templates select="node()[not(self::mn:title or self::mn:fmt-title or self::mn:fmt-xref-label)]" mode="update_xml_step1"/>
+		</mn:clause>
+	</xsl:template>
+
+	<!-- Published model courses carry no List of Tables / Figures in
+			their contents; the other doctypes keep them. -->
+	<xsl:template name="processTables_Contents">
+		<xsl:if test="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] != 'model-course'">
+			<mnx:tables>
+				<xsl:for-each select="//mn:table[not(ancestor::mn:metanorma-extension)][@id and mn:fmt-name and normalize-space(@id) != '']">
+					<xsl:variable name="root">
+						<xsl:if test="ancestor-or-self::mn:preface">preface</xsl:if>
+						<xsl:if test="ancestor-or-self::mn:annex">annex</xsl:if>
+					</xsl:variable>
+					<mnx:table id="{@id}" alt-text="{normalize-space(mn:fmt-name)}" root="{$root}">
+						<xsl:apply-templates select="mn:fmt-name" mode="update_xml_step1"/>
+					</mnx:table>
+				</xsl:for-each>
+			</mnx:tables>
+		</xsl:if>
+	</xsl:template>
+
+	<xsl:template name="processFigures_Contents">
+		<xsl:if test="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] != 'model-course'">
+			<mnx:figures>
+				<xsl:for-each select="//mn:figure[@id and mn:fmt-name and not(@unnumbered = 'true') and normalize-space(@id) != '']">
+					<xsl:variable name="root">
+						<xsl:if test="ancestor-or-self::mn:preface">preface</xsl:if>
+						<xsl:if test="ancestor-or-self::mn:annex">annex</xsl:if>
+					</xsl:variable>
+					<mnx:figure id="{@id}" alt-text="{normalize-space(mn:fmt-name)}" root="{$root}">
+						<xsl:apply-templates select="mn:fmt-name" mode="update_xml_step1"/>
+					</mnx:figure>
+				</xsl:for-each>
+			</mnx:figures>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- The published contents never list deeper than three levels. -->
+	<xsl:variable name="toc_level">
+		<xsl:variable name="pdftoclevels" select="normalize-space(//mn:metanorma-extension/mn:presentation-metadata/mn:pdf-toc-heading-levels)"/>
+		<xsl:variable name="toclevels" select="normalize-space(//mn:metanorma-extension/mn:presentation-metadata/mn:toc-heading-levels)"/>
+		<xsl:variable name="lvl">
+			<xsl:choose>
+				<xsl:when test="$pdftoclevels != ''"><xsl:value-of select="number($pdftoclevels)"/></xsl:when>
+				<xsl:when test="$toclevels != ''"><xsl:value-of select="number($toclevels)"/></xsl:when>
+				<xsl:otherwise>2</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="number($lvl) &gt; 3">3</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$lvl"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+
+	<!-- ============================================================ -->
+	<!-- getSection / getName overrides                               -->
+	<!-- ============================================================ -->
+	<!-- The contents listings are collected from the source tree, so
+			the relocations done in update_xml_step1 do not reach them;
+			teach the label resolution about the published numbering model. -->
+	<xsl:template name="getSection">
+		<xsl:choose>
+			<xsl:when test="self::mn:references[@normative = 'true']">
+				<xsl:value-of select="count(parent::mn:sections/*[not(self::mn:references)]) + 2"/>
+			</xsl:when>
+			<xsl:when test="self::mn:references[not(@normative = 'true')]">
+				<xsl:value-of select="count(parent::mn:sections/*[not(self::mn:references)]) + 3"/>
+			</xsl:when>
+			<xsl:when test="mn:fmt-title">
+				<xsl:variable name="fmt_title_section">
+					<xsl:copy-of select="mn:fmt-title//mn:span[@class = 'fmt-caption-delim'][mn:tab][1]/preceding-sibling::node()[not(self::mn:annotation)]"/>
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($fmt_title_section)"/>
+				<xsl:if test="normalize-space($fmt_title_section) = ''">
+					<xsl:value-of select="mn:fmt-title/mn:tab[1]/preceding-sibling::node()"/>
+				</xsl:if>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="mn:title/mn:tab[1]/preceding-sibling::node()"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="getName">
+		<xsl:choose>
+			<xsl:when test="self::mn:references[@normative = 'true']">References</xsl:when>
+			<xsl:when test="self::mn:references[not(@normative = 'true')]">Further reading</xsl:when>
+			<xsl:when test="mn:fmt-title//mn:span[@class = 'fmt-caption-delim'][mn:tab]">
+				<xsl:copy-of select="mn:fmt-title//mn:span[@class = 'fmt-caption-delim'][mn:tab][1]/following-sibling::node()"/>
+			</xsl:when>
+			<xsl:when test="mn:fmt-title/mn:tab">
+				<xsl:copy-of select="mn:fmt-title/mn:tab[1]/following-sibling::node()"/>
+			</xsl:when>
+			<xsl:when test="mn:fmt-title">
+				<xsl:copy-of select="mn:fmt-title/node()"/>
+			</xsl:when>
+			<xsl:when test="mn:title/mn:tab">
+				<xsl:copy-of select="mn:title/mn:tab[1]/following-sibling::node()"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="mn:title/node()"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- Published documents number figures and tables sequentially through
+			the document (Figure 1..N, Table 1..N), not per-clause. -->
+	<!-- the caption render resolves the number from @autonum on the
+			figure/table element; renumber it there (sequential 1..N) -->
+	<xsl:template match="mn:figure/@autonum | mn:table/@autonum" mode="update_xml_step1" priority="3">
+		<xsl:attribute name="autonum">
+			<xsl:choose>
+				<xsl:when test="parent::mn:figure">
+					<xsl:value-of select="count(preceding::mn:figure) + 1"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="count(preceding::mn:table) + 1"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:attribute>
+	</xsl:template>
+	<xsl:template match="mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-label']/mn:semx[@element = 'autonum']" mode="update_xml_step1" priority="3">
+		<mn:semx>
+			<xsl:apply-templates select="@*[local-name() != 'source']" mode="update_xml_step1"/>
+			<xsl:value-of select="count(preceding::mn:figure) + 1"/>
+		</mn:semx>
+	</xsl:template>
+	<xsl:template match="mn:table/mn:fmt-name/mn:span[@class = 'fmt-caption-label']/mn:semx[@element = 'autonum']" mode="update_xml_step1" priority="3">
+		<mn:semx>
+			<xsl:apply-templates select="@*[local-name() != 'source']" mode="update_xml_step1"/>
+			<xsl:value-of select="count(preceding::mn:table) + 1"/>
+		</mn:semx>
+	</xsl:template>
+
+	<!-- Published documents print reference entries as
+			"[n] <document identifier> <title>"; the formattedref built by the
+			presentation step carries the title only, so prepend the identifier. -->
+	<xsl:template match="mn:bibitem/mn:formattedref[parent::mn:bibitem/mn:docidentifier[not(@scope)]]" mode="update_xml_step1" priority="2">
+		<mn:formattedref>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<xsl:value-of select="../mn:docidentifier[not(@scope)][1]"/>
+			<xsl:text> </xsl:text>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+		</mn:formattedref>
+	</xsl:template>
+
 	<!-- ============================================================ -->
 	<!-- ============================================================ -->
 
