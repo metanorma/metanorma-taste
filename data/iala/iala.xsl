@@ -892,6 +892,12 @@
 		<xsl:variable name="is_landscape_table" select="boolean(self::mn:table[@landscape = 'true'] or ancestor-or-self::mn:table[@landscape = 'true'])"/>
 		<xsl:for-each select="xalan:nodeset($colwidths)//column">
 			<xsl:choose>
+				<!-- on landscape tables the precomputed portrait proportions
+						starve the leading column; equal shares reproduce the
+						published layout -->
+				<xsl:when test="$is_landscape_table">
+					<fo:table-column column-width="proportional-column-width(20)"/>
+				</xsl:when>
 				<xsl:when test=". = 1 or . = 0">
 					<fo:table-column column-width="proportional-column-width(2)"/>
 				</xsl:when>
@@ -901,14 +907,7 @@
 						<xsl:if test="not(@divider)">1</xsl:if>
 					</xsl:variable>
 					<xsl:variable name="w" select="round(. div $divider)"/>
-					<xsl:choose>
-						<xsl:when test="position() = 1 and $is_landscape_table">
-							<fo:table-column column-width="proportional-column-width({round($w * 2)})"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<fo:table-column column-width="proportional-column-width({$w})"/>
-						</xsl:otherwise>
-					</xsl:choose>
+					<fo:table-column column-width="proportional-column-width({$w})"/>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:for-each>
