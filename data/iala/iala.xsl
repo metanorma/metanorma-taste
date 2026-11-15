@@ -1433,6 +1433,16 @@
 	<xsl:template name="refine_p-style">
 		<xsl:param name="element-name"/>
 		<xsl:param name="margin"/>
+		<xsl:if test="$iala_guide_family and $iala_era_old and not(ancestor::mn:clause[@type = 'revision']) and not(ancestor::mn:table)">
+			<!-- the published legacy guidelines and model courses run looser
+				body paragraphs than the generated ones (table content stays
+				tight, as printed) -->
+			<xsl:attribute name="line-height">1.32</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$iala_is_model_course and not(ancestor::mn:clause[@type = 'revision']) and not(ancestor::mn:table)">
+			<!-- the published model courses run looser body paragraphs still -->
+			<xsl:attribute name="line-height">1.5</xsl:attribute>
+		</xsl:if>
 		<xsl:if test="$iala_is_rescirc and ancestor::mn:annex">
 			<xsl:attribute name="line-height">150%</xsl:attribute>
 			<xsl:attribute name="space-after">10pt</xsl:attribute>
@@ -2336,6 +2346,16 @@
 	<xsl:template name="refine_table-cell-style"><?extend?>
 		<xsl:attribute name="padding-left">4mm</xsl:attribute>
 		<xsl:attribute name="display-align">center</xsl:attribute>
+		<xsl:if test="$iala_guide_family and not(ancestor::mn:table[@landscape = 'true'])">
+			<!-- the published guide-family body tables set compact cells
+				(the Annex D assessment matrix spreads over four pages) -->
+			<xsl:attribute name="padding-left">2.5mm</xsl:attribute>
+			<xsl:attribute name="padding-right">1.5mm</xsl:attribute>
+			<xsl:attribute name="padding-top">0.5mm</xsl:attribute>
+			<xsl:attribute name="padding-bottom">0.5mm</xsl:attribute>
+			<xsl:attribute name="font-size">9pt</xsl:attribute>
+			<xsl:attribute name="line-height">1.12</xsl:attribute>
+		</xsl:if>
 		<xsl:if test="ancestor::mn:table[@landscape = 'true'] and $iala_compact_landscape">
 			<xsl:attribute name="padding-left">2mm</xsl:attribute>
 			<xsl:attribute name="padding-right">2mm</xsl:attribute>
