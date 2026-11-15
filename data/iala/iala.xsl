@@ -579,21 +579,22 @@
 		<xsl:apply-templates select="../mn:clause[@type = 'revision']" mode="update_xml_step1">
 			<xsl:with-param name="process">true</xsl:with-param>
 		</xsl:apply-templates>
-		<xsl:copy>
-			<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
-		</xsl:copy>
+		<!-- resolutions and circular letters carry no Contents page -->
+		<xsl:if test="not($iala_is_rescirc)">
+			<xsl:copy>
+				<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
+			</xsl:copy>
+		</xsl:if>
 	</xsl:template>
 	<xsl:template match="mn:preface/mn:clause[@type = 'revision']" mode="update_xml_step1" priority="4">
 		<xsl:param name="process">false</xsl:param>
 		<xsl:if test="$process = 'true'">
-		<xsl:if test="not($iala_is_rescirc)">
 			<xsl:copy>
 				<xsl:apply-templates select="@*" mode="update_xml_step1"/>
 				<xsl:attribute name="displayorder">-1</xsl:attribute>
 				
 				<xsl:apply-templates select="node()" mode="update_xml_step1"/>
 			</xsl:copy>
-		</xsl:if>
 		</xsl:if>
 	</xsl:template>
 
