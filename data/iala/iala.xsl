@@ -806,7 +806,11 @@
 	</xsl:attribute-set>
 
 	<xsl:template name="refine_toc-item-block-style">
-		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+		<!-- the guide-family ToCs print entries in caps; the manual and
+				report ToCs keep the authored title case -->
+		<xsl:if test="not($iala_is_report) and not($iala_is_manual)">
+			<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+		</xsl:if>
 		<xsl:attribute name="line-height">1.4</xsl:attribute>
 		<xsl:attribute name="margin-right">8mm</xsl:attribute>
 		<xsl:attribute name="provisional-distance-between-starts">
@@ -851,6 +855,12 @@
 		<xsl:attribute name="margin-top">9mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">6mm</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_toc_title"/></xsl:attribute>
+		<!-- the manual's combined LIST OF TABLES AND FIGURES prints in the
+				Contents tail at the heading size of the section lists; the
+				report's page placement is handled by insertListsOf -->
+		<xsl:if test="$iala_is_manual">
+			<xsl:attribute name="font-size">14pt</xsl:attribute>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="refine_toc-listof-item-style"><?extend?>
@@ -967,7 +977,13 @@
 	</xsl:template>
 
 	<xsl:template name="refine_title-style"><?extend?>
-		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+		<!-- the standards/guideline/resolution families print headings in
+				caps; the published manuals and reports keep the authored
+				title case ("Scope and Objectives", "Session 1 - Opening of
+				the Workshop") -->
+		<xsl:if test="not($iala_is_report) and not($iala_is_manual)">
+			<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+		</xsl:if>
 		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
 		<xsl:if test="$level = 1">
 			<xsl:attribute name="font-size">14pt</xsl:attribute>
@@ -1290,6 +1306,13 @@
 		<xsl:if test="$iala_is_rescirc and ancestor::mn:annex">
 			<xsl:attribute name="line-height">150%</xsl:attribute>
 			<xsl:attribute name="space-after">10pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="($iala_is_report or $iala_is_manual) and not(ancestor::mn:table) and not(ancestor::mn:boilerplate)">
+			<!-- the published manual and report print Word single spacing
+					for Calibri 11 (13.4pt pitch); the FOP default packs 6%
+					tighter and the body drifts ahead of the published
+					pagination -->
+			<xsl:attribute name="line-height">122%</xsl:attribute>
 		</xsl:if>
 		<xsl:attribute name="text-align">
 			<xsl:choose>
@@ -1779,13 +1802,26 @@
 		<fo:inline padding-right="5mm" role="SKIP"><xsl:value-of select="$zero_width_space"/></fo:inline>
 	</xsl:template> -->
 	<xsl:template name="refine_table-container-style"><?extend?>
+		<xsl:variable name="in_annex" select="boolean(ancestor::mn:annex)"/>
+		<xsl:variable name="n_cols_">
+			<xsl:choose>
+				<xsl:when test="mn:colgroup"><xsl:value-of select="count(mn:colgroup/mn:col)"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="count(mn:thead/mn:tr[1]/*)"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		<xsl:attribute name="font-size">
 			<xsl:choose>
-				<!-- reports and manuals rotate their wide tables onto landscape
-						pages at the compact published size, so they keep the
-						published pagination; the standards family keeps the
-						base table size on landscape pages -->
-				<xsl:when test="@landscape = 'true' and $iala_compact_landscape">7.5pt</xsl:when>
+				<!-- the 2021 report prints its gap/measure matrices at the
+						10pt body size -->
+				<xsl:when test="@landscape = 'true' and $iala_is_report">10pt</xsl:when>
+				<!-- the 2017 manual prints the many-column annex radio tables
+						one step below the body size and the few-column annex
+						matrices (the ITU recommendations table) a further step
+						down, and the wide body matrices (Tables 1-2) in
+						miniature -->
+				<xsl:when test="@landscape = 'true' and $iala_is_manual and $in_annex and $n_cols_ &gt;= 8">9.5pt</xsl:when>
+				<xsl:when test="@landscape = 'true' and $iala_is_manual and $in_annex">9pt</xsl:when>
+				<xsl:when test="@landscape = 'true' and $iala_is_manual">6pt</xsl:when>
 				<xsl:otherwise>10pt</xsl:otherwise>
 			</xsl:choose>
 		</xsl:attribute>
@@ -2053,7 +2089,15 @@
 		<xsl:if test="ancestor::mn:table[@landscape = 'true'] and $iala_compact_landscape">
 			<xsl:attribute name="padding-left">2mm</xsl:attribute>
 			<xsl:attribute name="padding-right">2mm</xsl:attribute>
-			<xsl:attribute name="line-height">1.15</xsl:attribute>
+			<xsl:attribute name="padding-top">1.25mm</xsl:attribute>
+			<xsl:attribute name="padding-bottom">1.25mm</xsl:attribute>
+			<xsl:choose>
+				<!-- the manual's dense radio matrices print tight leading;
+						the report's gap/measure tables keep the house
+						line-height of the published 2021 PDF -->
+				<xsl:when test="$iala_is_manual"><xsl:attribute name="line-height">1.15</xsl:attribute></xsl:when>
+				<xsl:otherwise><xsl:attribute name="line-height">1.2</xsl:attribute></xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 		<!-- Published standards print roomy rows (~13mm) with the cell content
 			centred; padding (not row min-height, unsupported by FOP here)
@@ -2071,12 +2115,16 @@
 	<xsl:template name="insertTableColumnWidth">
 		<xsl:param name="colwidths"/>
 		<xsl:variable name="is_landscape_table" select="boolean(self::mn:table[@landscape = 'true'] or ancestor-or-self::mn:table[@landscape = 'true'])"/>
+		<xsl:variable name="n_cols" select="count(xalan:nodeset($colwidths)//column)"/>
 		<xsl:for-each select="xalan:nodeset($colwidths)//column">
 			<xsl:choose>
-				<!-- on the reports/manuals landscape tables the precomputed
+				<!-- on the manuals' many-column landscape tables the precomputed
 						portrait proportions starve the leading column; equal
-						shares reproduce the published layout -->
-				<xsl:when test="$is_landscape_table and $iala_compact_landscape">
+						shares reproduce the published layout. Tables with fewer
+						columns (the four-column ITU recommendations matrix) print
+						pronounced unequal columns and keep the computed
+						proportions -->
+				<xsl:when test="$is_landscape_table and $iala_is_manual and $n_cols &gt;= 8">
 					<fo:table-column column-width="proportional-column-width(20)"/>
 				</xsl:when>
 				<xsl:when test=". = 1 or . = 0">
@@ -2193,6 +2241,50 @@
 					</fo:block-container>
 				</fo:static-content>
 			</xsl:when>
+			<xsl:when test="$iala_is_manual">
+				<!-- Published manual footer: gold rule over the association
+						name and title, then the publication date left and the
+						"____ P N" page stamp right, as printed in the 2017
+						MRCP -->
+				<fo:static-content flow-name="footer" role="artifact">
+					<fo:block-container font-size="7.56pt" font-weight="bold" color="{$color_corporate_blue}" border-top="0.75pt solid {$color_corporate_yellow}" line-height="1.43">
+						<fo:block margin-top="4.5mm">
+							<xsl:text>IALA </xsl:text>
+							<xsl:variable name="title">
+								<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
+							</xsl:variable>
+							<xsl:for-each select="xalan:nodeset($title)/item">
+								<xsl:copy-of select="node()"/>
+							</xsl:for-each>
+						</fo:block>
+						<fo:block text-align-last="justify">
+							<xsl:call-template name="getVariable"><xsl:with-param name="variable">date</xsl:with-param></xsl:call-template>
+							<fo:leader leader-pattern="space"/>
+							<fo:inline color="{$color_corporate_yellow}">____</fo:inline>
+							<xsl:text> P&#xa0;</xsl:text><fo:page-number />
+						</fo:block>
+					</fo:block-container>
+				</fo:static-content>
+			</xsl:when>
+			<xsl:when test="$iala_is_report">
+				<!-- Published 2021-report footer: plain title line, then the
+						centred "Page N" Word stamp -->
+				<fo:static-content flow-name="footer" role="artifact">
+					<fo:block-container font-size="7.56pt" color="{$color_corporate_blue}" line-height="1.43">
+						<fo:block margin-top="4.5mm">
+							<xsl:variable name="title">
+								<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
+							</xsl:variable>
+							<xsl:for-each select="xalan:nodeset($title)/item">
+								<xsl:copy-of select="node()"/>
+							</xsl:for-each>
+						</fo:block>
+						<fo:block text-align="center">
+							<xsl:text>Page </xsl:text><fo:page-number />
+						</fo:block>
+					</fo:block-container>
+				</fo:static-content>
+			</xsl:when>
 			<xsl:otherwise>
 
 		<fo:static-content flow-name="footer" role="artifact">
@@ -2257,6 +2349,101 @@
 				</xsl:if>
 			</fo:block-container>
 		</fo:static-content>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- Reports and manuals carry the printed caption numbers inside the
+			titles themselves ("Table 3 – Gap Analysis...", "Table 6 – System
+			Description Table"); the generated autonum label and its dash
+			delimiter are dropped so the captions print verbatim. The manual's
+			annex subsection headings do the same (the printed "E3 AIS Today"
+			carries its number in the title; the body clauses keep theirs). -->
+	<xsl:template match="mn:table/mn:fmt-name/mn:span[@class = 'fmt-caption-label'][$iala_compact_landscape] |
+			mn:table/mn:fmt-name/mn:span[@class = 'fmt-caption-delim'][$iala_compact_landscape] |
+			mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-label'][$iala_compact_landscape] |
+			mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-delim'][$iala_compact_landscape] |
+			mn:annex//mn:clause/mn:fmt-title/mn:span[@class = 'fmt-caption-label'][$iala_is_manual] |
+			mn:annex//mn:clause/mn:fmt-title/mn:span[@class = 'fmt-caption-delim'][$iala_is_manual] |
+			mn:annex//mn:clause/mn:fmt-title/mn:span[@class = 'fmt-autonum-delim'][$iala_is_manual]" mode="update_xml_step1" priority="3"/>
+
+	<!-- Manuals print annex headings on one line, "ANNEX A – System
+			Description" (the caption-delim break becomes an en dash and
+			the Annex label uppercases), and the printed Contents carries
+			no annex entries at all. -->
+	<xsl:template match="mn:annex/mn:fmt-title/mn:span[@class = 'fmt-caption-delim'][mn:br][$iala_is_manual]" mode="update_xml_step1" priority="4">
+		<span class="fmt-caption-delim"> &#8211; </span>
+	</xsl:template>
+	<xsl:template match="mn:annex/mn:fmt-title/mn:span[@class = 'fmt-caption-label']//mn:span[@class = 'fmt-element-name'][normalize-space() = 'Annex'][$iala_is_manual]" mode="update_xml_step1" priority="4">
+		<span class="fmt-element-name">ANNEX</span>
+	</xsl:template>
+	<xsl:template match="mn:annex[$iala_is_manual]" mode="contents" priority="3">
+		<xsl:apply-templates mode="contents"/>
+	</xsl:template>
+
+	<!-- the printed MRCP Contents carries no level-1 entries (the Word ToC
+			was built from the level 2-4 headings only) and no ANNEX A-E
+			entries themselves, but keeps the annex subsection entries
+			(E.1, E.6.1, ...): the level-1 items are skipped and their
+			children render in their place -->
+	<xsl:template match="mnx:item[$iala_is_manual][@level = '1' or @type = 'annex']" priority="3">
+		<xsl:if test="mnx:item[@display = 'true']">
+			<fo:block role="TOC">
+				<xsl:apply-templates select="mnx:item[@display = 'true']"/>
+			</fo:block>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- List-of sequences per published form:
+			- the 2017 manual closes the Contents with a single combined
+			  LIST OF TABLES AND FIGURES (tables first, then figures);
+			- the 2021 report opens the List of Figures on its own page
+			  with the List of Tables continuing below it;
+			- every other family keeps the base order (tables, figures). -->
+	<xsl:template name="insertListsOf">
+		<xsl:param name="num"/>
+		<xsl:variable name="tables" select="$contents/mnx:doc[@num = $num]/mnx:contents//mnx:tables/mnx:table"/>
+		<xsl:variable name="figures" select="$contents/mnx:doc[@num = $num]/mnx:contents//mnx:figures/mnx:figure"/>
+		<xsl:choose>
+			<xsl:when test="$iala_is_manual">
+				<xsl:if test="$tables or $figures">
+					<fo:block xsl:use-attribute-sets="toc-listof-title-style">
+						<xsl:call-template name="refine_toc-listof-title-style"/>
+						<xsl:text>LIST OF TABLES AND FIGURES</xsl:text>
+					</fo:block>
+					<fo:block role="TOC">
+						<xsl:for-each select="$tables">
+							<xsl:call-template name="insertListOf_Item"/>
+						</xsl:for-each>
+						<xsl:for-each select="$figures">
+							<xsl:call-template name="insertListOf_Item"/>
+						</xsl:for-each>
+					</fo:block>
+				</xsl:if>
+			</xsl:when>
+			<xsl:when test="$iala_is_report">
+				<xsl:if test="$figures">
+					<fo:block break-before="page" font-size="1pt" role="SKIP"/>
+					<xsl:call-template name="insertListOfFigures">
+						<xsl:with-param name="num" select="$num"/>
+					</xsl:call-template>
+				</xsl:if>
+				<xsl:if test="$tables">
+					<xsl:call-template name="insertListOfTables">
+						<xsl:with-param name="num" select="$num"/>
+					</xsl:call-template>
+				</xsl:if>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="insertListOfTables">
+					<xsl:with-param name="num" select="$num"/>
+				</xsl:call-template>
+				<xsl:call-template name="insertListOfFigures">
+					<xsl:with-param name="num" select="$num"/>
+				</xsl:call-template>
+				<xsl:call-template name="insertListOfExamples">
+					<xsl:with-param name="num" select="$num"/>
+				</xsl:call-template>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
