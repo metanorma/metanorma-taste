@@ -2552,8 +2552,11 @@
 						</fo:block>
 						<fo:block text-align="center">
 							<xsl:text>Page </xsl:text><fo:page-number />
-=======
-			<xsl:when test="$iala_is_information_paper">
+					</fo:block>
+				</fo:block-container>
+			</fo:static-content>
+		</xsl:when>
+		<xsl:when test="$iala_is_information_paper">
 				<!-- the published leaflet footer: "Information Paper – <title> /
 						<date>" left, "Page n" right -->
 				<fo:static-content flow-name="footer" role="artifact">
