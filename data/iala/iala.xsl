@@ -97,6 +97,11 @@
 			base-size landscape tables; the reports, manuals and rescirc
 			doctypes were tuned without them. -->
 	<xsl:variable name="iala_std_numbering" select="not($iala_is_report) and not($iala_is_manual) and not($iala_is_rescirc)"/>
+	<!-- the guide sub-family (guidelines, model courses) carries the
+			published numbering model and the standards-family landscape
+			rules; the standards and recommendations were verified without
+			them (their published form is the stdrec brand-era layout) -->
+	<xsl:variable name="iala_guide_family" select="not($iala_is_report) and not($iala_is_manual) and not($iala_is_rescirc) and not($iala_is_standard) and not($iala_is_recommendation)"/>
 	<!-- the compact landscape rendering (7.5pt, tight paddings, equal
 			column shares) is the reports/manuals published form -->
 	<xsl:variable name="iala_compact_landscape" select="$iala_is_report or $iala_is_manual"/>
@@ -843,14 +848,14 @@
 				</xsl:variable>
 				<xsl:apply-templates select="xalan:nodeset($synth_revision)/mn:clause" mode="update_xml_step1"/>
 			</xsl:when>
-			<xsl:when test="not($iala_is_rescirc) and not($iala_is_recommendation)">
-				<!-- The standards family (guidelines, model courses) prints a
+			<xsl:when test="not($iala_is_rescirc) and not($iala_is_recommendation) and not($iala_is_standard)">
+				<!-- The guide family (guidelines, model courses) prints a
 						DOCUMENT REVISION page before the contents; synthesise
 						it when the source carries no revision clause (the
 						table is padded to the house height by the
 						document_revision mode below). Recommendations render
 						their DOCUMENT REVISION page from inner-cover-page
-						instead, and carry no Contents page at all. -->
+						instead; the standards carry no revision page at all. -->
 				<xsl:variable name="synth_revision">
 					<xsl:call-template name="make_document_revision_clause"/>
 				</xsl:variable>
@@ -858,9 +863,10 @@
 			</xsl:when>
 		</xsl:choose>
 		<!-- resolutions, circular letters and recommendations carry no
-				Contents page (the recommendation DOCUMENT REVISION page takes
-				its slot), so the contents clause is dropped here rather than
-				blanked at render time, to keep the preface page_sequence away -->
+				Contents clause here (the recommendation DOCUMENT REVISION
+				page takes its slot), so the contents clause is dropped
+				rather than blanked at render time, to keep the preface
+				page_sequence away. The standards keep their Contents. -->
 		<xsl:if test="not($iala_is_rescirc) and not($iala_is_recommendation)">
 			<xsl:copy>
 				<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
@@ -1158,7 +1164,7 @@
 			this model; it applies to the standards family only. -->
 
 	<!-- Introduction: receives number 1 -->
-	<xsl:template match="mn:introduction/mn:fmt-title[not(mn:span[@class = 'fmt-caption-label'])][$iala_std_numbering]" mode="update_xml_step1" priority="3">
+	<xsl:template match="mn:introduction/mn:fmt-title[not(mn:span[@class = 'fmt-caption-label'])][$iala_guide_family]" mode="update_xml_step1" priority="3">
 		<xsl:copy>
 			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
 			<mn:span class="fmt-caption-label"><mn:semx element="autonum">1</mn:semx></mn:span>
@@ -1169,7 +1175,7 @@
 
 	<!-- Normative references: move to the end of the document, retitle
 			"References", number after the last body clause -->
-	<xsl:template match="mn:sections/mn:references[@normative = 'true'][$iala_std_numbering]" mode="update_xml_step1" priority="3">
+	<xsl:template match="mn:sections/mn:references[@normative = 'true'][$iala_guide_family]" mode="update_xml_step1" priority="3">
 		<xsl:variable name="num" select="count(../*[not(self::mn:references)]) + 2"/>
 		<!-- wrap as a clause so the heading renders through the normal
 				clause path exactly once -->
@@ -1187,7 +1193,7 @@
 	</xsl:template>
 
 	<!-- Further reading: follows References, numbered after it -->
-	<xsl:template match="mn:sections/mn:references[not(@normative = 'true')][$iala_std_numbering]" mode="update_xml_step1" priority="3">
+	<xsl:template match="mn:sections/mn:references[not(@normative = 'true')][$iala_guide_family]" mode="update_xml_step1" priority="3">
 		<xsl:variable name="num" select="count(../*[not(self::mn:references)]) + 3"/>
 		<mn:clause id="{@id}">
 			<xsl:attribute name="displayorder">999</xsl:attribute>
@@ -1286,10 +1292,10 @@
 			teach the label resolution about the published numbering model. -->
 	<xsl:template name="getSection">
 		<xsl:choose>
-			<xsl:when test="$iala_std_numbering and self::mn:references[@normative = 'true']">
+			<xsl:when test="$iala_guide_family and self::mn:references[@normative = 'true']">
 				<xsl:value-of select="count(parent::mn:sections/*[not(self::mn:references)]) + 2"/>
 			</xsl:when>
-			<xsl:when test="$iala_std_numbering and self::mn:references[not(@normative = 'true')]">
+			<xsl:when test="$iala_guide_family and self::mn:references[not(@normative = 'true')]">
 				<xsl:value-of select="count(parent::mn:sections/*[not(self::mn:references)]) + 3"/>
 			</xsl:when>
 			<xsl:when test="mn:fmt-title">
@@ -1309,8 +1315,8 @@
 
 	<xsl:template name="getName">
 		<xsl:choose>
-			<xsl:when test="$iala_std_numbering and self::mn:references[@normative = 'true']">References</xsl:when>
-			<xsl:when test="$iala_std_numbering and self::mn:references[not(@normative = 'true')]">Further reading</xsl:when>
+			<xsl:when test="$iala_guide_family and self::mn:references[@normative = 'true']">References</xsl:when>
+			<xsl:when test="$iala_guide_family and self::mn:references[not(@normative = 'true')]">Further reading</xsl:when>
 			<xsl:when test="mn:fmt-title//mn:span[@class = 'fmt-caption-delim'][mn:tab]">
 				<xsl:copy-of select="mn:fmt-title//mn:span[@class = 'fmt-caption-delim'][mn:tab][1]/following-sibling::node()"/>
 			</xsl:when>
@@ -1332,7 +1338,7 @@
 	<!-- Published documents print reference entries as
 			"[n] <document identifier> <title>"; the formattedref built by the
 			presentation step carries the title only, so prepend the identifier. -->
-	<xsl:template match="mn:bibitem/mn:formattedref[parent::mn:bibitem/mn:docidentifier[not(@scope)]][$iala_std_numbering]" mode="update_xml_step1" priority="2">
+	<xsl:template match="mn:bibitem/mn:formattedref[parent::mn:bibitem/mn:docidentifier[not(@scope)]][$iala_guide_family]" mode="update_xml_step1" priority="2">
 		<mn:formattedref>
 			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
 			<xsl:value-of select="../mn:docidentifier[not(@scope)][1]"/>
@@ -1387,8 +1393,8 @@
 		<xsl:variable name="long_cells" select="count($table/mn:tbody//mn:td[string-length(normalize-space()) &gt;= 120] | $table/mn:tbody//mn:th[string-length(normalize-space()) &gt;= 120])"/>
 		<xsl:variable name="name" select="normalize-space($table/mn:fmt-name)"/>
 		<xsl:choose>
-			<!-- rescirc documents print no rotated tables -->
-			<xsl:when test="$iala_is_rescirc"/>
+			<!-- rescirc documents and standards print no rotated tables -->
+			<xsl:when test="$iala_is_rescirc or $iala_is_standard"/>
 			<!-- reports and manuals: the published report/manual form -->
 			<xsl:when test="$iala_compact_landscape">
 				<xsl:if test="$cols &gt;= 10
