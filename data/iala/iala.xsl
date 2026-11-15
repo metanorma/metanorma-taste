@@ -803,6 +803,146 @@
 		</xsl:if>
 	</xsl:template>
 
+	<!-- language as printed: Original: English -->
+	<xsl:template name="rescirc_lang_name">
+		<xsl:choose>
+			<xsl:when test="$iala_lang = 'en'">English</xsl:when>
+			<xsl:when test="$iala_lang = 'fr'">French</xsl:when>
+			<xsl:when test="$iala_lang = 'es'">Spanish</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="concat(translate(substring($iala_lang, 1, 1), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), substring($iala_lang, 2))"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="rescirc_letterhead">
+		<xsl:choose>
+			<xsl:when test="$iala_is_letter">
+				<!-- Circular letter: centered logo, then the letter number
+				     and the date right-aligned, as printed -->
+				<fo:block text-align="center" margin-top="3mm">
+					<fo:instream-foreign-object content-width="34mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+						<xsl:copy-of select="$IALA-Logo-full"/>
+					</fo:instream-foreign-object>
+				</fo:block>
+				<fo:block text-align="right" margin-top="10mm" margin-right="2mm">
+					<xsl:text>Circular Letter </xsl:text>
+					<xsl:value-of select="$iala_docidentifier"/>
+				</fo:block>
+				<fo:block text-align="right" margin-top="4mm" margin-right="2mm">
+					<xsl:call-template name="rescirc_date"/>
+				</fo:block>
+				<fo:block font-size="0pt" margin-bottom="16mm">&#xa0;</fo:block>
+			</xsl:when>
+			<xsl:when test="starts-with($iala_docidentifier, 'GA')">
+				<!-- GA resolutions: docidentifier top left, language top
+				     right, centered logo, assembly / document block, rule,
+				     centered resolution line and title -->
+				<fo:block-container width="100%" role="SKIP">
+					<fo:block text-align="left" font-weight="bold" font-size="10pt">
+						<xsl:value-of select="$iala_docid_slash"/>
+					</fo:block>
+				</fo:block-container>
+				<fo:block text-align="right" font-size="10pt" margin-top="-4mm" margin-right="2mm">
+					<xsl:value-of select="translate($iala_lang, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
+				</fo:block>
+				<fo:block text-align="center" margin-top="6mm">
+					<fo:instream-foreign-object content-width="26mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+						<xsl:copy-of select="$IALA-Logo-full"/>
+					</fo:instream-foreign-object>
+				</fo:block>
+				<fo:table table-layout="fixed" width="100%" role="SKIP" margin-top="8mm">
+					<fo:table-column column-width="50%"/>
+					<fo:table-column column-width="50%"/>
+					<fo:table-body role="SKIP">
+						<fo:table-row role="SKIP">
+							<fo:table-cell role="SKIP" font-size="10pt" line-height="1.3">
+								<fo:block><xsl:value-of select="$iala_ga_ordinal"/><xsl:value-of select="$iala_ga_ordinal_suffix"/> General Assembly</fo:block>
+								<fo:block>International Organization</fo:block>
+								<fo:block>for Marine Aids to Navigation</fo:block>
+							</fo:table-cell>
+							<fo:table-cell role="SKIP" font-size="10pt" line-height="1.3" text-align="right">
+								<fo:block><xsl:value-of select="$iala_docid_slash"/></fo:block>
+								<fo:block><xsl:call-template name="rescirc_date"/></fo:block>
+								<fo:block>Original: <xsl:call-template name="rescirc_lang_name"/></fo:block>
+							</fo:table-cell>
+						</fo:table-row>
+					</fo:table-body>
+				</fo:table>
+				<fo:block-container border-top="0.5pt solid {$color_corporate_blue}" font-size="0pt" margin-top="4mm" role="SKIP">
+					<fo:block role="SKIP">&#xa0;</fo:block>
+				</fo:block-container>
+				<fo:block text-align="center" font-weight="bold" font-size="11pt" margin-top="9mm">
+					<xsl:text>Resolution </xsl:text>
+					<xsl:value-of select="$iala_docidentifier"/>
+				</fo:block>
+				<fo:block text-align="center" font-weight="bold" font-size="11pt" margin-top="8pt">
+					<xsl:text>Adopted on </xsl:text>
+					<xsl:call-template name="rescirc_date"/>
+				</fo:block>
+				<fo:block text-align="center" font-weight="bold" font-size="11pt" margin-top="8pt" text-transform="uppercase" color="{$color_primary_recommendation}">
+					<xsl:value-of select="$iala_title_en"/>
+				</fo:block>
+				<fo:block font-size="0pt" margin-bottom="7mm">&#xa0;</fo:block>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:choose>
+					<xsl:when test="number($iala_year) &lt; 2016">
+						<!-- Legacy assembly resolutions (A12 era): logo left,
+						     association name block right, resolution and
+						     adoption lines, then the title -->
+						<fo:table table-layout="fixed" width="100%" role="SKIP">
+							<fo:table-column column-width="30%"/>
+							<fo:table-column column-width="70%"/>
+							<fo:table-body role="SKIP">
+								<fo:table-row role="SKIP">
+									<fo:table-cell role="SKIP">
+										<fo:block text-align="left">
+											<fo:instream-foreign-object content-width="26mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+												<xsl:copy-of select="$IALA-Logo-full"/>
+											</fo:instream-foreign-object>
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell role="SKIP" text-align="justify" font-style="italic" font-weight="bold" color="{$color_primary_recommendation}" font-size="10pt">
+										<fo:block>IALA &#8212; AISM <fo:inline font-weight="normal">(International Association of Marine</fo:inline></fo:block>
+										<fo:block><fo:inline font-weight="normal">Aids to Navigation and Lighthouse Authorities</fo:inline></fo:block>
+										<fo:block><fo:inline font-weight="normal">Association Internationale de Signalisation Maritime)</fo:inline></fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+							</fo:table-body>
+						</fo:table>
+						<fo:block text-align="right" font-weight="bold" margin-top="10mm" margin-right="2mm">
+							<xsl:text>IALA General Assembly Resolution </xsl:text>
+							<xsl:value-of select="$iala_docidentifier"/>
+						</fo:block>
+						<fo:block text-align="right" margin-top="4pt" margin-right="2mm">
+							<xsl:text>Adopted on </xsl:text>
+							<xsl:call-template name="rescirc_date"/>
+						</fo:block>
+						<fo:block font-weight="bold" font-size="11pt" text-transform="uppercase" color="{$color_primary_recommendation}" margin-top="10mm">
+							<xsl:value-of select="$iala_title_en"/>
+						</fo:block>
+						<fo:block font-size="0pt" margin-bottom="5mm">&#xa0;</fo:block>
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- A1x assembly resolutions (A13): docidentifier
+						     top right, centered logo, then the body -->
+						<fo:block text-align="right" font-size="10pt" margin-right="2mm">
+							<xsl:text>Resolution </xsl:text>
+							<xsl:value-of select="$iala_docidentifier"/>
+						</fo:block>
+						<fo:block text-align="center" margin-top="6mm">
+							<fo:instream-foreign-object content-width="26mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+								<xsl:copy-of select="$IALA-Logo-full"/>
+							</fo:instream-foreign-object>
+						</fo:block>
+						<fo:block font-size="0pt" margin-bottom="9mm">&#xa0;</fo:block>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
 	<xsl:template name="refine_table-header-row-style"><?extend?>
 		<xsl:attribute name="background-color">transparent</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
