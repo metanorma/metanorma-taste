@@ -49,6 +49,11 @@
 	<xsl:variable name="iala_doctype_alias" select="normalize-space(/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:doctype-alias)"/>
 	<xsl:variable name="iala_is_report" select="$iala_doctype_alias = 'report'"/>
 	<xsl:variable name="iala_is_manual" select="$iala_doctype_alias = 'manual'"/>
+	<!-- The information-paper leaflet family (the 2008 "Definitions
+			relating to ..." form): routed per document through the
+			presentation-metadata doctype alias; the registered base doctype
+			stays whatever the catalogue carries. -->
+	<xsl:variable name="iala_is_information_paper" select="$iala_doctype_alias = 'information-paper'"/>
 
 	<!-- ============================================================ -->
 	<!-- RESOLUTIONS + CIRCULAR LETTERS (published-PDF parity)        -->
@@ -61,6 +66,9 @@
 	     are "General Assembly Resolution" (base doctype "standard"),
 	     letters are "Circular Letter" / "Letter" (base doctype "letter") -->
 	<xsl:variable name="iala_doctype_full_lc" select="translate(normalize-space(/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) != '']), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+	<!-- The model course doctype: the base doctype is "standard" for them,
+			so key the model-course form on the language-tagged full name. -->
+	<xsl:variable name="iala_is_model_course" select="$iala_doctype_full_lc = 'model course'"/>
 	<xsl:variable name="iala_is_letter" select="contains($iala_doctype_full_lc, 'letter')"/>
 	<xsl:variable name="iala_is_resolution" select="not($iala_is_letter) and (contains($iala_doctype_full_lc, 'assembly') or contains($iala_doctype_full_lc, 'resolution'))"/>
 	<xsl:variable name="iala_is_rescirc" select="$iala_is_letter or $iala_is_resolution"/>
@@ -101,7 +109,7 @@
 			published numbering model and the standards-family landscape
 			rules; the standards and recommendations were verified without
 			them (their published form is the stdrec brand-era layout) -->
-	<xsl:variable name="iala_guide_family" select="not($iala_is_report) and not($iala_is_manual) and not($iala_is_rescirc) and not($iala_is_standard) and not($iala_is_recommendation)"/>
+	<xsl:variable name="iala_guide_family" select="not($iala_is_report) and not($iala_is_manual) and not($iala_is_rescirc) and not($iala_is_standard) and not($iala_is_recommendation) and not($iala_is_information_paper)"/>
 	<!-- the compact landscape rendering (7.5pt, tight paddings, equal
 			column shares) is the reports/manuals published form -->
 	<xsl:variable name="iala_compact_landscape" select="$iala_is_report or $iala_is_manual"/>
@@ -125,6 +133,13 @@
 	<xsl:variable name="iala_era_old" select="number($iala_year) &lt; 2026"/>
 	<xsl:variable name="iala_is_standard" select="$iala_doctype_full = 'Standard'"/>
 	<xsl:variable name="iala_is_recommendation" select="$iala_doctype_full = 'Recommendation'"/>
+	<!-- Published documents dated before 2026 carry the "IALA" association
+			prefix on the doctype banner and in the running footer (the
+			December 2025 guidelines print "IALA GUIDELINE", the model
+			courses "IALA MODEL COURSE"); the 2026 editions print the bare
+			doctype. Reports, manuals, leaflets and rescirc documents are
+			not keyed on it. -->
+	<xsl:variable name="iala_iala_prefix" select="$iala_era_old and ($iala_is_standard or $iala_is_recommendation or $iala_guide_family)"/>
 
 	<!-- Recital qualifier printed under the doctype banner on recommendation
 			covers ("(NORMATIVE)" / "(INFORMATIVE)" / "(Normative)", as printed
@@ -297,10 +312,54 @@
 
 	<xsl:template name="cover-page">
 		<xsl:param name="num"/>
+		<!-- The information-paper leaflet cover: the published form is a
+				plain title page - the doctype line, the subtitle, the title,
+				the date, the IALA-AISM logo over the pre-2014 address block;
+				no docidentifier, no URN and no banner block. -->
+		<xsl:if test="$iala_is_information_paper">
+		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" initial-page-number="1" color="{$color_corporate_blue}">
+			<fo:static-content flow-name="cover-page-header" id="__internal_layout__coverpage_image_{$num}_{generate-id()}" role="SKIP">
+				<fo:block text-align="center" margin-left="0.5mm" margin-top="3mm" font-size="0pt">
+					<fo:instream-foreign-object content-width="47mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+						<xsl:copy-of select="$IALA-Logo-full"/>
+					</fo:instream-foreign-object>
+				</fo:block>
+			</fo:static-content>
+			<fo:static-content flow-name="cover-page-footer" role="SKIP">
+				<fo:block-container font-size="9pt" margin-left="2.5mm" role="SKIP">
+					<fo:block margin-top="4mm">20ter, rue Schnapper, 78100</fo:block>
+					<fo:block>Saint Germain en Laye, France</fo:block>
+					<fo:block>Telephone +33 1 34 51 70 01 Telefax +33 1 34 51 82 05</fo:block>
+					<fo:block>E-mail - iala-aism@wanadoo.fr&#160;&#160;&#160;&#160;&#160;Internet -&#160;&#160;<fo:basic-link external-destination="http://iala-aism.org" fox:alt-text="http://iala-aism.org">http://iala-aism.org</fo:basic-link></fo:block>
+				</fo:block-container>
+			</fo:static-content>
+			<fo:flow flow-name="xsl-region-body" color="black">
+				<xsl:call-template name="insert_firstpage_id"><xsl:with-param name="num" select="$num"/></xsl:call-template>
+				<fo:block text-align="center" font-size="17pt" font-weight="bold" margin-top="8mm" text-transform="uppercase" role="H1">
+					<xsl:text>Information Paper</xsl:text>
+				</fo:block>
+				<xsl:variable name="subtitle" select="(/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:cover-subtitle[1] | /mn:metanorma/mn:bibdata/mn:title[@type = 'subtitle'][normalize-space(@language) = '' or @language = 'en'][1])[1]"/>
+				<xsl:if test="normalize-space($subtitle) != ''">
+					<fo:block text-align="center" font-size="12pt" margin-top="6mm">
+						<xsl:text>(</xsl:text><xsl:value-of select="normalize-space($subtitle)"/><xsl:text>)</xsl:text>
+					</fo:block>
+				</xsl:if>
+				<fo:block text-align="center" font-size="18pt" font-weight="bold" margin-top="30mm" line-height="1.3" role="H2">
+					<xsl:apply-templates select="/mn:metanorma/mn:bibdata/mn:title[@type = 'main' and (@language = 'en' or normalize-space(@language) = '')][1]/node()"/>
+				</fo:block>
+				<fo:block text-align="center" font-size="12pt" margin-top="14mm">
+					<xsl:call-template name="convertDate">
+						<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on"/>
+					</xsl:call-template>
+				</fo:block>
+			</fo:flow>
+		</fo:page-sequence>
+		</xsl:if>
+
 		<!-- resolutions and circular letters carry no cover page: the
 		     letterhead rides the first document page (see the rescirc
 		     header templates below) -->
-		<xsl:if test="not($iala_is_rescirc)">
+		<xsl:if test="not($iala_is_rescirc) and not($iala_is_information_paper)">
 		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" initial-page-number="1" color="{$color_corporate_blue}">
 			<!-- Logo -->
 			<fo:static-content flow-name="cover-page-header" id="__internal_layout__coverpage_image_{$num}_{generate-id()}" role="SKIP">
@@ -372,8 +431,8 @@
 							<!-- Recommendations carry base doctype 'standard', so the
 								light-blue branch keys on the IALA doctype, not the base one -->
 							<xsl:when test="$iala_is_recommendation"><xsl:value-of select="$color_primary_recommendation_50"/></xsl:when>
+							<xsl:when test="$iala_is_model_course"><xsl:value-of select="$color_primary_model_course"/></xsl:when>
 							<xsl:when test="$iala_is_standard or $doctype = 'standard'"><xsl:value-of select="$color_corporate_blue"/></xsl:when>
-							<xsl:when test="$doctype = 'model-course'"><xsl:value-of select="$color_primary_model_course"/></xsl:when>
 							<!-- default, for doctype 'guideline' -->
 							<xsl:otherwise><xsl:value-of select="$color_corporate_light_blue"/></xsl:otherwise>
 						</xsl:choose>
@@ -381,8 +440,9 @@
 
 
 					<fo:block font-size="25pt" font-weight="bold" margin-left="17mm" margin-right="17mm" margin-top="4pt" text-transform="uppercase">
-						<!-- Legacy era banners read "IALA STANDARD" / "IALA RECOMMENDATION" -->
-						<xsl:if test="$iala_era_old and ($iala_is_standard or $iala_is_recommendation)">
+						<!-- Publications dated before 2026 read "IALA STANDARD" /
+							"IALA GUIDELINE" / "IALA MODEL COURSE" on the banner -->
+						<xsl:if test="$iala_iala_prefix">
 							<xsl:text>IALA </xsl:text>
 						</xsl:if>
 						<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
@@ -805,13 +865,35 @@
 		<xsl:attribute name="border-right">1pt solid black</xsl:attribute> -->
 	</xsl:attribute-set>
 
-	<xsl:template name="refine_toc-item-block-style">
-		<!-- the guide-family ToCs print entries in caps; the manual and
-				report ToCs keep the authored title case -->
-		<xsl:if test="not($iala_is_report) and not($iala_is_manual)">
-			<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+	<!-- the published leaflet contents join entry and page number with
+			space, not dots -->
+	<xsl:template name="refine_toc-leader-style"><?extend?>
+		<xsl:if test="$iala_is_information_paper">
+			<xsl:attribute name="leader-pattern">space</xsl:attribute>
 		</xsl:if>
-		<xsl:attribute name="line-height">1.4</xsl:attribute>
+	</xsl:template>
+
+	<xsl:template name="refine_toc-item-block-style">
+		<xsl:attribute name="text-transform">
+			<xsl:choose>
+				<!-- the guide-family ToCs print entries in caps; the manual and
+					report ToCs keep the authored title case; the leaflet prints
+					its deeper levels in source case -->
+				<xsl:when test="$iala_is_information_paper and @level &gt; 1">none</xsl:when>
+				<xsl:when test="not($iala_is_report) and not($iala_is_manual)">uppercase</xsl:when>
+			</xsl:choose>
+		</xsl:attribute>
+		<xsl:attribute name="line-height">
+			<xsl:choose>
+				<!-- the published model-course contents run at generous
+					leading with a margin per entry, spreading over two pages -->
+				<xsl:when test="$iala_is_model_course">1.9</xsl:when>
+				<xsl:otherwise>1.4</xsl:otherwise>
+			</xsl:choose>
+		</xsl:attribute>
+		<xsl:if test="$iala_is_model_course">
+			<xsl:attribute name="margin-top">12pt</xsl:attribute>
+		</xsl:if>
 		<xsl:attribute name="margin-right">8mm</xsl:attribute>
 		<xsl:attribute name="provisional-distance-between-starts">
 			<xsl:choose>
@@ -997,6 +1079,36 @@
 		</xsl:if>
 	</xsl:template>
 
+	<!-- the information-paper leaflet prints its definition entries as
+			run-in lines: "TERM - definition", not as a two-column list -->
+	<xsl:template match="mn:dl[$iala_is_information_paper]" priority="3">
+		<fo:block>
+			<xsl:for-each select="mn:dt">
+				<fo:block margin-bottom="1.5mm">
+					<xsl:apply-templates/>
+					<xsl:text> - </xsl:text>
+					<xsl:apply-templates select="following-sibling::mn:dd[1]/node()"/>
+				</fo:block>
+			</xsl:for-each>
+		</fo:block>
+	</xsl:template>
+
+	<!-- the leaflet contents heading prints as "Table of Contents" -->
+	<xsl:template match="mn:preface//mn:clause[@type = 'toc']/mn:fmt-title[$iala_is_information_paper]" priority="4">
+		<fo:block xsl:use-attribute-sets="toc-title-style">
+			<xsl:call-template name="refine_toc-title-style"/>
+			<fo:block-container width="100%" role="SKIP">
+				<fo:block role="SKIP">
+					<xsl:attribute name="color">black</xsl:attribute>
+					<xsl:attribute name="text-transform">none</xsl:attribute>
+					<xsl:attribute name="font-size">13pt</xsl:attribute>
+					<xsl:attribute name="font-weight">bold</xsl:attribute>
+					<xsl:text>Table of Contents</xsl:text>
+				</fo:block>
+			</fo:block-container>
+		</fo:block>
+	</xsl:template>
+
 	<!-- Tabulation processing -->
 	<xsl:template match="mn:tab">
 		<xsl:variable name="padding-right">8</xsl:variable>
@@ -1139,7 +1251,7 @@
 				</xsl:variable>
 				<xsl:apply-templates select="xalan:nodeset($synth_revision)/mn:clause" mode="update_xml_step1"/>
 			</xsl:when>
-			<xsl:when test="not($iala_is_rescirc) and not($iala_is_recommendation) and not($iala_is_standard)">
+			<xsl:when test="not($iala_is_rescirc) and not($iala_is_recommendation) and not($iala_is_standard) and not($iala_is_information_paper)">
 				<!-- The guide family (guidelines, model courses) prints a
 						DOCUMENT REVISION page before the contents; synthesise
 						it when the source carries no revision clause (the
@@ -1217,7 +1329,7 @@
 			<mn:fmt-title>Document revision</mn:fmt-title>
 			<mn:p>
 				<xsl:choose>
-					<xsl:when test="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] = 'model-course'">
+					<xsl:when test="$iala_is_model_course">
 						<xsl:text>Revisions to this IALA document are to be noted in the table prior to the issue of a revised document.</xsl:text>
 					</xsl:when>
 					<xsl:otherwise>
@@ -1286,6 +1398,24 @@
 	<xsl:template match="mn:table/mn:fmt-name" mode="update_xml_step1" priority="5">
 		<xsl:choose>
 			<xsl:when test="$iala_is_rescirc or $iala_is_standard"><!-- no caption, as published --></xsl:when>
+			<xsl:when test="$iala_guide_family and not(mn:semx[@element = 'name' or @element = 'title'])">
+				<!-- auto-numbered table: no caption, as published -->
+			</xsl:when>
+			<xsl:when test="$iala_guide_family">
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+					<xsl:call-template name="addNamedDestinationAttribute"/>
+					<!-- flat caption number: position among the named tables -->
+					<xsl:variable name="flat" select="count(preceding::mn:table[mn:fmt-name/mn:semx[@element = 'name' or @element = 'title']][not(ancestor::mn:metanorma-extension)]) + 1"/>
+					<span class="fmt-caption-label">
+						<span class="fmt-element-name">Table</span>
+						<xsl:text> </xsl:text>
+						<mn:semx element="autonum"><xsl:value-of select="$flat"/></mn:semx>
+					</span>
+					<xsl:apply-templates select="mn:span[@class = 'fmt-caption-delim']" mode="update_xml_step1"/>
+					<xsl:apply-templates select="mn:semx[@element = 'name' or @element = 'title']" mode="update_xml_step1"/>
+				</xsl:copy>
+			</xsl:when>
 			<xsl:otherwise>
 				<xsl:copy>
 					<xsl:copy-of select="@*"/>
@@ -1405,14 +1535,19 @@
 		</xsl:copy>
 	</xsl:template>
 	
-	<xsl:template match="mn:tbody[count(mn:tr) &lt; 7]" mode="document_revision">
+	<!-- The published revision table height: guidelines pad to seven body
+			rows (one data row over six spare rows), the model courses to six
+			(two data rows over four spare rows). -->
+	<xsl:variable name="iala_rev_pad_target" select="6 + number(not($iala_is_model_course))"/>
+
+	<xsl:template match="mn:tbody[count(mn:tr) &lt; number($iala_rev_pad_target)]" mode="document_revision">
 		<xsl:copy>
 			<xsl:copy-of select="@*"/>
 			<xsl:apply-templates select="node()" mode="document_revision"/>
 			<xsl:variable name="tr_count" select="count(mn:tr)"/>
 			<xsl:variable name="td_count" select="count(mn:tr[last()]/*)"/>
 			<xsl:call-template name="addDocumentRevisionTableRow">
-				<xsl:with-param name="tr_count" select="7 - $tr_count"/>
+				<xsl:with-param name="tr_count" select="number($iala_rev_pad_target) - $tr_count"/>
 				<xsl:with-param name="td_count" select="$td_count"/>
 			</xsl:call-template>
 		</xsl:copy>
@@ -1506,63 +1641,46 @@
 		</mn:clause>
 	</xsl:template>
 
-	<!-- Published model courses carry no List of Tables / Figures in
-			their contents; the other doctypes keep them (rendered through
-			the base collection logic, alt-texts included). -->
-	<xsl:template name="processTables_Contents">
-		<xsl:choose>
-			<xsl:when test="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] = 'model-course'">
-				<!-- published model courses carry no List of Tables -->
-			</xsl:when>
-			<xsl:otherwise>
-				<mnx:tables>
-					<xsl:for-each select="//mn:table[not(ancestor::mn:metanorma-extension)][@id and mn:fmt-name and normalize-space(@id) != '']">
-						<xsl:variable name="root">
-							<xsl:if test="ancestor-or-self::mn:preface">preface</xsl:if>
-							<xsl:if test="ancestor-or-self::mn:annex">annex</xsl:if>
-						</xsl:variable>
-						<xsl:variable name="fmt_name">
-							<xsl:apply-templates select="mn:fmt-name" mode="update_xml_step1"/>
-						</xsl:variable>
-						<xsl:variable name="alt_text_">
-							<xsl:apply-templates select="xalan:nodeset($fmt_name)/node()" mode="bookmarks"/>
-						</xsl:variable>
-						<xsl:variable name="alt_text" select="normalize-space(translate(normalize-space($alt_text_), concat($nbsp,$zero_width_space,$hair_space), ' '))"/>
-						<mnx:table id="{@id}" alt-text="{$alt_text}" root="{$root}">
-							<xsl:copy-of select="$fmt_name"/>
-						</mnx:table>
-					</xsl:for-each>
-				</mnx:tables>
-			</xsl:otherwise>
-		</xsl:choose>
+<xsl:template name="processTables_Contents">
+		<mnx:tables>
+			<xsl:for-each select="//mn:table[not(ancestor::mn:metanorma-extension)][@id and mn:fmt-name and normalize-space(@id) != ''][not($iala_guide_family) or mn:fmt-name/mn:semx[@element = 'name' or @element = 'title']]">
+				<xsl:variable name="root">
+					<xsl:if test="ancestor-or-self::mn:preface">preface</xsl:if>
+					<xsl:if test="ancestor-or-self::mn:annex">annex</xsl:if>
+				</xsl:variable>
+				<xsl:variable name="fmt_name">
+					<xsl:apply-templates select="mn:fmt-name" mode="update_xml_step1"/>
+				</xsl:variable>
+				<xsl:variable name="alt_text_">
+					<xsl:apply-templates select="xalan:nodeset($fmt_name)/node()" mode="bookmarks"/>
+				</xsl:variable>
+				<xsl:variable name="alt_text" select="normalize-space(translate(normalize-space($alt_text_), concat($nbsp,$zero_width_space,$hair_space), ' '))"/>
+				<mnx:table id="{@id}" alt-text="{$alt_text}" root="{$root}">
+					<xsl:copy-of select="$fmt_name"/>
+				</mnx:table>
+			</xsl:for-each>
+		</mnx:tables>
 	</xsl:template>
 
 	<xsl:template name="processFigures_Contents">
-		<xsl:choose>
-			<xsl:when test="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] = 'model-course'">
-				<!-- published model courses carry no List of Figures -->
-			</xsl:when>
-			<xsl:otherwise>
-				<mnx:figures>
-					<xsl:for-each select="//mn:figure[@id and mn:fmt-name and not(@unnumbered = 'true') and normalize-space(@id) != ''] | //*[@id and starts-with(mn:name, 'Figure ') and normalize-space(@id) != '']">
-						<xsl:variable name="root">
-							<xsl:if test="ancestor-or-self::mn:preface">preface</xsl:if>
-							<xsl:if test="ancestor-or-self::mn:annex">annex</xsl:if>
-						</xsl:variable>
-						<xsl:variable name="fmt_name">
-							<xsl:apply-templates select="mn:fmt-name" mode="update_xml_step1"/>
-						</xsl:variable>
-						<xsl:variable name="alt_text_">
-							<xsl:apply-templates select="xalan:nodeset($fmt_name)/node()" mode="bookmarks"/>
-						</xsl:variable>
-						<xsl:variable name="alt_text" select="normalize-space(translate(normalize-space($alt_text_), concat($nbsp,$zero_width_space,$hair_space), ' '))"/>
-						<mnx:figure id="{@id}" alt-text="{$alt_text}" root="{$root}">
-							<xsl:copy-of select="$fmt_name"/>
-						</mnx:figure>
-					</xsl:for-each>
-				</mnx:figures>
-			</xsl:otherwise>
-		</xsl:choose>
+		<mnx:figures>
+			<xsl:for-each select="(//mn:figure[@id and mn:fmt-name and not(@unnumbered = 'true') and normalize-space(@id) != ''] | //*[@id and starts-with(mn:name, 'Figure ') and normalize-space(@id) != ''])[not($iala_guide_family) or mn:fmt-name/mn:semx[@element = 'name' or @element = 'title']]">
+				<xsl:variable name="root">
+					<xsl:if test="ancestor-or-self::mn:preface">preface</xsl:if>
+					<xsl:if test="ancestor-or-self::mn:annex">annex</xsl:if>
+				</xsl:variable>
+				<xsl:variable name="fmt_name">
+					<xsl:apply-templates select="mn:fmt-name" mode="update_xml_step1"/>
+				</xsl:variable>
+				<xsl:variable name="alt_text_">
+					<xsl:apply-templates select="xalan:nodeset($fmt_name)/node()" mode="bookmarks"/>
+				</xsl:variable>
+				<xsl:variable name="alt_text" select="normalize-space(translate(normalize-space($alt_text_), concat($nbsp,$zero_width_space,$hair_space), ' '))"/>
+				<mnx:figure id="{@id}" alt-text="{$alt_text}" root="{$root}">
+					<xsl:copy-of select="$fmt_name"/>
+				</mnx:figure>
+			</xsl:for-each>
+		</mnx:figures>
 	</xsl:template>
 
 	<!-- The published contents never list deeper than three levels. -->
@@ -1595,6 +1713,34 @@
 			</xsl:when>
 			<xsl:when test="$iala_guide_family and self::mn:references[not(@normative = 'true')]">
 				<xsl:value-of select="count(parent::mn:sections/*[not(self::mn:references)]) + 3"/>
+			</xsl:when>
+			<xsl:when test="$iala_guide_family and self::mn:introduction">
+				<!-- the published guidelines number the Introduction as clause 1 -->
+				<xsl:text>1</xsl:text>
+			</xsl:when>
+			<xsl:when test="$iala_is_model_course and self::mn:clause[starts-with(normalize-space(mn:title), 'Part')]">
+				<!-- the published model courses print their part dividers unnumbered -->
+			</xsl:when>
+			<xsl:when test="$iala_is_model_course and self::mn:clause[ancestor::mn:clause[starts-with(normalize-space(mn:title), 'Part')]]">
+				<!-- descendants of a part divider drop the part segment of
+						their number: "2.1" under PART 2 prints as "1" -->
+				<xsl:variable name="label">
+					<xsl:value-of select="normalize-space(mn:fmt-title//mn:span[@class = 'fmt-caption-delim'][mn:tab][1]/preceding-sibling::node()[not(self::mn:annotation)])"/>
+				</xsl:variable>
+				<xsl:value-of select="substring-after($label, '.')"/>
+			</xsl:when>
+			<xsl:when test="$iala_guide_family and self::mn:clause[mn:fmt-title/@depth = 1][//mn:preface/mn:introduction]">
+				<!-- the preface Introduction carries clause 1: shift the body
+						clauses by one to the published numbering -->
+				<xsl:variable name="label">
+					<xsl:value-of select="normalize-space(mn:fmt-title//mn:span[@class = 'fmt-caption-delim'][mn:tab][1]/preceding-sibling::node()[not(self::mn:annotation)])"/>
+				</xsl:variable>
+				<xsl:choose>
+					<xsl:when test="string(number($label)) != 'NaN' and number($label) &gt; 0">
+						<xsl:value-of select="number($label) + 1"/>
+					</xsl:when>
+					<xsl:otherwise><xsl:value-of select="$label"/></xsl:otherwise>
+				</xsl:choose>
 			</xsl:when>
 			<xsl:when test="mn:fmt-title">
 				<xsl:variable name="fmt_title_section">
@@ -1650,6 +1796,94 @@
 
 	<!-- keep ' — ' -->
 		<!-- ============================================================ -->
+	<!-- Model course part numbering model                            -->
+	<!-- ============================================================ -->
+	<!-- The published model courses print their "PART n - ..." dividers
+			unnumbered and number the clauses beneath them restarting at 1
+			(Part 1: 1..8; Part 2 modules: 1..5 with module-scoped 1.x
+			sub-clauses). The clause below each part therefore drops the
+			part segment of its number: "2.1" prints "1", "2.1.3.1" prints
+			"1.3.1". Each part also starts its own page. -->
+	<xsl:template match="mn:sections/mn:clause[starts-with(normalize-space(mn:title), 'Part')][$iala_is_model_course]" mode="update_xml_step1" priority="4">
+		<mn:pagebreak from_source_xml="true"/>
+		<mn:clause>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<xsl:apply-templates select="node()[not(self::mn:title)]" mode="update_xml_step1">
+				<xsl:with-param name="iala_part_divider">true</xsl:with-param>
+			</xsl:apply-templates>
+		</mn:clause>
+	</xsl:template>
+
+	<!-- the part divider heading prints unnumbered: the label and the
+			number delimiter are dropped, the title text is kept -->
+	<xsl:template match="mn:fmt-title[mn:span[@class = 'fmt-caption-label']][$iala_is_model_course][count(ancestor::mn:clause[starts-with(normalize-space(mn:title), 'Part')]) = 1]" mode="update_xml_step1" priority="4">
+		<xsl:param name="iala_part_divider"/>
+		<xsl:if test="normalize-space($iala_part_divider) = 'true' and mn:span[@class = 'fmt-caption-delim']">
+			<mn:fmt-title>
+				<xsl:copy-of select="@*"/>
+				<xsl:apply-templates select="mn:span[@class = 'fmt-caption-delim'][1]/following-sibling::node()" mode="update_xml_step1"/>
+			</mn:fmt-title>
+		</xsl:if>
+		<xsl:if test="not(normalize-space($iala_part_divider) = 'true' and mn:span[@class = 'fmt-caption-delim'])">
+			<!-- titles outside the part-divider path keep their label -->
+			<xsl:copy>
+				<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+				<xsl:apply-templates mode="update_xml_step1"/>
+			</xsl:copy>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- descendants of a part divider: drop the first number segment;
+			the number is rewritten from the label text (the autonum semx
+			markers are resolved before this pass, and match-pattern
+			predicates with nested steps do not resolve in this pipeline) -->
+	<xsl:template match="mn:span[@class = 'fmt-caption-label'][$iala_is_model_course]" mode="update_xml_step1" priority="5">
+		<xsl:variable name="under_part" select="count(ancestor::mn:clause[starts-with(normalize-space(mn:title), 'Part')]) = 1"/>
+		<xsl:variable name="own_clause_is_part" select="count(ancestor::mn:clause[starts-with(normalize-space(mn:title), 'Part')]) = count(ancestor::mn:clause)"/>
+		<xsl:choose>
+			<xsl:when test="$under_part and not($own_clause_is_part) and contains(normalize-space(.), '.')">
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+					<xsl:value-of select="substring-after(normalize-space(.), '.')"/>
+				</xsl:copy>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+					<xsl:apply-templates mode="update_xml_step1"/>
+				</xsl:copy>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- same for the cross-reference labels of part descendants -->
+	<xsl:template match="mn:fmt-xref-label[$iala_is_model_course]" mode="update_xml_step1" priority="4">
+		<xsl:variable name="under_part" select="count(ancestor::mn:clause[starts-with(normalize-space(mn:title), 'Part')]) = 1"/>
+		<xsl:variable name="own_clause_is_part" select="count(ancestor::mn:clause[starts-with(normalize-space(mn:title), 'Part')]) = count(ancestor::mn:clause)"/>
+		<xsl:choose>
+			<xsl:when test="$under_part and not($own_clause_is_part) and contains(normalize-space(.), '.')">
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+					<xsl:copy-of select="mn:span[@class = 'fmt-element-name']"/>
+					<xsl:text> </xsl:text>
+					<xsl:variable name="num" select="normalize-space(substring-after(normalize-space(.), normalize-space(mn:span[@class = 'fmt-element-name'])))"/>
+					<xsl:value-of select="substring-after($num, '.')"/>
+				</xsl:copy>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+					<xsl:apply-templates mode="update_xml_step1"/>
+				</xsl:copy>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- the published model-course contents carry no Foreword entry -->
+	<xsl:template match="mn:foreword[$iala_is_model_course]" mode="contents" priority="3"/>
+	<!-- the published guide-family contents list no annex entries -->
+	<xsl:template match="mn:annex[$iala_guide_family]" mode="contents" priority="3"/>
+
 	<!-- Landscape pages for wide tables                              -->
 	<!-- ============================================================ -->
 	<!-- Published IALA documents print wide tables on landscape pages.
@@ -1721,7 +1955,7 @@
 		</xsl:variable>
 		<!-- when the table opens its annex, the annex-level template
 				below has already rotated the page before the title -->
-		<xsl:variable name="skip_leading_break" select="parent::mn:annex and not(preceding-sibling::*[not(self::mn:fmt-title)])"/>
+		<xsl:variable name="skip_leading_break" select="parent::mn:annex and not(preceding-sibling::*[not(self::mn:fmt-title | self::mn:title | self::mn:fmt-xref-label | self::mn:variant-title)])"/>
 		<xsl:if test="normalize-space($wide) = 'true' and not($skip_leading_break)">
 			<mn:pagebreak from_source_xml="true" orientation="landscape"/>
 		</xsl:if>
@@ -1752,22 +1986,32 @@
 	<!-- Annexes that open with a wide table start on the landscape
 			page itself (title and table share it, as published). -->
 	<xsl:template match="mn:annex" mode="update_xml_step1" priority="1">
-		<xsl:variable name="first_tbl" select="mn:table[not(preceding-sibling::*[not(self::mn:fmt-title)])][1]"/>
-		<xsl:if test="$first_tbl">
-			<xsl:variable name="wide">
-				<xsl:call-template name="is_iala_wide_table">
-					<xsl:with-param name="table" select="$first_tbl"/>
-				</xsl:call-template>
-			</xsl:variable>
-			<xsl:if test="normalize-space($wide) = 'true'">
-				<mn:pagebreak from_source_xml="true" orientation="landscape"/>
-			</xsl:if>
-		</xsl:if>
+		<xsl:variable name="first_tbl" select="mn:table[not(preceding-sibling::*[not(self::mn:fmt-title | self::mn:title | self::mn:fmt-xref-label | self::mn:variant-title)])][1]"/>
 		<xsl:copy>
-			<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<xsl:if test="$first_tbl">
+				<xsl:variable name="wide">
+					<xsl:call-template name="is_iala_wide_table">
+						<xsl:with-param name="table" select="$first_tbl"/>
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:if test="normalize-space($wide) = 'true'">
+					<!-- the break rides inside the annex: the annex title shares
+						the first landscape page with the table, as published -->
+					<mn:pagebreak from_source_xml="true" orientation="landscape"/>
+				</xsl:if>
+			</xsl:if>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
 		</xsl:copy>
 	</xsl:template>
 
+
+	<!-- the published guide-family documents caption the named figures
+			only; the auto-numbered figures (Annex C reference images) print
+			no caption -->
+	<xsl:template match="mn:figure/mn:fmt-name[$iala_guide_family and not(mn:semx[@element = 'name' or @element = 'title'])]" mode="update_xml_step1" priority="5">
+		<!-- no caption, as published -->
+	</xsl:template>
 
 	<xsl:template match="mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-delim']" mode="update_xml_step1" priority="4">
 		<padding value="5mm"/>
@@ -2075,6 +2319,12 @@
 		<xsl:if test="$iala_is_standard and not(ancestor::mn:table[@type = 'revision'])">
 			<xsl:attribute name="min-height">12mm</xsl:attribute>
 		</xsl:if>
+		<!-- The published G1195 spreads its landscape Annex A descriptors over
+			five pages at roughly half a page per element row; the generated
+			rows were text-height and packed the table tighter -->
+		<xsl:if test="$iala_guide_family and ancestor::mn:annex and ancestor::mn:table[@landscape = 'true'] and not(ancestor::mn:table[@type = 'revision'])">
+			<xsl:attribute name="min-height">38mm</xsl:attribute>
+		</xsl:if>
 		<!-- The document history table never splits: it moves whole to the
 			next page, leaving the clause heading at the bottom of the previous
 			one (S1060 published layout) -->
@@ -2241,6 +2491,7 @@
 					</fo:block-container>
 				</fo:static-content>
 			</xsl:when>
+
 			<xsl:when test="$iala_is_manual">
 				<!-- Published manual footer: gold rule over the association
 						name and title, then the publication date left and the
@@ -2281,6 +2532,24 @@
 						</fo:block>
 						<fo:block text-align="center">
 							<xsl:text>Page </xsl:text><fo:page-number />
+=======
+			<xsl:when test="$iala_is_information_paper">
+				<!-- the published leaflet footer: "Information Paper – <title> /
+						<date>" left, "Page n" right -->
+				<fo:static-content flow-name="footer" role="artifact">
+					<fo:block-container font-size="9pt" border-top="0.2pt solid black" margin-top="4.5mm">
+						<fo:block text-align-last="justify">
+							<fo:inline font-weight="bold"><xsl:text>Information Paper</xsl:text></fo:inline>
+							<xsl:text> &#8211; </xsl:text>
+							<xsl:value-of select="normalize-space(/mn:metanorma/mn:bibdata/mn:title[@type = 'main' and (@language = 'en' or normalize-space(@language) = '')][1])"/>
+							<fo:leader leader-pattern="space"/>
+							<xsl:call-template name="convertDate">
+								<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on"/>
+							</xsl:call-template>
+						</fo:block>
+						<fo:block text-align="right">
+							<xsl:text>Page </xsl:text><fo:page-number/>
+
 						</fo:block>
 					</fo:block-container>
 				</fo:static-content>
@@ -2290,10 +2559,9 @@
 		<fo:static-content flow-name="footer" role="artifact">
 			<fo:block-container font-size="7.56pt" font-weight="bold" color="{$color_corporate_blue}" border-top="0.2pt solid black" line-height="1.43">
 				<fo:block margin-top="4.5mm">
-					<!-- Legacy-era standards and recommendations open with the
-						"IALA" association prefix; standards join the title with
-						an en dash, recommendations with a space -->
-					<xsl:if test="$iala_era_old and ($iala_is_standard or $iala_is_recommendation)">
+					<!-- Publications dated before 2026 open with the
+						"IALA" association prefix -->
+					<xsl:if test="$iala_iala_prefix">
 						<xsl:text>IALA </xsl:text>
 					</xsl:if>
 					<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
@@ -2311,20 +2579,31 @@
 						<xsl:when test="$iala_is_standard"><xsl:text> – </xsl:text></xsl:when>
 						<xsl:otherwise><xsl:text> </xsl:text></xsl:otherwise>
 					</xsl:choose>
-					<xsl:variable name="title">
-						<xsl:choose>
-							<xsl:when test="$iala_running_title != ''">
-								<item><xsl:value-of select="$iala_running_title"/></item>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:variable>
-					<xsl:for-each select="xalan:nodeset($title)/item">
-						<xsl:text> </xsl:text>
-						<xsl:copy-of select="node()"/>
-					</xsl:for-each>
+					<xsl:choose>
+						<!-- the published model courses join the docidentifier with
+							the course subtitle: "IALA Model Course C2007-1 – Radar
+							Beacons (Racon) Maintenance" -->
+						<xsl:when test="$iala_is_model_course and normalize-space(/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:cover-subtitle | /mn:metanorma/mn:bibdata/mn:title[@type = 'subtitle']) != ''">
+							<xsl:text> &#8211; </xsl:text>
+							<xsl:value-of select="normalize-space(/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:cover-subtitle | /mn:metanorma/mn:bibdata/mn:title[@type = 'subtitle'])"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:variable name="title">
+								<xsl:choose>
+									<xsl:when test="$iala_running_title != ''">
+										<item><xsl:value-of select="$iala_running_title"/></item>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:variable>
+							<xsl:for-each select="xalan:nodeset($title)/item">
+								<xsl:text> </xsl:text>
+								<xsl:copy-of select="node()"/>
+							</xsl:for-each>
+						</xsl:otherwise>
+					</xsl:choose>
 				</fo:block>
 				<fo:block>
 					<xsl:if test="not($iala_is_standard and $iala_era_old)">
