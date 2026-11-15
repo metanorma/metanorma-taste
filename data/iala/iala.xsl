@@ -50,6 +50,48 @@
 	<xsl:variable name="iala_is_report" select="$iala_doctype_alias = 'report'"/>
 	<xsl:variable name="iala_is_manual" select="$iala_doctype_alias = 'manual'"/>
 
+	<!-- ============================================================ -->
+	<!-- RESOLUTIONS + CIRCULAR LETTERS (published-PDF parity)        -->
+	<!-- Resolutions (doctype general-assembly) and circular letters  -->
+	<!-- (doctype letter) carry no standard-style cover: the published -->
+	<!-- PDFs open with a letterhead block that shares page 1 with the -->
+	<!-- body, and carry no Contents page and no Foreword.             -->
+	<!-- ============================================================ -->
+	<!-- The language-tagged ext/doctype carries the full name: resolutions
+	     are "General Assembly Resolution" (base doctype "standard"),
+	     letters are "Circular Letter" / "Letter" (base doctype "letter") -->
+	<xsl:variable name="iala_doctype_full_lc" select="translate(normalize-space(/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) != '']), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+	<xsl:variable name="iala_is_letter" select="contains($iala_doctype_full_lc, 'letter')"/>
+	<xsl:variable name="iala_is_resolution" select="not($iala_is_letter) and (contains($iala_doctype_full_lc, 'assembly') or contains($iala_doctype_full_lc, 'resolution'))"/>
+	<xsl:variable name="iala_is_rescirc" select="$iala_is_letter or $iala_is_resolution"/>
+	<!-- Example: GA01.01 - GA resolutions print the docidentifier in the
+	     slash form GA01/Res.01; A1x assembly resolutions (A12-01) print
+	     "Resolution " + docidentifier verbatim -->
+	<xsl:variable name="iala_docidentifier" select="normalize-space(/mn:metanorma/mn:bibdata/mn:docidentifier[@primary = 'true'])"/>
+	<xsl:variable name="iala_docid_slash">
+		<xsl:choose>
+			<xsl:when test="contains($iala_docidentifier, '.') and starts-with($iala_docidentifier, 'GA')">
+				<xsl:value-of select="concat(substring-before($iala_docidentifier, '.'), '/Res.', substring-after($iala_docidentifier, '.'))"/>
+			</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$iala_docidentifier"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<!-- the GA series ordinal: GA01.01 - "1st General Assembly" (the
+	     ordinal comes from the series part, before the dot) -->
+	<xsl:variable name="iala_ga_series" select="substring-before(concat($iala_docidentifier, '.'), '.')"/>
+	<xsl:variable name="iala_ga_ordinal" select="number(substring-after($iala_ga_series, 'GA'))"/>
+	<xsl:variable name="iala_ga_ordinal_suffix">
+		<xsl:choose>
+			<xsl:when test="$iala_ga_ordinal = 1">st</xsl:when>
+			<xsl:when test="$iala_ga_ordinal = 2">nd</xsl:when>
+			<xsl:when test="$iala_ga_ordinal = 3">rd</xsl:when>
+			<xsl:otherwise>th</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:variable name="iala_docdate" select="normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on)"/>
+	<xsl:variable name="iala_lang" select="normalize-space(/mn:metanorma/mn:bibdata/mn:language[@current = 'true'])"/>
+	<xsl:variable name="iala_title_en" select="normalize-space(/mn:metanorma/mn:bibdata/mn:title[@type = 'main' and (@language = 'en' or normalize-space(@language) = '')])"/>
+
 	<xsl:attribute-set name="root-style">
 		<xsl:attribute name="font-family">Calibri, Cambria Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
 		<xsl:attribute name="font-family-generic">Sans</xsl:attribute>
@@ -176,6 +218,10 @@
 
 	<xsl:template name="cover-page">
 		<xsl:param name="num"/>
+		<!-- resolutions and circular letters carry no cover page: the
+		     letterhead rides the first document page (see the rescirc
+		     header templates below) -->
+		<xsl:if test="not($iala_is_rescirc)">
 		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" initial-page-number="1" color="{$color_corporate_blue}">
 			<!-- Logo -->
 			<fo:static-content flow-name="cover-page-header" id="__internal_layout__coverpage_image_{$num}_{generate-id()}" role="SKIP">
@@ -274,6 +320,7 @@
 				</fo:block-container>
 			</fo:flow>
 		</fo:page-sequence>
+		</xsl:if>
 
 		<xsl:if test="$iala_is_report">
 			<!-- Published IALA reports carry a blank verso after the cover;
@@ -571,9 +618,12 @@
 				<xsl:apply-templates select="xalan:nodeset($synth_revision)/mn:clause" mode="update_xml_step1"/>
 			</xsl:when>
 		</xsl:choose>
-		<xsl:copy>
-			<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
-		</xsl:copy>
+		<!-- resolutions and circular letters carry no Contents page -->
+		<xsl:if test="not($iala_is_rescirc)">
+			<xsl:copy>
+				<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
+			</xsl:copy>
+		</xsl:if>
 	</xsl:template>
 
 	<!-- Reports: the Executive summary moves ahead of the Contents -->
@@ -629,6 +679,53 @@
 				<xsl:apply-templates select="node()" mode="update_xml_step1"/>
 			</xsl:copy>
 		</xsl:if>
+	</xsl:template>
+
+	<!-- Resolutions and circular letters carry no "Foreword" heading in
+	     the published PDFs - and in the GA resolutions the resolution body
+	     itself rides the generated foreword. Keep the content, drop the
+	     heading. -->
+	<!-- Resolutions and circular letters carry no "Foreword" heading in
+	     the published PDFs. In the GA resolutions the resolution body
+	     itself rides the generated foreword: the sections update below
+	     hoists that content into the body flow, so the whole foreword is
+	     dropped here. -->
+	<xsl:template match="mn:preface/mn:foreword | mn:foreword" mode="update_xml_step1" priority="4">
+		<xsl:if test="not($iala_is_rescirc)">
+			<xsl:copy>
+				<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
+			</xsl:copy>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- the published resolutions print no table caption -->
+	<xsl:template match="mn:table/mn:fmt-name" mode="update_xml_step1" priority="5">
+		<xsl:if test="not($iala_is_rescirc)">
+			<xsl:copy>
+				<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
+			</xsl:copy>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- rescirc annexes set the leading the published resolutions print:
+	     the declaration spreads over the page like the reference PDF -->
+	<xsl:template name="refine_p-style">
+		<?extend?>
+		<xsl:if test="$iala_is_rescirc and ancestor::mn:annex">
+			<xsl:attribute name="line-height">150%</xsl:attribute>
+			<xsl:attribute name="space-after">10pt</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- rescirc: hoist the foreword content into sections. These documents
+	     have no bibliography, so a plain copy of the section children plus
+	     the hoisted foreword content matches the base update for them. -->
+	<xsl:template match="mn:sections[$iala_is_rescirc]" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+			<xsl:apply-templates select="/mn:metanorma/mn:preface/mn:foreword/node()[not(self::mn:title or self::mn:fmt-title)] | /mn:metanorma/mn:preface/mn:foreword/mn:title/node() | /mn:metanorma/mn:preface/mn:foreword/mn:fmt-title/node()" mode="update_xml_step1"/>
+		</xsl:copy>
 	</xsl:template>
 
 	<xsl:template match="mn:clause[@type = 'revision']/mn:table[@unnumbered = 'true']" mode="update_xml_step1" priority="3">
@@ -818,6 +915,8 @@
 	
 	<!-- li/fmt-name -->
 	<xsl:template match="mn:ol/mn:li/mn:fmt-name" priority="2" mode="update_xml_step1">
+		<!-- rescirc lists take the computed position label (see mn:ol/mn:li) -->
+		<xsl:if test="not($iala_is_rescirc)">
 		<xsl:variable name="label_" select="normalize-space()"/>
 		<xsl:variable name="label_last_char" select="substring($label_, string-length($label_), 1)"/>
 		<!-- label without . or ) at the end -->
@@ -833,6 +932,7 @@
 		</xsl:variable>
 		<xsl:attribute name="label"><xsl:value-of select="$label"/></xsl:attribute>
 		<xsl:attribute name="full">true</xsl:attribute>
+			</xsl:if>
 	</xsl:template>
 	
 	<!-- ============================================================ -->
@@ -850,6 +950,228 @@
 				<xsl:otherwise>10pt</xsl:otherwise>
 			</xsl:choose>
 		</xsl:attribute>
+	</xsl:template>
+
+	<!-- ============================================================ -->
+	<!-- Top-level lists and tables in clause-less documents          -->
+	<!-- (resolutions, circular letters)                              -->
+	<!-- ============================================================ -->
+	<!-- The base XSL's top-level wildcards (sections_node
+	     match="/*/mn:sections/*", and match="mn:sections/mn:page_sequence/*[not(@top-level)]",
+	     both priority 2) hijack top-level mn:ol / mn:ul / mn:table elements in
+	     documents that carry no clauses (the FO pre-processing wraps each
+	     sections child in a mn:page_sequence). Their children (fo:list-item,
+	     fo:table-header) end up bare inside a fo:block, which FOP rejects
+	     as a fatal validation error and the whole compile dies. Give them
+	     priority-3 templates that render through the proper list / table
+	     templates, wrapped in the same Sect block the wildcard would give. -->
+	<xsl:template match="/*/mn:sections/mn:ol | /*/mn:sections/mn:ul |
+			/*/mn:sections/mn:page_sequence/mn:ol | /*/mn:sections/mn:page_sequence/mn:ul" priority="3">
+		<fo:block role="Sect">
+			<xsl:call-template name="setId"/>
+			<xsl:call-template name="addTagElementT"/>
+			<fo:block role="SKIP">
+				<xsl:apply-templates select="." mode="list"/>
+			</fo:block>
+		</fo:block>
+	</xsl:template>
+
+	<xsl:template match="/*/mn:sections/mn:table |
+			/*/mn:sections/mn:page_sequence/mn:table" priority="3">
+		<!-- no setId here: the rendered fo:table keeps the element's id,
+		     and a duplicate on the wrapper breaks FOP -->
+		<fo:block role="Sect">
+			<xsl:call-template name="addTagElementT"/>
+			<xsl:call-template name="table"/>
+		</fo:block>
+	</xsl:template>
+
+	<!-- ============================================================ -->
+	<!-- Resolutions + circular letters: letterhead on page 1         -->
+	<!-- ============================================================ -->
+	<!-- The published PDFs open the letterhead block at the top of the
+	     FIRST body page and flow the document content right below it on
+	     the same page (no cover page-sequence, no Contents, no Foreword).
+	     The first sections element carries the letterhead ahead of its
+	     normal rendering. -->
+<xsl:template match="/*/mn:sections/mn:page_sequence/*[1][$iala_is_rescirc]" priority="4">
+		<xsl:call-template name="rescirc_letterhead"/>
+		<xsl:choose>
+			<xsl:when test="self::mn:ol or self::mn:ul">
+				<fo:block role="Sect">
+					<xsl:call-template name="setId"/>
+					<xsl:call-template name="addTagElementT"/>
+					<fo:block role="SKIP">
+						<xsl:apply-templates select="." mode="list"/>
+					</fo:block>
+				</fo:block>
+			</xsl:when>
+			<xsl:when test="self::mn:table">
+				<!-- no setId: the fo:table keeps the element's id -->
+				<fo:block role="Sect">
+					<xsl:call-template name="addTagElementT"/>
+					<xsl:call-template name="table"/>
+				</fo:block>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="sections_node"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- date as printed: 08 January 2025 (or January 2025 when the
+	     bibdata date carries no day) -->
+	<xsl:template name="rescirc_date">
+		<xsl:if test="$iala_docdate != ''">
+			<xsl:if test="substring($iala_docdate, 9, 2) != ''">
+				<xsl:value-of select="substring($iala_docdate, 9, 2)"/>
+				<xsl:text> </xsl:text>
+			</xsl:if>
+			<xsl:call-template name="getMonthByNum">
+				<xsl:with-param name="num" select="substring($iala_docdate, 6, 2)"/>
+			</xsl:call-template>
+			<xsl:text> </xsl:text>
+			<xsl:value-of select="substring($iala_docdate, 1, 4)"/>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- language as printed: Original: English -->
+	<xsl:template name="rescirc_lang_name">
+		<xsl:choose>
+			<xsl:when test="$iala_lang = 'en'">English</xsl:when>
+			<xsl:when test="$iala_lang = 'fr'">French</xsl:when>
+			<xsl:when test="$iala_lang = 'es'">Spanish</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="concat(translate(substring($iala_lang, 1, 1), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), substring($iala_lang, 2))"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="rescirc_letterhead">
+		<xsl:choose>
+			<xsl:when test="$iala_is_letter">
+				<!-- Circular letter: centered logo, then the letter number
+				     and the date right-aligned, as printed -->
+				<fo:block text-align="center" margin-top="6mm">
+					<fo:instream-foreign-object content-width="34mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+						<xsl:copy-of select="$IALA-Logo-full"/>
+					</fo:instream-foreign-object>
+				</fo:block>
+				<fo:block text-align="right" margin-top="14mm" margin-right="2mm">
+					<xsl:text>Circular Letter </xsl:text>
+					<xsl:value-of select="$iala_docidentifier"/>
+				</fo:block>
+				<fo:block text-align="right" margin-top="6mm" margin-right="2mm">
+					<xsl:call-template name="rescirc_date"/>
+				</fo:block>
+				<fo:block font-size="0pt" margin-bottom="26mm">&#xa0;</fo:block>
+			</xsl:when>
+			<xsl:when test="starts-with($iala_docidentifier, 'GA')">
+				<!-- GA resolutions: docidentifier top left, language top
+				     right, centered logo, assembly / document block, rule,
+				     centered resolution line and title -->
+				<fo:block-container width="100%" role="SKIP">
+					<fo:block text-align="left" font-weight="bold" font-size="10pt">
+						<xsl:value-of select="$iala_docid_slash"/>
+					</fo:block>
+				</fo:block-container>
+				<fo:block text-align="right" font-size="10pt" margin-top="-4mm" margin-right="2mm">
+					<xsl:value-of select="translate($iala_lang, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
+				</fo:block>
+				<fo:block text-align="center" margin-top="6mm">
+					<fo:instream-foreign-object content-width="26mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+						<xsl:copy-of select="$IALA-Logo-full"/>
+					</fo:instream-foreign-object>
+				</fo:block>
+				<fo:table table-layout="fixed" width="100%" role="SKIP" margin-top="8mm">
+					<fo:table-column column-width="50%"/>
+					<fo:table-column column-width="50%"/>
+					<fo:table-body role="SKIP">
+						<fo:table-row role="SKIP">
+							<fo:table-cell role="SKIP" font-size="10pt" line-height="1.3">
+								<fo:block><xsl:value-of select="$iala_ga_ordinal"/><xsl:value-of select="$iala_ga_ordinal_suffix"/> General Assembly</fo:block>
+								<fo:block>International Organization</fo:block>
+								<fo:block>for Marine Aids to Navigation</fo:block>
+							</fo:table-cell>
+							<fo:table-cell role="SKIP" font-size="10pt" line-height="1.3" text-align="right">
+								<fo:block><xsl:value-of select="$iala_docid_slash"/></fo:block>
+								<fo:block><xsl:call-template name="rescirc_date"/></fo:block>
+								<fo:block>Original: <xsl:call-template name="rescirc_lang_name"/></fo:block>
+							</fo:table-cell>
+						</fo:table-row>
+					</fo:table-body>
+				</fo:table>
+				<!-- the printed rule: a run of underscores in the published PDF -->
+				<fo:block font-size="10pt" margin-top="4mm" margin-right="2mm" role="SKIP">___________________________________________________________________</fo:block>
+				<fo:block text-align="center" font-weight="bold" font-size="11pt" margin-top="9mm">
+					<xsl:text>Resolution </xsl:text>
+					<xsl:value-of select="$iala_docidentifier"/>
+				</fo:block>
+				<fo:block text-align="center" font-weight="bold" font-size="11pt" margin-top="8pt">
+					<xsl:text>Adopted on </xsl:text>
+					<xsl:call-template name="rescirc_date"/>
+				</fo:block>
+				<fo:block text-align="center" font-weight="bold" font-size="11pt" margin-top="8pt" text-transform="uppercase" color="{$color_primary_recommendation}">
+					<xsl:value-of select="$iala_title_en"/>
+				</fo:block>
+				<fo:block font-size="0pt" margin-bottom="7mm">&#xa0;</fo:block>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:choose>
+					<xsl:when test="number(substring(normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on), 1, 4)) &lt; 2016">
+						<!-- Legacy assembly resolutions (A12 era): logo left,
+						     association name block right, resolution and
+						     adoption lines, then the title -->
+						<fo:table table-layout="fixed" width="100%" role="SKIP">
+							<fo:table-column column-width="30%"/>
+							<fo:table-column column-width="70%"/>
+							<fo:table-body role="SKIP">
+								<fo:table-row role="SKIP">
+									<fo:table-cell role="SKIP">
+										<fo:block text-align="left" margin-top="4mm">
+											<fo:instream-foreign-object content-width="30mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+												<xsl:copy-of select="$IALA-Logo-full"/>
+											</fo:instream-foreign-object>
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell role="SKIP" text-align="justify" font-style="italic" font-weight="bold" color="{$color_primary_recommendation}" font-size="10pt">
+										<fo:block>IALA &#8212; AISM <fo:inline font-weight="normal">(International Association of Marine</fo:inline></fo:block>
+										<fo:block><fo:inline font-weight="normal">Aids to Navigation and Lighthouse Authorities</fo:inline></fo:block>
+										<fo:block><fo:inline font-weight="normal">Association Internationale de Signalisation Maritime)</fo:inline></fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+							</fo:table-body>
+						</fo:table>
+						<fo:block text-align="right" font-weight="bold" margin-top="16mm" margin-right="2mm">
+							<xsl:text>IALA General Assembly Resolution </xsl:text>
+							<xsl:value-of select="$iala_docidentifier"/>
+						</fo:block>
+						<fo:block text-align="right" margin-top="6pt" margin-right="2mm">
+							<xsl:text>Adopted on </xsl:text>
+							<xsl:call-template name="rescirc_date"/>
+						</fo:block>
+						<fo:block font-weight="bold" font-size="11pt" text-transform="uppercase" color="{$color_primary_recommendation}" margin-top="16mm">
+							<xsl:value-of select="$iala_title_en"/>
+						</fo:block>
+						<fo:block font-size="0pt" margin-bottom="10mm">&#xa0;</fo:block>
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- A1x assembly resolutions (A13): docidentifier
+						     top right, centered logo, then the body -->
+						<fo:block text-align="right" font-size="10pt" margin-right="2mm">
+							<xsl:text>Resolution </xsl:text>
+							<xsl:value-of select="$iala_docidentifier"/>
+						</fo:block>
+						<fo:block text-align="center" margin-top="6mm">
+							<fo:instream-foreign-object content-width="26mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+								<xsl:copy-of select="$IALA-Logo-full"/>
+							</fo:instream-foreign-object>
+						</fo:block>
+						<fo:block font-size="0pt" margin-bottom="9mm">&#xa0;</fo:block>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="refine_table-header-row-style"><?extend?>
@@ -992,6 +1314,28 @@
 	</xsl:template>
 
 	<xsl:template name="insertFooter">
+		<xsl:choose>
+			<xsl:when test="$iala_is_rescirc and number(substring(normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on), 1, 4)) &lt; 2016">
+				<fo:static-content flow-name="footer" role="artifact">
+					<fo:block-container border-top="0.2pt solid black" font-size="7.56pt" margin-top="4.5mm" line-height="1.43">
+						<fo:block text-align="right">IALA-AISM</fo:block>
+						<fo:block text-align="center">10, rue des Gaudines &#8211; 78100 Saint-Germain-en-Laye &#8211; France</fo:block>
+						<fo:block text-align="center">Tel.: +33 1 34 51 70 01 &#8211; Fax: +33 1 34 51 82 05</fo:block>
+						<fo:block text-align="center">e-mail: contact@iala-aism.org &#8211; web: www.iala-aism.org</fo:block>
+					</fo:block-container>
+				</fo:static-content>
+			</xsl:when>
+			<xsl:when test="$iala_is_rescirc">
+				<!-- the published PDFs carry no footer text for resolutions
+				     and circular letters: the address block is a graphic -->
+				<fo:static-content flow-name="footer" role="artifact">
+					<fo:block-container border-top="0.2pt solid black" font-size="0pt" margin-top="4.5mm" role="SKIP">
+						<fo:block role="SKIP"><fo:wrapper role="artifact">&#xa0;</fo:wrapper></fo:block>
+					</fo:block-container>
+				</fo:static-content>
+			</xsl:when>
+			<xsl:otherwise>
+
 		<fo:static-content flow-name="footer" role="artifact">
 			<fo:block-container font-size="7.56pt" font-weight="bold" color="{$color_corporate_blue}" border-top="0.2pt solid black" line-height="1.43">
 				<fo:block margin-top="4.5mm">
@@ -1016,6 +1360,8 @@
 				</fo:block>
 			</fo:block-container>
 		</fo:static-content>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:variable name="IALA-Logo">
