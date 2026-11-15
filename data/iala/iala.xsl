@@ -1519,9 +1519,11 @@
 	     fo:table-header) end up bare inside a fo:block, which FOP rejects
 	     as a fatal validation error and the whole compile dies. Give them
 	     priority-3 templates that render through the proper list / table
-	     templates, wrapped in the same Sect block the wildcard would give. -->
-	<xsl:template match="/*/mn:sections/mn:ol | /*/mn:sections/mn:ul |
-			/*/mn:sections/mn:page_sequence/mn:ol | /*/mn:sections/mn:page_sequence/mn:ul" priority="3">
+	     templates, wrapped in the same Sect block the wildcard would give.
+	     Gated to the rescirc doctypes: the other families were verified
+	     with the base wildcard rendering. -->
+	<xsl:template match="/*/mn:sections/mn:ol[$iala_is_rescirc] | /*/mn:sections/mn:ul[$iala_is_rescirc] |
+			/*/mn:sections/mn:page_sequence/mn:ol[$iala_is_rescirc] | /*/mn:sections/mn:page_sequence/mn:ul[$iala_is_rescirc]" priority="3">
 		<fo:block role="Sect">
 			<xsl:call-template name="setId"/>
 			<xsl:call-template name="addTagElementT"/>
@@ -1531,8 +1533,8 @@
 		</fo:block>
 	</xsl:template>
 
-	<xsl:template match="/*/mn:sections/mn:table |
-			/*/mn:sections/mn:page_sequence/mn:table" priority="3">
+	<xsl:template match="/*/mn:sections/mn:table[$iala_is_rescirc] |
+			/*/mn:sections/mn:page_sequence/mn:table[$iala_is_rescirc]" priority="3">
 		<!-- no setId here: the rendered fo:table keeps the element's id,
 		     and a duplicate on the wrapper breaks FOP -->
 		<fo:block role="Sect">
