@@ -1,9 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?><xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:mn="https://www.metanorma.org/ns/standoc" xmlns:mnx="https://www.metanorma.org/ns/xslt" xmlns:mathml="http://www.w3.org/1998/Math/MathML" xmlns:xalan="http://xml.apache.org/xalan" xmlns:fox="http://xmlgraphics.apache.org/fop/extensions" xmlns:pdf="http://xmlgraphics.apache.org/fop/extensions/pdf" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:java="http://xml.apache.org/xalan/java" xmlns:barcode="http://barcode4j.krysalis.org/ns" xmlns:redirect="http://xml.apache.org/xalan/redirect" exclude-result-prefixes="java" extension-element-prefixes="redirect" version="1.0">
 
-	<xsl:variable name="marginTop">19</xsl:variable>
-	<xsl:variable name="marginBottom">25.8</xsl:variable>
-	<xsl:variable name="marginLeftRight1">16</xsl:variable>
-	<xsl:variable name="marginLeftRight2">13.2</xsl:variable>
+	<!-- Page margins. The base values serve every doctype; the published
+	     resolutions and circular letters print their own geometry, so the
+	     variables are computed per document class:
+	     - legacy assembly resolutions (A12 era): the body starts at the
+	       19mm flow top on page 1 and at 30.5mm on continuation pages,
+	       with 25mm side margins and the footer block reserved below;
+	     - A1x assembly resolutions (A13): the bilingual page opens near
+	       the sheet top (11.9mm) on 14.6mm side margins;
+	     - circular letters: the letterhead rides page 1 at 19mm and the
+	       body continues at 28.5mm, with the printed footer zone kept
+	       free at the bottom. -->
+	<xsl:variable name="iala_rescirc_legacy" select="$iala_is_rescirc and number(substring(normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on), 1, 4)) &lt; 2016"/>
+	<xsl:variable name="iala_rescirc_a1x" select="$iala_is_resolution and not(starts-with($iala_docidentifier, 'GA')) and not($iala_rescirc_legacy)"/>
+	<xsl:variable name="marginTop">
+		<xsl:choose>
+			<xsl:when test="$iala_rescirc_legacy">30.5</xsl:when>
+			<xsl:when test="$iala_rescirc_a1x">11.9</xsl:when>
+			<xsl:when test="$iala_is_letter">28.5</xsl:when>
+			<xsl:otherwise>19</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<!-- the flow top of page 1: circular letters open with the letterhead
+	     block riding a tall first-page header zone; the A1x bilingual
+	     resolutions open the whole page near the sheet top -->
+	<xsl:variable name="marginTopFirst">
+		<xsl:choose>
+			<xsl:when test="$iala_is_letter">46</xsl:when>
+			<xsl:when test="$iala_rescirc_a1x">11.9</xsl:when>
+			<xsl:otherwise>19</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:variable name="marginBottom">
+		<xsl:choose>
+			<xsl:when test="$iala_rescirc_legacy">34.4</xsl:when>
+			<xsl:when test="$iala_rescirc_a1x">27.5</xsl:when>
+			<xsl:when test="$iala_is_letter">31.75</xsl:when>
+			<xsl:otherwise>25.8</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:variable name="marginLeftRight1">
+		<xsl:choose>
+			<xsl:when test="$iala_rescirc_legacy">25</xsl:when>
+			<xsl:when test="$iala_rescirc_a1x">14.6</xsl:when>
+			<xsl:otherwise>16</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:variable name="marginLeftRight2">
+		<xsl:choose>
+			<xsl:when test="$iala_rescirc_legacy">25</xsl:when>
+			<xsl:when test="$iala_rescirc_a1x">14.6</xsl:when>
+			<xsl:otherwise>13.2</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
 
 	<!-- CORPORATE COLOURS -->
 	<xsl:variable name="color_corporate_blue">rgb(0, 85, 140)</xsl:variable>
@@ -64,6 +113,14 @@
 	<xsl:variable name="iala_is_letter" select="contains($iala_doctype_full_lc, 'letter')"/>
 	<xsl:variable name="iala_is_resolution" select="not($iala_is_letter) and (contains($iala_doctype_full_lc, 'assembly') or contains($iala_doctype_full_lc, 'resolution'))"/>
 	<xsl:variable name="iala_is_rescirc" select="$iala_is_letter or $iala_is_resolution"/>
+	<!-- the first-page header region carries the printed letterhead logo on
+	     circular letters; every other document keeps the running header -->
+	<xsl:variable name="iala_first_header_region">
+		<xsl:choose>
+			<xsl:when test="$iala_is_letter">header-first</xsl:when>
+			<xsl:otherwise>header</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
 	<!-- Example: GA01.01 - GA resolutions print the docidentifier in the
 	     slash form GA01/Res.01; A1x assembly resolutions (A12-01) print
 	     "Resolution " + docidentifier verbatim -->
@@ -247,15 +304,31 @@
 			
 			<fo:simple-page-master master-name="page-landscape" page-width="{$pageHeight}mm" page-height="{$pageWidth}mm">
 				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
-				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
+				<fo:region-before region-name="header" extent="{$marginTop}mm"/>
 				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
 				<fo:region-start region-name="left-region" extent="{$marginLeftRight1}mm"/>
 				<fo:region-end region-name="right-region" extent="{$marginLeftRight2}mm"/>
 			</fo:simple-page-master>
-			
+
+			<!-- first body page of the resolutions and circular letters: the
+			     letterhead zone differs from the continuation pages (circular
+			     letters ride the printed letterhead logo in a tall header
+			     region, named header-first so the running header stays off
+			     page 1) -->
+			<fo:simple-page-master master-name="page-first" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTopFirst}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="{$iala_first_header_region}" extent="{$marginTopFirst}mm"/>
+				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
+				<fo:region-start region-name="left-region" extent="{$marginLeftRight1}mm"/>
+				<fo:region-end region-name="right-region" extent="{$marginLeftRight2}mm"/>
+			</fo:simple-page-master>
+
 			<!-- Preface pages -->
 			<fo:page-sequence-master master-name="preface">
 				<fo:repeatable-page-master-alternatives>
+					<xsl:if test="$iala_is_rescirc">
+						<fo:conditional-page-master-reference page-position="first" master-reference="page-first"/>
+					</xsl:if>
 					<fo:conditional-page-master-reference odd-or-even="even" master-reference="page"/>
 					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="page"/>
 				</fo:repeatable-page-master-alternatives>
@@ -269,12 +342,18 @@
 			<!-- Document pages -->
 			<fo:page-sequence-master master-name="document">
 				<fo:repeatable-page-master-alternatives>
+					<xsl:if test="$iala_is_rescirc">
+						<fo:conditional-page-master-reference page-position="first" master-reference="page-first"/>
+					</xsl:if>
 					<fo:conditional-page-master-reference odd-or-even="even" master-reference="page"/>
 					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="page"/>
 				</fo:repeatable-page-master-alternatives>
 			</fo:page-sequence-master>
 			<fo:page-sequence-master master-name="document-portrait">
 				<fo:repeatable-page-master-alternatives>
+					<xsl:if test="$iala_is_rescirc">
+						<fo:conditional-page-master-reference page-position="first" master-reference="page-first"/>
+					</xsl:if>
 					<fo:conditional-page-master-reference odd-or-even="even" master-reference="page"/>
 					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="page"/>
 				</fo:repeatable-page-master-alternatives>
@@ -583,16 +662,8 @@
 		</xsl:if>
 	</xsl:template>
 
-	<!-- Published recital lists run a slightly wider item gap (the base
-			list-item style is tighter); table cells keep the base zero. -->
-	<xsl:template name="refine_list-item-style">
-		<xsl:if test="ancestor::mn:table">
-			<xsl:attribute name="margin-bottom">0pt</xsl:attribute>
-		</xsl:if>
-		<xsl:if test="ancestor::mn:clause[mn:fmt-title[normalize-space(.) = 'The Council']][$iala_is_recommendation]">
-			<xsl:attribute name="margin-bottom">5pt</xsl:attribute>
-		</xsl:if>
-	</xsl:template>
+	<!-- (the list-item refinement lives with the rescirc list geometry
+			below; it merges the published recital gap of the recommendations) -->
 
 	<xsl:attribute-set name="page-sequence-preface"><?extend?>
 		<xsl:attribute name="format">1</xsl:attribute>
@@ -1280,6 +1351,37 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<!-- the published resolutions and circular letters print no figure
+	     caption either: the Secretary-General signature graphic rides the
+	     letter bare, without the generated "Figure N" line -->
+	<xsl:template match="mn:figure/mn:fmt-name" mode="update_xml_step1" priority="5">
+		<xsl:choose>
+			<xsl:when test="$iala_is_rescirc"><!-- no caption, as published --></xsl:when>
+			<xsl:otherwise>
+				<xsl:copy>
+					<xsl:copy-of select="@*"/>
+					<xsl:apply-templates mode="update_xml_step1"/>
+				</xsl:copy>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- the letter signature block prints flush left, not centred -->
+	<xsl:template name="refine_image-style">
+		<xsl:if test="$iala_is_letter and parent::mn:figure">
+			<xsl:attribute name="text-align">left</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+
+	<xsl:template name="refine_figure-block-style">
+		<xsl:if test="$iala_is_letter">
+			<xsl:attribute name="margin-bottom">0pt</xsl:attribute>
+			<xsl:attribute name="margin-top">0pt</xsl:attribute>
+			<!-- the signature graphic rides the closing block on the last page -->
+			<xsl:attribute name="keep-with-previous">always</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+
 	<!-- rescirc annexes set the leading the published resolutions print:
 	     the declaration spreads over the page like the reference PDF.
 	     The base paragraph refinement is preserved for every other
@@ -1336,6 +1438,90 @@
 
 		<xsl:if test=".//mn:fn">
 			<xsl:attribute name="line-height-shift-adjustment">disregard-shifts</xsl:attribute>
+		</xsl:if>
+
+		<!-- Resolutions and circular letters carry the printed paragraph
+		     rhythm. Set after the base rules so the printed gaps survive
+		     the generic pre-list tightening. -->
+		<!-- legacy assembly resolutions (A12 era): the recital flow prints
+		     at 122% leading with a full blank line between paragraphs; the
+		     operative list items print looser, set solid inside the item -->
+		<xsl:if test="$iala_rescirc_legacy">
+			<xsl:choose>
+				<xsl:when test="ancestor::mn:li">
+					<xsl:attribute name="line-height">155%</xsl:attribute>
+					<xsl:attribute name="space-after">0pt</xsl:attribute>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:attribute name="line-height">122%</xsl:attribute>
+					<xsl:attribute name="space-after">13.4pt</xsl:attribute>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:if>
+		<!-- circular letters: the correspondence flow prints at 140% leading;
+		     the bullet lists print set solid at 128%; the correspondence head
+		     carries the printed extra spacing after the Subject line, after
+		     the To line, and after the salutation (the base rules keep the
+		     body paragraph gap) -->
+		<xsl:if test="$iala_is_letter">
+			<xsl:choose>
+				<xsl:when test="ancestor::mn:li">
+					<xsl:attribute name="line-height">128%</xsl:attribute>
+					<xsl:attribute name="space-after">0pt</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="not(ancestor::mn:td)">
+					<xsl:attribute name="line-height">140%</xsl:attribute>
+					<xsl:variable name="letter_p" select="normalize-space()"/>
+					<!-- the correspondence body prints the paragraph gap a shade
+					     looser than the base default (pre-list paragraphs keep
+					     the base tightening) -->
+					<xsl:if test="not(following-sibling::*[1][self::mn:ol or self::mn:ul or self::mn:note or self::mn:termnote or self::mn:example or self::mn:dl])">
+						<xsl:attribute name="space-after">7.5pt</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="starts-with($letter_p, 'Subject:')">
+						<xsl:attribute name="space-after">11.5pt</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="starts-with($letter_p, 'To:')">
+						<xsl:attribute name="space-after">24.9pt</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="starts-with($letter_p, 'Dear ')">
+						<xsl:attribute name="space-after">10.6pt</xsl:attribute>
+					</xsl:if>
+					<!-- the printed page break falls inside the final membership
+					     list, with the closing paragraph and the signature block
+					     opening the last page: keep the letter tail bound so the
+					     printed break reproduces wherever the list splits -->
+					<xsl:if test="following-sibling::*[1][self::mn:figure]">
+						<xsl:attribute name="keep-with-previous">always</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="following-sibling::mn:p[1][starts-with(normalize-space(), 'Yours sincerely')]">
+						<xsl:attribute name="keep-with-previous">always</xsl:attribute>
+					</xsl:if>
+					<xsl:if test="preceding-sibling::mn:figure">
+						<xsl:attribute name="keep-with-previous">always</xsl:attribute>
+					</xsl:if>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:if>
+		<!-- A1x bilingual resolutions (A13): the table text prints at 120%
+		     leading; the constitution-title cell drops its second line to
+		     the printed 12pt, and the resolution body cells keep the
+		     printed paragraph gap -->
+		<xsl:if test="$iala_rescirc_a1x and ancestor::mn:td">
+			<xsl:attribute name="line-height">120%</xsl:attribute>
+			<xsl:variable name="a13_row" select="count(ancestor::mn:td[1]/parent::mn:tr[1]/preceding-sibling::mn:tr) + 1 + count(ancestor::mn:tbody[1]/preceding-sibling::mn:thead[1]/mn:tr)"/>
+			<xsl:choose>
+				<xsl:when test="$a13_row = 3 and count(preceding-sibling::mn:p) = 1">
+					<xsl:attribute name="font-size">12pt</xsl:attribute>
+					<xsl:attribute name="space-after">0pt</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="$a13_row = 5">
+					<xsl:attribute name="space-after">6pt</xsl:attribute>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:attribute name="space-after">0pt</xsl:attribute>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 
 		<xsl:copy-of select="@id"/>
@@ -1795,6 +1981,23 @@
 	<!-- Top-level lists and tables in clause-less documents          -->
 	<!-- (resolutions, circular letters)                              -->
 	<!-- ============================================================ -->
+	<!-- The base wildcards also hijack top-level mn:p elements: the
+	     clause-less paragraphs render through sections_node without any
+	     paragraph styling (no p-style attributes, no refine_p-style). The
+	     legacy and A1x assembly resolutions print their recitals with the
+	     published leading and paragraph gap, so route those paragraphs
+	     through the real paragraph template inside the same Sect wrapper. -->
+	<xsl:template match="/*/mn:sections/mn:p[$iala_rescirc_legacy or $iala_rescirc_a1x] |
+			mn:sections/mn:page_sequence/mn:p[$iala_rescirc_legacy or $iala_rescirc_a1x]" priority="3">
+		<fo:block role="Sect">
+			<xsl:call-template name="addTagElementT"/>
+			<xsl:call-template name="paragraph"/>
+		</fo:block>
+	</xsl:template>
+
+	<!-- ============================================================ -->
+	<!-- Top-level lists and tables in clause-less documents (lists)  -->
+	<!-- ============================================================ -->
 	<!-- The base XSL's top-level wildcards (sections_node
 	     match="/*/mn:sections/*", and match="mn:sections/mn:page_sequence/*[not(@top-level)]",
 	     both priority 2) hijack top-level mn:ol / mn:ul / mn:table elements in
@@ -1891,21 +2094,18 @@
 	<xsl:template name="rescirc_letterhead">
 		<xsl:choose>
 			<xsl:when test="$iala_is_letter">
-				<!-- Circular letter: centered logo, then the letter number
-				     and the date right-aligned, as printed -->
-				<fo:block text-align="center" margin-top="6mm">
-					<fo:instream-foreign-object content-width="34mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
-						<xsl:copy-of select="$IALA-Logo-full"/>
-					</fo:instream-foreign-object>
-				</fo:block>
-				<fo:block text-align="right" margin-top="14mm" margin-right="2mm">
+				<!-- Circular letter: the letterhead logo rides the page-first
+				     header region (see insertHeader); the flow opens with the
+				     letter number (bold, right-aligned) and the date, as
+				     printed -->
+				<fo:block text-align="right" font-weight="bold" margin-top="14mm" margin-right="2mm">
 					<xsl:text>Circular Letter </xsl:text>
 					<xsl:value-of select="$iala_docidentifier"/>
 				</fo:block>
-				<fo:block text-align="right" margin-top="6mm" margin-right="2mm">
+				<fo:block text-align="right" margin-top="3.5mm" margin-right="2mm">
 					<xsl:call-template name="rescirc_date"/>
 				</fo:block>
-				<fo:block font-size="0pt" margin-bottom="26mm">&#xa0;</fo:block>
+				<fo:block font-size="0pt" margin-bottom="9.5mm">&#xa0;</fo:block>
 			</xsl:when>
 			<xsl:when test="starts-with($iala_docidentifier, 'GA')">
 				<!-- GA resolutions: docidentifier top left, language top
@@ -1962,7 +2162,10 @@
 					<xsl:when test="number(substring(normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on), 1, 4)) &lt; 2016">
 						<!-- Legacy assembly resolutions (A12 era): logo left,
 						     association name block right, resolution and
-						     adoption lines, then the title -->
+						     adoption lines, then the title. FOP collapses a
+						     leading table margin, so the printed offset rides
+						     a spacer block -->
+						<fo:block font-size="0pt" margin-bottom="4mm">&#xa0;</fo:block>
 						<fo:table table-layout="fixed" width="100%" role="SKIP">
 							<fo:table-column column-width="30%"/>
 							<fo:table-column column-width="70%"/>
@@ -1983,32 +2186,34 @@
 								</fo:table-row>
 							</fo:table-body>
 						</fo:table>
-						<fo:block text-align="right" font-weight="bold" margin-top="16mm" margin-right="2mm">
+						<fo:block text-align="right" font-weight="bold" margin-top="8.5mm" margin-right="2mm">
 							<xsl:text>IALA General Assembly Resolution </xsl:text>
-							<xsl:value-of select="$iala_docidentifier"/>
+							<!-- the A12-era print sets the session-less resolution
+							     index: A12-01 prints as A.01 -->
+							<xsl:value-of select="concat(substring($iala_docidentifier, 1, 1), '.', substring-after($iala_docidentifier, '-'))"/>
 						</fo:block>
 						<fo:block text-align="right" margin-top="6pt" margin-right="2mm">
 							<xsl:text>Adopted on </xsl:text>
 							<xsl:call-template name="rescirc_date"/>
 						</fo:block>
-						<fo:block font-weight="bold" font-size="11pt" text-transform="uppercase" color="{$color_primary_recommendation}" margin-top="16mm">
+						<fo:block font-weight="bold" font-size="12pt" text-transform="uppercase" color="black" margin-top="15mm">
 							<xsl:value-of select="$iala_title_en"/>
 						</fo:block>
-						<fo:block font-size="0pt" margin-bottom="10mm">&#xa0;</fo:block>
+						<fo:block font-size="0pt" margin-bottom="4mm">&#xa0;</fo:block>
 					</xsl:when>
 					<xsl:otherwise>
 						<!-- A1x assembly resolutions (A13): docidentifier
 						     top right, centered logo, then the body -->
-						<fo:block text-align="right" font-size="10pt" margin-right="2mm">
+						<fo:block text-align="right" font-size="11pt" margin-right="2mm">
 							<xsl:text>Resolution </xsl:text>
 							<xsl:value-of select="$iala_docidentifier"/>
 						</fo:block>
-						<fo:block text-align="center" margin-top="6mm">
-							<fo:instream-foreign-object content-width="26mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+						<fo:block text-align="center" margin-top="1mm">
+							<fo:instream-foreign-object content-width="45mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
 								<xsl:copy-of select="$IALA-Logo-full"/>
 							</fo:instream-foreign-object>
 						</fo:block>
-						<fo:block font-size="0pt" margin-bottom="9mm">&#xa0;</fo:block>
+						<fo:block font-size="0pt" margin-bottom="1mm">&#xa0;</fo:block>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:otherwise>
@@ -2025,6 +2230,17 @@
 		<xsl:if test="ancestor::mn:table[@landscape = 'true'] and $iala_compact_landscape">
 			<xsl:attribute name="padding-left">2mm</xsl:attribute>
 			<xsl:attribute name="padding-right">2mm</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$iala_rescirc_a1x">
+			<xsl:attribute name="padding-left">0mm</xsl:attribute>
+			<xsl:attribute name="padding-right">0mm</xsl:attribute>
+			<xsl:attribute name="padding-top">3mm</xsl:attribute>
+			<xsl:attribute name="padding-bottom">3mm</xsl:attribute>
+			<xsl:attribute name="font-size">16pt</xsl:attribute>
+			<!-- the printed French column wraps the resolution header after
+					"de": under the substituted Carlito metrics the wrap
+					reproduces with a small size lift on the French cell -->
+
 		</xsl:if>
 	</xsl:template>
 	
@@ -2062,6 +2278,44 @@
 			<xsl:attribute name="padding-top">3.2mm</xsl:attribute>
 			<xsl:attribute name="padding-bottom">3.2mm</xsl:attribute>
 		</xsl:if>
+		<xsl:if test="$iala_rescirc_a1x">
+			<xsl:attribute name="padding-left">0mm</xsl:attribute>
+			<xsl:attribute name="padding-right">0mm</xsl:attribute>
+			<xsl:attribute name="padding-top">2.2mm</xsl:attribute>
+			<xsl:attribute name="padding-bottom">2.2mm</xsl:attribute>
+			<xsl:attribute name="border">none</xsl:attribute>
+			<xsl:variable name="a13_row" select="count(parent::mn:tr/preceding-sibling::mn:tr) + 1 + count(ancestor::mn:tbody[1]/preceding-sibling::mn:thead[1]/mn:tr)"/>
+			<xsl:attribute name="font-size">
+				<xsl:choose>
+					<xsl:when test="$a13_row = 1">16pt</xsl:when>
+					<xsl:when test="$a13_row = 2 or $a13_row = 3">14pt</xsl:when>
+					<xsl:otherwise>11pt</xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+		</xsl:if>
+		<!-- the letter membership tables print compact: tight rows on a
+			trimmed table width -->
+		<xsl:if test="$iala_is_letter">
+			<xsl:attribute name="padding-top">0.2mm</xsl:attribute>
+			<xsl:attribute name="padding-bottom">0.2mm</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- Published table refinements: border arrays from the markup, plus
+			the rescirc table widths -->
+	<xsl:template name="refine_table-style">
+		<xsl:param name="margin-side"/>
+		<xsl:call-template name="setBordersTableArray"/>
+		<xsl:call-template name="setNoBordersForTableList"/>
+		<!-- the letter membership tables print trimmed, not full measure -->
+		<xsl:if test="$iala_is_letter">
+			<xsl:attribute name="width">66%</xsl:attribute>
+		</xsl:if>
+		<!-- the A1x bilingual resolutions print the facing columns without
+			the grid -->
+		<xsl:if test="$iala_rescirc_a1x">
+			<xsl:attribute name="border">none</xsl:attribute>
+		</xsl:if>
 	</xsl:template>
 
 	<!-- Column widths: the base derives proportional widths from the
@@ -2073,6 +2327,18 @@
 		<xsl:variable name="is_landscape_table" select="boolean(self::mn:table[@landscape = 'true'] or ancestor-or-self::mn:table[@landscape = 'true'])"/>
 		<xsl:for-each select="xalan:nodeset($colwidths)//column">
 			<xsl:choose>
+				<!-- the letter membership tables print the label column at
+						double weight over three equal rate columns -->
+				<xsl:when test="$iala_is_letter">
+					<xsl:choose>
+						<xsl:when test="position() = 1">
+							<fo:table-column column-width="proportional-column-width(2.4)"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<fo:table-column column-width="proportional-column-width(1)"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
 				<!-- on the reports/manuals landscape tables the precomputed
 						portrait proportions starve the leading column; equal
 						shares reproduce the published layout -->
@@ -2115,7 +2381,64 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>
+			<!-- the printed letter bullets sit on the text line: the 120%
+			     bullet keeps its size but stops inflating the line pitch -->
+			<xsl:if test="$iala_is_letter">
+				<xsl:attribute name="line-height">100%</xsl:attribute>
+			</xsl:if>
 		</xsl:if>
+	</xsl:template>
+
+	<!-- published resolutions and circular letters print the operative
+	     lists with the period label ("1."), taken verbatim from the item
+	     position (the base would append the parenthesis form) -->
+	<xsl:template name="refine_list-style">
+		<xsl:if test="$iala_rescirc_legacy and self::mn:ol">
+			<xsl:attribute name="margin-left">6.35mm</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- Published recital lists run a slightly wider item gap (the base
+			list-item style is tighter); table cells keep the base zero. The
+			resolutions and letters carry their own item rhythm (the legacy
+			operative list keeps a full blank line between items; the letter
+			bullet lists print set solid), and the final membership list of a
+			letter keeps its last two items bound so the printed page break
+			inside the list reproduces. -->
+	<xsl:template name="refine_list-item-style">
+		<xsl:if test="ancestor::mn:table">
+			<xsl:attribute name="margin-bottom">0pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="ancestor::mn:clause[mn:fmt-title[normalize-space(.) = 'The Council']][$iala_is_recommendation]">
+			<xsl:attribute name="margin-bottom">5pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$iala_rescirc_legacy and parent::mn:ol">
+			<xsl:attribute name="margin-bottom">12pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$iala_is_letter and parent::mn:ul">
+			<xsl:attribute name="margin-bottom">0pt</xsl:attribute>
+			<!-- the printed page break falls inside the closing membership
+					list: bind its last two items so the list splits after its
+					first item, as printed -->
+			<xsl:if test="count(following-sibling::mn:li) &lt;= 1">
+				<xsl:attribute name="keep-with-previous">always</xsl:attribute>
+			</xsl:if>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- rescirc operative items carry the computed period label on the li,
+	     printed verbatim by the base getListItemFormat via @full -->
+	<xsl:template match="mn:ol/mn:li" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:copy-of select="@*[not(name() = 'label' or name() = 'full')]"/>
+			<xsl:if test="$iala_is_rescirc">
+				<xsl:attribute name="label">
+					<xsl:value-of select="concat(string(count(preceding-sibling::mn:li) + 1), '.')"/>
+				</xsl:attribute>
+				<xsl:attribute name="full">true</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+		</xsl:copy>
 	</xsl:template>
 
 	<xsl:attribute-set name="quote-container-style">
@@ -2161,22 +2484,56 @@
 	</xsl:template>
 
 	<xsl:template name="insertHeader">
-		<fo:static-content flow-name="header" role="artifact">
-			<fo:block text-align="right" margin-top="7.5mm" margin-right="-4.5mm" font-size="0pt">
-				<xsl:if test="xalan:nodeset($IALA-Logo)/*">
-					<fo:instream-foreign-object content-width="7.25mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
-						<xsl:copy-of select="$IALA-Logo"/>
-					</fo:instream-foreign-object>
-				</xsl:if>
-			</fo:block>
-		</fo:static-content>
+		<xsl:choose>
+			<xsl:when test="$iala_is_letter">
+				<!-- Circular letters: page 1 rides the printed letterhead logo
+				     (big, centred, high on the sheet) in the header-first
+				     region of the page-first master; the continuation pages
+				     keep the small right-hand logo of the published template -->
+				<fo:static-content flow-name="header-first" role="artifact">
+					<fo:block text-align="center" margin-top="5mm" font-size="0pt">
+						<fo:instream-foreign-object content-width="41mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+							<xsl:copy-of select="$IALA-Logo-full"/>
+						</fo:instream-foreign-object>
+					</fo:block>
+				</fo:static-content>
+				<fo:static-content flow-name="header" role="artifact">
+					<fo:block text-align="right" margin-top="5mm" margin-right="-4.5mm" font-size="0pt">
+						<fo:instream-foreign-object content-width="20mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+							<xsl:copy-of select="$IALA-Logo-full"/>
+						</fo:instream-foreign-object>
+					</fo:block>
+				</fo:static-content>
+			</xsl:when>
+			<xsl:when test="$iala_is_rescirc">
+				<!-- the published resolutions carry no running header: the
+				     letterhead logo rides the first body page in the flow -->
+				<fo:static-content flow-name="header" role="artifact">
+					<fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#xa0;</fo:wrapper></fo:block>
+				</fo:static-content>
+			</xsl:when>
+			<xsl:otherwise>
+				<fo:static-content flow-name="header" role="artifact">
+					<fo:block text-align="right" margin-top="7.5mm" margin-right="-4.5mm" font-size="0pt">
+						<xsl:if test="xalan:nodeset($IALA-Logo)/*">
+							<fo:instream-foreign-object content-width="7.25mm" fox:alt-text="Image Logo IALA" fox:placement="Block">
+								<xsl:copy-of select="$IALA-Logo"/>
+							</fo:instream-foreign-object>
+						</xsl:if>
+					</fo:block>
+				</fo:static-content>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="insertFooter">
 		<xsl:choose>
 			<xsl:when test="$iala_is_rescirc and number(substring(normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on), 1, 4)) &lt; 2016">
 				<fo:static-content flow-name="footer" role="artifact">
-					<fo:block-container border-top="0.2pt solid black" font-size="7.56pt" margin-top="4.5mm" line-height="1.43">
+					<!-- the legacy (A12-era) print sets the association address
+					     block in 10pt Century Gothic: right-aligned first line,
+					     centred address lines, no rule above -->
+					<fo:block-container font-size="10pt" margin-top="4.5mm" line-height="1.25">
 						<fo:block text-align="right">IALA-AISM</fo:block>
 						<fo:block text-align="center">10, rue des Gaudines &#8211; 78100 Saint-Germain-en-Laye &#8211; France</fo:block>
 						<fo:block text-align="center">Tel.: +33 1 34 51 70 01 &#8211; Fax: +33 1 34 51 82 05</fo:block>
