@@ -43,6 +43,48 @@
 
 	<xsl:variable name="color_toc_title">rgb(0, 159, 227)</xsl:variable>
 
+	<!-- ============================================================ -->
+	<!-- RESOLUTIONS + CIRCULAR LETTERS (published-PDF parity)        -->
+	<!-- Resolutions (doctype general-assembly) and circular letters  -->
+	<!-- (doctype letter) carry no standard-style cover: the published -->
+	<!-- PDFs open with a letterhead block that shares page 1 with the -->
+	<!-- body, and carry no Contents page and no Foreword.             -->
+	<!-- ============================================================ -->
+	<!-- The language-tagged ext/doctype carries the full name: resolutions
+	     are "General Assembly Resolution" (base doctype "standard"),
+	     letters are "Circular Letter" / "Letter" (base doctype "letter") -->
+	<xsl:variable name="iala_doctype_full_lc" select="translate($iala_doctype_full, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+	<xsl:variable name="iala_is_letter" select="contains($iala_doctype_full_lc, 'letter')"/>
+	<xsl:variable name="iala_is_resolution" select="not($iala_is_letter) and (contains($iala_doctype_full_lc, 'assembly') or contains($iala_doctype_full_lc, 'resolution'))"/>
+	<xsl:variable name="iala_is_rescirc" select="$iala_is_letter or $iala_is_resolution"/>
+	<!-- Example: GA01.01 - GA resolutions print the docidentifier in the
+	     slash form GA01/Res.01; A1x assembly resolutions (A12-01) print
+	     "Resolution " + docidentifier verbatim -->
+	<xsl:variable name="iala_docidentifier" select="normalize-space(/mn:metanorma/mn:bibdata/mn:docidentifier[@primary = 'true'])"/>
+	<xsl:variable name="iala_docid_slash">
+		<xsl:choose>
+			<xsl:when test="contains($iala_docidentifier, '.') and starts-with($iala_docidentifier, 'GA')">
+				<xsl:value-of select="concat(substring-before($iala_docidentifier, '.'), '/Res.', substring-after($iala_docidentifier, '.'))"/>
+			</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$iala_docidentifier"/></xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<!-- the GA series ordinal: GA01.01 - "1st General Assembly" (the
+	     ordinal comes from the series part, before the dot) -->
+	<xsl:variable name="iala_ga_series" select="substring-before(concat($iala_docidentifier, '.'), '.')"/>
+	<xsl:variable name="iala_ga_ordinal" select="number(substring-after($iala_ga_series, 'GA'))"/>
+	<xsl:variable name="iala_ga_ordinal_suffix">
+		<xsl:choose>
+			<xsl:when test="$iala_ga_ordinal = 1">st</xsl:when>
+			<xsl:when test="$iala_ga_ordinal = 2">nd</xsl:when>
+			<xsl:when test="$iala_ga_ordinal = 3">rd</xsl:when>
+			<xsl:otherwise>th</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:variable name="iala_docdate" select="normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on)"/>
+	<xsl:variable name="iala_lang" select="normalize-space(/mn:metanorma/mn:bibdata/mn:language[@current = 'true'])"/>
+	<xsl:variable name="iala_title_en" select="normalize-space(/mn:metanorma/mn:bibdata/mn:title[@type = 'main' and (@language = 'en' or normalize-space(@language) = '')])"/>
+
 	<xsl:attribute-set name="root-style">
 		<xsl:attribute name="font-family">Calibri, Cambria Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
 		<xsl:attribute name="font-family-generic">Sans</xsl:attribute>
@@ -169,6 +211,10 @@
 
 	<xsl:template name="cover-page">
 		<xsl:param name="num"/>
+		<!-- resolutions and circular letters carry no cover page: the
+		     letterhead rides the first document page (see the rescirc
+		     header templates below) -->
+		<xsl:if test="not($iala_is_rescirc)">
 		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" initial-page-number="1" color="{$color_corporate_blue}">
 			<!-- Logo -->
 			<fo:static-content flow-name="cover-page-header" id="__internal_layout__coverpage_image_{$num}_{generate-id()}" role="SKIP">
@@ -267,6 +313,7 @@
 				</fo:block-container>
 			</fo:flow>
 		</fo:page-sequence>
+		</xsl:if>
 	</xsl:template> <!-- END cover-page -->
 
 	<xsl:template name="inner-cover-page">
@@ -539,11 +586,23 @@
 	<xsl:template match="mn:preface/mn:clause[@type = 'revision']" mode="update_xml_step1" priority="4">
 		<xsl:param name="process">false</xsl:param>
 		<xsl:if test="$process = 'true'">
+		<xsl:if test="not($iala_is_rescirc)">
 			<xsl:copy>
 				<xsl:apply-templates select="@*" mode="update_xml_step1"/>
 				<xsl:attribute name="displayorder">-1</xsl:attribute>
 				
 				<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+			</xsl:copy>
+		</xsl:if>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- Resolutions and circular letters carry no Foreword in the published
+	     PDFs: remove the generated boilerplate foreword from the tree -->
+	<xsl:template match="mn:preface/mn:foreword | mn:foreword" mode="update_xml_step1" priority="4">
+		<xsl:if test="not($iala_is_rescirc)">
+			<xsl:copy>
+				<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
 			</xsl:copy>
 		</xsl:if>
 	</xsl:template>
@@ -659,6 +718,86 @@
 	</xsl:template> -->
 	<xsl:template name="refine_table-container-style"><?extend?>
 		<xsl:attribute name="font-size">10pt</xsl:attribute>
+	</xsl:template>
+
+	<!-- ============================================================ -->
+	<!-- Top-level lists and tables in clause-less documents          -->
+	<!-- (resolutions, circular letters)                              -->
+	<!-- ============================================================ -->
+	<!-- The base XSL's top-level wildcards (sections_node
+	     match="/*/mn:sections/*", and match="mn:sections/mn:page_sequence/*[not(@top-level)]",
+	     both priority 2) hijack top-level mn:ol / mn:ul / mn:table elements in
+	     documents that carry no clauses (the FO pre-processing wraps each
+	     sections child in a mn:page_sequence). Their children (fo:list-item,
+	     fo:table-header) end up bare inside a fo:block, which FOP rejects
+	     as a fatal validation error and the whole compile dies. Give them
+	     priority-3 templates that render through the proper list / table
+	     templates, wrapped in the same Sect block the wildcard would give. -->
+	<xsl:template match="/*/mn:sections/mn:ol | /*/mn:sections/mn:ul |
+			/*/mn:sections/mn:page_sequence/mn:ol | /*/mn:sections/mn:page_sequence/mn:ul" priority="3">
+		<fo:block role="Sect">
+			<xsl:call-template name="setId"/>
+			<xsl:call-template name="addTagElementT"/>
+			<fo:block role="SKIP">
+				<xsl:apply-templates select="." mode="list"/>
+			</fo:block>
+		</fo:block>
+	</xsl:template>
+
+	<xsl:template match="/*/mn:sections/mn:table |
+			/*/mn:sections/mn:page_sequence/mn:table" priority="3">
+		<!-- no setId here: the rendered fo:table keeps the element's id,
+		     and a duplicate on the wrapper breaks FOP -->
+		<fo:block role="Sect">
+			<xsl:call-template name="addTagElementT"/>
+			<xsl:call-template name="table"/>
+		</fo:block>
+	</xsl:template>
+
+	<!-- ============================================================ -->
+	<!-- Resolutions + circular letters: letterhead on page 1         -->
+	<!-- ============================================================ -->
+	<!-- The published PDFs open the letterhead block at the top of the
+	     FIRST body page and flow the document content right below it on
+	     the same page (no cover page-sequence, no Contents, no Foreword).
+	     The first sections element carries the letterhead ahead of its
+	     normal rendering. -->
+	<xsl:template match="/*/mn:sections/mn:page_sequence/*[1][$iala_is_rescirc]" priority="4">
+		<xsl:call-template name="rescirc_letterhead"/>
+		<xsl:choose>
+			<xsl:when test="self::mn:ol or self::mn:ul">
+				<fo:block role="Sect">
+					<xsl:call-template name="setId"/>
+					<xsl:call-template name="addTagElementT"/>
+					<fo:block role="SKIP">
+						<xsl:apply-templates select="." mode="list"/>
+					</fo:block>
+				</fo:block>
+			</xsl:when>
+			<xsl:when test="self::mn:table">
+				<!-- no setId: the fo:table keeps the element's id -->
+				<fo:block role="Sect">
+					<xsl:call-template name="addTagElementT"/>
+					<xsl:call-template name="table"/>
+				</fo:block>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="sections_node"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- date as printed: 08 January 2025 -->
+	<xsl:template name="rescirc_date">
+		<xsl:if test="$iala_docdate != ''">
+			<xsl:value-of select="substring($iala_docdate, 9, 2)"/>
+			<xsl:text> </xsl:text>
+			<xsl:call-template name="getMonthByNum">
+				<xsl:with-param name="num" select="substring($iala_docdate, 6, 2)"/>
+			</xsl:call-template>
+			<xsl:text> </xsl:text>
+			<xsl:value-of select="substring($iala_docdate, 1, 4)"/>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="refine_table-header-row-style"><?extend?>
