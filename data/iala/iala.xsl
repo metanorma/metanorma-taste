@@ -163,6 +163,17 @@
 			column shares) is the reports/manuals published form -->
 	<xsl:variable name="iala_compact_landscape" select="$iala_is_report or $iala_is_manual"/>
 
+	<!-- the model courses print unnumbered PART banners and restart the
+			clause numbering beneath each banner (flat overview, module-
+			scoped M.x teaching modules); the model-course doctype sits in
+			the language-tagged ext/doctype and the doctype alias, while
+			the bare ext/doctype slot reads "standard" -->
+	<xsl:variable name="iala_is_model_course" select="$iala_doctype_alias = 'model-course' or /mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] = 'model-course'"/>
+	<!-- the C0103-1 era prints the module rows as unnumbered "MODULE N"
+			banners ("Module 1: Communication ..."); the C2007-1 era numbers
+			them as ordinary clauses ("Module 1 - Introduction ...") -->
+	<xsl:variable name="iala_mc_module_banner" select="$iala_is_model_course and /mn:metanorma/mn:sections//mn:clause[mn:title][starts-with(normalize-space(mn:title), 'Module ')][contains(mn:title, ':')]"/>
+
 	<!-- ============================================================ -->
 	<!-- BRAND ERA HELPERS (published-PDF parity)                     -->
 	<!-- The published IALA corpus spans three brand eras, driven by  -->
@@ -877,7 +888,12 @@
 	</xsl:attribute-set>
 
 	<xsl:template name="refine_toc-item-block-style">
-		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+		<!-- Guide-family contents print typed case; only the top level
+				prints in capitals. Manual and report ToCs keep the authored
+				title case. Every other doctype was tuned with all-capitals. -->
+		<xsl:if test="(not($iala_guide_family) or @level = 1) and not($iala_is_report) and not($iala_is_manual)">
+			<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+		</xsl:if>
 		<xsl:attribute name="line-height">1.4</xsl:attribute>
 		<xsl:attribute name="margin-right">8mm</xsl:attribute>
 		<xsl:attribute name="provisional-distance-between-starts">
@@ -922,6 +938,12 @@
 		<xsl:attribute name="margin-top">9mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">6mm</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_toc_title"/></xsl:attribute>
+		<!-- the manual's combined LIST OF TABLES AND FIGURES prints in the
+				Contents tail at the heading size of the section lists; the
+				report's page placement is handled by insertListsOf -->
+		<xsl:if test="$iala_is_manual">
+			<xsl:attribute name="font-size">14pt</xsl:attribute>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="refine_toc-listof-item-style"><?extend?>
@@ -1038,7 +1060,13 @@
 	</xsl:template>
 
 	<xsl:template name="refine_title-style"><?extend?>
-		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+		<!-- the standards/guideline/resolution families print headings in
+				caps; the published manuals and reports keep the authored
+				title case ("Scope and Objectives", "Session 1 - Opening of
+				the Workshop") -->
+		<xsl:if test="not($iala_is_report) and not($iala_is_manual)">
+			<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+		</xsl:if>
 		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
 		<xsl:if test="$level = 1">
 			<xsl:attribute name="font-size">14pt</xsl:attribute>
@@ -1180,8 +1208,14 @@
 					<xsl:with-param name="process">true</xsl:with-param>
 				</xsl:apply-templates>
 			</xsl:when>
-			<xsl:when test="../mn:clause[@type = 'revision']">
-				<xsl:apply-templates select="../mn:clause[@type = 'revision']" mode="update_xml_step1">
+			<xsl:when test="../mn:clause[@type = 'revision'] or /mn:metanorma/mn:sections/mn:clause[@type = 'revision'][$iala_guide_family]">
+				<!-- The printed DOCUMENT REVISION page carries the real
+						revision rows; the source may encode them as a
+						preface sibling of the Contents or as the first
+						body clause (metanorma has no preface route for
+						it) — either way it renders in this slot, ahead
+						of the Contents. -->
+				<xsl:apply-templates select="(../mn:clause[@type = 'revision'] | /mn:metanorma/mn:sections/mn:clause[@type = 'revision'][$iala_guide_family])[1]" mode="update_xml_step1">
 					<xsl:with-param name="process">true</xsl:with-param>
 				</xsl:apply-templates>
 			</xsl:when>
@@ -1272,7 +1306,7 @@
 			<mn:fmt-title>Document revision</mn:fmt-title>
 			<mn:p>
 				<xsl:choose>
-					<xsl:when test="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] = 'model-course'">
+					<xsl:when test="$iala_is_model_course">
 						<xsl:text>Revisions to this IALA document are to be noted in the table prior to the issue of a revised document.</xsl:text>
 					</xsl:when>
 					<xsl:otherwise>
@@ -1305,13 +1339,15 @@
 			</mn:table>
 		</mn:clause>
 	</xsl:template>
-	<xsl:template match="mn:preface/mn:clause[@type = 'revision']" mode="update_xml_step1" priority="4">
+	<xsl:template match="mn:preface/mn:clause[@type = 'revision'] | mn:sections/mn:clause[@type = 'revision'][$iala_guide_family]" mode="update_xml_step1" priority="4">
 		<xsl:param name="process">false</xsl:param>
+		<!-- without the process flag (the body flow pass) the clause is
+				swallowed: it renders in the Contents slot instead -->
 		<xsl:if test="$process = 'true'">
 			<xsl:copy>
 				<xsl:apply-templates select="@*" mode="update_xml_step1"/>
 				<xsl:attribute name="displayorder">-1</xsl:attribute>
-				
+
 				<xsl:apply-templates select="node()" mode="update_xml_step1"/>
 			</xsl:copy>
 		</xsl:if>
@@ -1392,6 +1428,20 @@
 		<xsl:if test="$iala_is_rescirc and ancestor::mn:annex">
 			<xsl:attribute name="line-height">150%</xsl:attribute>
 			<xsl:attribute name="space-after">10pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$iala_guide_family and not(ancestor::mn:table) and not(ancestor::mn:figure)">
+			<!-- the published guide family sets body text on the 1.4 leading
+					with a 10pt paragraph step; the landscape competence
+					tables keep their tuned compact leading -->
+			<xsl:attribute name="line-height">140%</xsl:attribute>
+			<xsl:attribute name="space-after">10pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="($iala_is_report or $iala_is_manual) and not(ancestor::mn:table) and not(ancestor::mn:boilerplate)">
+			<!-- the published manual and report print Word single spacing
+					for Calibri 11 (13.4pt pitch); the FOP default packs 6%
+					tighter and the body drifts ahead of the published
+					pagination -->
+			<xsl:attribute name="line-height">122%</xsl:attribute>
 		</xsl:if>
 		<xsl:attribute name="text-align">
 			<xsl:choose>
@@ -1635,9 +1685,12 @@
 	</xsl:template>
 
 	<!-- Normative references: move to the end of the document, retitle
-			"References", number after the last body clause -->
-	<xsl:template match="mn:sections/mn:references[@normative = 'true'][$iala_guide_family]" mode="update_xml_step1" priority="3">
-		<xsl:variable name="num" select="count(../*[not(self::mn:references)]) + 2"/>
+			"References", number after the last body clause. The published
+			"Further reading" section comes through the converter marked
+			normative like its References sibling, so it is told apart by
+			title, not by the normative flag. -->
+	<xsl:template match="mn:sections/mn:references[@normative = 'true'][mn:title != 'Further reading'][$iala_guide_family]" mode="update_xml_step1" priority="3">
+		<xsl:variable name="num" select="count(../*[not(self::mn:references or self::mn:clause[@type = 'revision' or mn:title = 'Appended publications'])]) + 2 - (count(../mn:introduction | ../mn:clause[mn:title = 'Introduction']) &gt; 0)"/>
 		<!-- wrap as a clause so the heading renders through the normal
 				clause path exactly once -->
 		<mn:clause id="{@id}">
@@ -1649,13 +1702,16 @@
 				<mn:semx element="title">References</mn:semx>
 			</mn:fmt-title>
 			<mn:fmt-xref-label><mn:span class="fmt-element-name">Clause</mn:span><xsl:text> </xsl:text><mn:semx element="autonum"><xsl:value-of select="$num"/></mn:semx></mn:fmt-xref-label>
-			<xsl:apply-templates select="node()[not(self::mn:title or self::mn:fmt-title or self::mn:fmt-xref-label)]" mode="update_xml_step1"/>
+			<!-- the published references print the heading straight into the
+					citations; the standard normative-preamble paragraph is
+					not carried over -->
+			<xsl:apply-templates select="node()[not(self::mn:title or self::mn:fmt-title or self::mn:fmt-xref-label or self::mn:p)]" mode="update_xml_step1"/>
 		</mn:clause>
 	</xsl:template>
 
 	<!-- Further reading: follows References, numbered after it -->
-	<xsl:template match="mn:sections/mn:references[not(@normative = 'true')][$iala_guide_family]" mode="update_xml_step1" priority="3">
-		<xsl:variable name="num" select="count(../*[not(self::mn:references)]) + 3"/>
+	<xsl:template match="mn:sections/mn:references[mn:title = 'Further reading' or not(@normative = 'true')][$iala_guide_family]" mode="update_xml_step1" priority="3">
+		<xsl:variable name="num" select="count(../*[not(self::mn:references or self::mn:clause[@type = 'revision'])]) + 3 - (count(../mn:introduction | ../mn:clause[mn:title = 'Introduction']) &gt; 0)"/>
 		<mn:clause id="{@id}">
 			<xsl:attribute name="displayorder">999</xsl:attribute>
 			<mn:title>Further reading</mn:title>
@@ -1665,8 +1721,308 @@
 				<mn:semx element="title">Further reading</mn:semx>
 			</mn:fmt-title>
 			<mn:fmt-xref-label><mn:span class="fmt-element-name">Clause</mn:span><xsl:text> </xsl:text><mn:semx element="autonum"><xsl:value-of select="$num"/></mn:semx></mn:fmt-xref-label>
-			<xsl:apply-templates select="node()[not(self::mn:title or self::mn:fmt-title or self::mn:fmt-xref-label)]" mode="update_xml_step1"/>
+			<xsl:apply-templates select="node()[not(self::mn:title or self::mn:fmt-title or self::mn:fmt-xref-label or self::mn:p)]" mode="update_xml_step1"/>
 		</mn:clause>
+	</xsl:template>
+
+	<!-- ============================================================ -->
+	<!-- GUIDE FAMILY round 2: published flow and numbering           -->
+	<!-- ============================================================ -->
+
+	<!-- The published guidelines flow the Introduction (clause 1) straight
+			into the clause that follows it on the same page; metanorma parks
+			the introduction in the preface, whose page sequence forces a
+			page break after it. Relocate it to the head of sections so the
+			main flow renders it as the first body clause. -->
+	<xsl:template match="mn:preface/mn:introduction[$iala_guide_family][/mn:metanorma/mn:sections]" mode="update_xml_step1" priority="3"/>
+
+	<xsl:template match="mn:sections[$iala_guide_family][/mn:metanorma/mn:preface/mn:introduction]" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:copy-of select="@*"/>
+
+			<xsl:variable name="nodes_sections_">
+				<xsl:for-each select="*">
+					<node id="{@id}"/>
+				</xsl:for-each>
+			</xsl:variable>
+			<xsl:variable name="nodes_sections" select="xalan:nodeset($nodes_sections_)"/>
+
+			<!-- the preface Introduction joins the body (its displayorder
+					seats it ahead of the first body clause); normative
+					references move inside 'sections' as in the base -->
+			<xsl:for-each select="/mn:metanorma/mn:preface/mn:introduction | * | ancestor::mn:metanorma/mn:bibliography/mn:references[@normative='true'] | ancestor::mn:metanorma/mn:bibliography/mn:clause[mn:references[@normative='true']]">
+				<xsl:sort select="@displayorder" data-type="number"/>
+
+				<xsl:variable name="preceding-sibling_id" select="$nodes_sections/node[@id = current()/@id]/preceding-sibling::node[1]/@id"/>
+				<xsl:if test="$preceding-sibling_id != ''">
+					<xsl:apply-templates select="parent::*/*[@type = 'section-title' and @id = $preceding-sibling_id and not(@displayorder)]" mode="update_xml_step1"/>
+				</xsl:if>
+
+				<xsl:choose>
+					<xsl:when test="@type = 'section-title' and not(@displayorder)"><!-- skip, don't copy --></xsl:when>
+					<xsl:otherwise>
+						<xsl:apply-templates select="." mode="update_xml_step1"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:for-each>
+		</xsl:copy>
+	</xsl:template>
+
+	<!-- The introduction subclauses carry the printed 1.x / 1.x.y numbers;
+			metanorma numbers only the body clauses, so synthesize the chain
+			here from the position inside the introduction -->
+	<xsl:template match="mn:introduction/mn:clause/mn:fmt-title[not(mn:span[@class = 'fmt-caption-label'])][$iala_guide_family]" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<mn:span class="fmt-caption-label">
+				<xsl:call-template name="iala_intro_clause_number">
+					<xsl:with-param name="clause" select=".."/>
+				</xsl:call-template>
+			</mn:span>
+			<mn:span class="fmt-caption-delim"><mn:tab/></mn:span>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+
+	<xsl:template name="iala_intro_clause_number">
+		<xsl:param name="clause"/>
+		<!-- the introduction itself is clause 1 -->
+		<xsl:text>1.</xsl:text>
+		<xsl:variable name="chain" select="$clause/ancestor-or-self::mn:clause[parent::mn:introduction or parent::mn:clause[ancestor::mn:introduction]]"/>
+		<xsl:variable name="chain_nums_">
+			<xsl:for-each select="$chain">
+				<xsl:sort select="count(ancestor::mn:clause[ancestor::mn:introduction])" data-type="number" order="ascending"/>
+				<n v="{count(preceding-sibling::mn:clause) + 1}"/>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:for-each select="xalan:nodeset($chain_nums_)/*">
+			<xsl:if test="position() &gt; 1"><xsl:text>.</xsl:text></xsl:if>
+			<xsl:value-of select="@v"/>
+		</xsl:for-each>
+	</xsl:template>
+
+	<!-- The published guide family numbers tables and figures sequentially
+			across the whole document ("Table 1"), not per clause -->
+	<xsl:template match="mn:table/mn:fmt-name[$iala_guide_family][not(../@unnumbered = 'true')]" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<mn:span class="fmt-caption-label">
+				<mn:span class="fmt-element-name"><xsl:text>Table </xsl:text></mn:span>
+				<mn:semx element="autonum"><xsl:value-of select="count(../preceding::mn:table[not(@unnumbered = 'true')][mn:fmt-name]) + 1"/></mn:semx>
+			</mn:span>
+			<mn:span class="fmt-caption-delim"><xsl:text> </xsl:text></mn:span>
+			<xsl:apply-templates select="node()[not(self::mn:span[@class = 'fmt-caption-label' or @class = 'fmt-caption-delim'])]" mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+
+	<xsl:template match="mn:figure/mn:fmt-name[$iala_guide_family]" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<mn:span class="fmt-caption-label">
+				<mn:span class="fmt-element-name"><xsl:text>Figure </xsl:text></mn:span>
+				<mn:semx element="autonum"><xsl:value-of select="count(../preceding::mn:figure[mn:fmt-name]) + 1"/></mn:semx>
+			</mn:span>
+			<mn:span class="fmt-caption-delim"><xsl:text> </xsl:text></mn:span>
+			<xsl:apply-templates select="node()[not(self::mn:span[@class = 'fmt-caption-label' or @class = 'fmt-caption-delim'])]" mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+
+	<!-- The published guide family titles its standalone definitions
+			section "Definitions"; the converter renames it to the i18n
+			"Terms and definitions" -->
+	<xsl:template match="mn:sections/mn:terms/mn:title[. = 'Terms and definitions'][$iala_guide_family]" mode="update_xml_step1" priority="3">
+		<xsl:copy>Definitions</xsl:copy>
+	</xsl:template>
+	<xsl:template match="mn:sections/mn:terms/mn:fmt-title[mn:title = 'Terms and definitions' or normalize-space() = 'Terms and definitions'][$iala_guide_family]" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<xsl:apply-templates select="node()[not(self::mn:semx[@element = 'title'])][not(self::text()[normalize-space() = 'Terms and definitions'])]" mode="update_xml_step1"/>
+			<mn:semx element="title">Definitions</mn:semx>
+		</xsl:copy>
+	</xsl:template>
+
+	<!-- G1200 prints "Further reading"; the source clause carries an inert
+			title because the converter strips trailing informative sections
+			by their printed title. It numbers after References and rides
+			the very end of the body flow. -->
+	<xsl:template match="mn:sections/mn:clause[mn:title = 'Appended publications'][$iala_guide_family]" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<xsl:attribute name="displayorder">1000</xsl:attribute>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+	<xsl:template match="mn:sections/mn:clause[mn:title = 'Appended publications'][$iala_guide_family]/mn:title" mode="update_xml_step1" priority="3">
+		<xsl:copy>Further reading</xsl:copy>
+	</xsl:template>
+	<xsl:template match="mn:sections/mn:clause[mn:title = 'Appended publications'][$iala_guide_family]/mn:fmt-title" mode="update_xml_step1" priority="4">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<xsl:apply-templates select="node()[not(self::mn:semx[@element = 'title'])][not(self::text()[normalize-space() = 'Appended publications'])]" mode="update_xml_step1"/>
+			<mn:semx element="title">Further reading</mn:semx>
+		</xsl:copy>
+	</xsl:template>
+
+	<!-- The presentation step numbers the body clauses against its own
+			canonical model (normative references first); the published
+			guide family numbers the Introduction 1 and the body clauses
+			after it. Renumber the baked caption labels to the published
+			model; deeper captions keep their tail under the new prefix. -->
+	<xsl:template match="mn:sections/*[not(self::mn:clause[@type = 'revision'] or self::mn:references)]/mn:fmt-title/mn:span[@class = 'fmt-caption-label'][$iala_guide_family]" mode="update_xml_step1" priority="4">
+		<xsl:variable name="el" select="parent::mn:fmt-title/parent::*"/>
+		<xsl:variable name="n">
+			<xsl:choose>
+				<xsl:when test="$el[mn:title = 'Appended publications']">
+					<!-- Further reading numbers after References -->
+					<xsl:value-of select="1 + count($el/preceding-sibling::*[not(self::mn:references or self::mn:clause[@type = 'revision' or mn:title = 'Appended publications'])][number(@displayorder) &lt; number($el/@displayorder)]) + count(/mn:metanorma/mn:preface/mn:introduction) + 1"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="1 + count($el/preceding-sibling::*[not(self::mn:references or self::mn:clause[@type = 'revision' or mn:title = 'Appended publications'])][number(@displayorder) &lt; number($el/@displayorder)]) + count(/mn:metanorma/mn:preface/mn:introduction)"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<mn:semx element="autonum"><xsl:value-of select="$n"/></mn:semx>
+		</xsl:copy>
+	</xsl:template>
+
+	<xsl:template match="mn:sections/*[not(self::mn:clause[@type = 'revision'] or self::mn:references)]/mn:clause//mn:span[@class = 'fmt-caption-label'][$iala_guide_family]" mode="update_xml_step1" priority="3">
+		<xsl:variable name="top_parent" select="(ancestor::*[parent::mn:sections])[1]"/>
+		<xsl:variable name="n" select="1 + count($top_parent/preceding-sibling::*[not(self::mn:references or self::mn:clause[@type = 'revision'])][number(@displayorder) &lt; number($top_parent/@displayorder)]) + count(/mn:metanorma/mn:preface/mn:introduction)"/>
+		<xsl:variable name="old" select="normalize-space(.)"/>
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<mn:semx element="autonum">
+				<xsl:value-of select="$n"/>
+				<xsl:if test="contains($old, '.')"><xsl:value-of select="concat('.', substring-after($old, '.'))"/></xsl:if>
+			</mn:semx>
+		</xsl:copy>
+	</xsl:template>
+
+	<!-- the revision clause renders unnumbered -->
+	<xsl:template match="mn:clause[@type = 'revision']/mn:fmt-title" mode="update_xml_step1" priority="5">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<xsl:apply-templates select="node()[not(self::mn:span[@class = 'fmt-caption-label' or @class = 'fmt-autonum-delim' or @class = 'fmt-caption-delim'])]" mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+
+	<!-- ============ MODEL COURSE: published PART/MODULE numbering ======= -->
+	<!-- The published model courses print unnumbered "PART A / PART B"
+			banners and restart the clause numbering beneath each banner:
+			the overview clauses number flat (1..13, 10.1), the teaching
+			modules number per module (M.x, M.x.y). The C0103-1 era prints
+			the module rows themselves as unnumbered "MODULE N" banners. -->
+	<xsl:variable name="iala_upper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
+	<xsl:variable name="iala_lower" select="'abcdefghijklmnopqrstuvwxyz'"/>
+
+	<!-- the printed label of a clause in the model-course numbering
+			model (shared by the update pass and the contents resolution) -->
+	<xsl:template name="iala_mc_label">
+		<xsl:param name="clause" select="."/>
+		<xsl:variable name="t" select="normalize-space($clause/mn:title)"/>
+		<xsl:choose>
+			<xsl:when test="$clause[parent::mn:sections][starts-with($t, 'Part ')]">
+				<xsl:value-of select="concat('PART ', substring-before(substring-after($t, 'Part '), ' '))"/>
+			</xsl:when>
+			<xsl:when test="count($clause/ancestor::mn:clause[starts-with(normalize-space(mn:title), 'Part ')]) = 0"/>
+			<xsl:otherwise>
+				<xsl:variable name="part" select="$clause/ancestor::mn:clause[starts-with(normalize-space(mn:title), 'Part ')][1]"/>
+				<xsl:variable name="pid" select="generate-id($part)"/>
+				<xsl:variable name="chain" select="$clause/ancestor-or-self::mn:clause[ancestor::mn:clause[generate-id() = $pid]]"/>
+				<xsl:variable name="chain_nums_">
+					<xsl:for-each select="$chain">
+						<xsl:sort select="count(ancestor::mn:clause)" data-type="number" order="ascending"/>
+						<n v="{count(preceding-sibling::mn:clause) + 1}"/>
+					</xsl:for-each>
+				</xsl:variable>
+				<xsl:variable name="depth" select="count(xalan:nodeset($chain_nums_)/*)"/>
+				<xsl:choose>
+					<xsl:when test="$depth = 1 and starts-with($t, 'Module ') and $iala_mc_module_banner">
+						<xsl:value-of select="concat('MODULE ', xalan:nodeset($chain_nums_)/*/@v)"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:for-each select="xalan:nodeset($chain_nums_)/*">
+							<xsl:if test="position() &gt; 1"><xsl:text>.</xsl:text></xsl:if>
+							<xsl:value-of select="@v"/>
+						</xsl:for-each>
+						<xsl:if test="$depth &lt;= 2"><xsl:text>.</xsl:text></xsl:if>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- PART banner: unnumbered, "PART A" + tab + capitalised remainder -->
+	<xsl:template match="mn:sections/mn:clause[mn:title][starts-with(normalize-space(mn:title), 'Part ')][$iala_is_model_course]/mn:fmt-title" mode="update_xml_step1" priority="4">
+		<xsl:variable name="t" select="normalize-space(../mn:title)"/>
+		<xsl:variable name="rest">
+			<xsl:choose>
+				<xsl:when test="contains($t, '&#8211;')"><xsl:value-of select="normalize-space(substring-after($t, '&#8211;'))"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="normalize-space(substring-after($t, '- '))"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<mn:span class="fmt-caption-label">
+				<xsl:call-template name="iala_mc_label">
+					<xsl:with-param name="clause" select=".."/>
+				</xsl:call-template>
+			</mn:span>
+			<mn:span class="fmt-caption-delim"><mn:tab/></mn:span>
+			<mn:semx element="title"><xsl:value-of select="translate($rest, $iala_lower, $iala_upper)"/></mn:semx>
+		</xsl:copy>
+	</xsl:template>
+
+	<!-- Flat numbering restarts beneath the PART banner; the C0103-1
+			module rows become "MODULE N" banners, the C2007-1 module rows
+			stay numbered clauses -->
+	<xsl:template match="mn:sections/mn:clause[mn:title][starts-with(normalize-space(mn:title), 'Part ')][$iala_is_model_course]/mn:clause/mn:fmt-title" mode="update_xml_step1" priority="4">
+		<xsl:variable name="t" select="normalize-space(../mn:title)"/>
+		<xsl:choose>
+			<xsl:when test="$iala_mc_module_banner and starts-with($t, 'Module ')">
+				<xsl:copy>
+					<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+					<mn:span class="fmt-caption-label">
+						<xsl:call-template name="iala_mc_label">
+							<xsl:with-param name="clause" select=".."/>
+						</xsl:call-template>
+					</mn:span>
+					<mn:span class="fmt-caption-delim"><mn:tab/></mn:span>
+					<mn:semx element="title"><xsl:value-of select="translate(normalize-space(substring-after($t, ':')), $iala_lower, $iala_upper)"/></mn:semx>
+				</xsl:copy>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="title" select="translate($t, $iala_lower, $iala_upper)"/>
+				<xsl:copy>
+					<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+					<mn:span class="fmt-caption-label">
+						<xsl:call-template name="iala_mc_label">
+							<xsl:with-param name="clause" select=".."/>
+						</xsl:call-template>
+					</mn:span>
+					<mn:span class="fmt-caption-delim"><mn:tab/></mn:span>
+					<mn:semx element="title"><xsl:value-of select="$title"/></mn:semx>
+				</xsl:copy>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- Deeper clauses beneath a PART banner number through the clause
+			chain (M.x, M.x.y); the two top chain levels carry the printed
+			trailing dot -->
+	<xsl:template match="mn:sections/mn:clause[mn:title][starts-with(normalize-space(mn:title), 'Part ')][$iala_is_model_course]/mn:clause/mn:clause/mn:fmt-title | mn:sections/mn:clause[mn:title][starts-with(normalize-space(mn:title), 'Part ')][$iala_is_model_course]/mn:clause/mn:clause/mn:clause/mn:fmt-title" mode="update_xml_step1" priority="4">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<mn:span class="fmt-caption-label">
+				<xsl:call-template name="iala_mc_label">
+					<xsl:with-param name="clause" select=".."/>
+				</xsl:call-template>
+			</mn:span>
+			<mn:span class="fmt-caption-delim"><mn:tab/></mn:span>
+			<xsl:apply-templates select="node()[not(self::mn:span[@class = 'fmt-caption-label' or @class = 'fmt-autonum-delim' or @class = 'fmt-caption-delim'])]" mode="update_xml_step1"/>
+		</xsl:copy>
 	</xsl:template>
 
 	<!-- Published model courses carry no List of Tables / Figures in
@@ -1674,7 +2030,7 @@
 			the base collection logic, alt-texts included). -->
 	<xsl:template name="processTables_Contents">
 		<xsl:choose>
-			<xsl:when test="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] = 'model-course'">
+			<xsl:when test="$iala_is_model_course">
 				<!-- published model courses carry no List of Tables -->
 			</xsl:when>
 			<xsl:otherwise>
@@ -1702,7 +2058,7 @@
 
 	<xsl:template name="processFigures_Contents">
 		<xsl:choose>
-			<xsl:when test="/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''] = 'model-course'">
+			<xsl:when test="$iala_is_model_course">
 				<!-- published model courses carry no List of Figures -->
 			</xsl:when>
 			<xsl:otherwise>
@@ -1745,6 +2101,36 @@
 		</xsl:choose>
 	</xsl:variable>
 
+	<!-- The published guide-family contents list References and Further
+			reading last (after the numbered body clauses); the source tree
+			seats them first, so the guide family sorts them behind. -->
+	<xsl:template name="processMainSectionsDefault_Contents">
+		<xsl:variable name="nodes_sections_">
+			<xsl:for-each select="/*/mn:sections/*">
+				<node id="{@id}"/>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name="nodes_sections" select="xalan:nodeset($nodes_sections_)"/>
+
+		<xsl:for-each select="/*/mn:sections/* | /*/mn:bibliography/mn:references[@normative='true'] |    /*/mn:bibliography/mn:clause[mn:references[@normative='true']]">
+			<xsl:sort select="($iala_guide_family and (self::mn:references or mn:title = 'Appended publications'))" data-type="number"/>
+			<xsl:sort select="($iala_guide_family and mn:title = 'Appended publications')" data-type="number"/>
+			<xsl:sort select="@displayorder" data-type="number"/>
+
+			<xsl:variable name="preceding-sibling_id" select="$nodes_sections/node[@id = current()/@id]/preceding-sibling::node[1]/@id"/>
+			<xsl:if test="$preceding-sibling_id != ''">
+				<xsl:apply-templates select="parent::*/*[@type = 'section-title' and @id = $preceding-sibling_id and not(@displayorder)]" mode="contents_no_displayorder"/>
+			</xsl:if>
+
+			<xsl:apply-templates select="." mode="contents"/>
+		</xsl:for-each>
+
+		<xsl:for-each select="/*/mn:annex | /*/mn:bibliography/*[not(@normative='true') and not(mn:references[@normative='true'])][count(.//mn:bibitem[not(@hidden) = 'true']) &gt; 0] |          /*/mn:bibliography/mn:clause[mn:references[not(@normative='true')]][count(.//mn:bibitem[not(@hidden) = 'true']) &gt; 0]">
+			<xsl:sort select="@displayorder" data-type="number"/>
+			<xsl:apply-templates select="." mode="contents"/>
+		</xsl:for-each>
+	</xsl:template>
+
 	<!-- ============================================================ -->
 	<!-- getSection / getName overrides                               -->
 	<!-- ============================================================ -->
@@ -1753,11 +2139,34 @@
 			teach the label resolution about the published numbering model. -->
 	<xsl:template name="getSection">
 		<xsl:choose>
-			<xsl:when test="$iala_guide_family and self::mn:references[@normative = 'true']">
-				<xsl:value-of select="count(parent::mn:sections/*[not(self::mn:references)]) + 2"/>
+			<xsl:when test="$iala_is_model_course and self::mn:clause[mn:title]">
+				<xsl:call-template name="iala_mc_label">
+					<xsl:with-param name="clause" select="."/>
+				</xsl:call-template>
 			</xsl:when>
-			<xsl:when test="$iala_guide_family and self::mn:references[not(@normative = 'true')]">
-				<xsl:value-of select="count(parent::mn:sections/*[not(self::mn:references)]) + 3"/>
+			<xsl:when test="$iala_guide_family and self::mn:introduction">
+				<xsl:text>1</xsl:text>
+			</xsl:when>
+			<xsl:when test="$iala_guide_family and parent::mn:sections and mn:title = 'Appended publications'">
+				<xsl:value-of select="2 + count(preceding-sibling::*[not(self::mn:references or self::mn:clause[@type = 'revision' or mn:title = 'Appended publications'])][number(@displayorder) &lt; number(current()/@displayorder)]) + count(/mn:metanorma/mn:preface/mn:introduction)"/>
+			</xsl:when>
+			<xsl:when test="$iala_guide_family and parent::mn:sections and not(self::mn:references or self::mn:clause[@type = 'revision'])">
+				<xsl:value-of select="1 + count(preceding-sibling::*[not(self::mn:references or self::mn:clause[@type = 'revision' or mn:title = 'Appended publications'])][number(@displayorder) &lt; number(current()/@displayorder)]) + count(/mn:metanorma/mn:preface/mn:introduction)"/>
+			</xsl:when>
+			<xsl:when test="$iala_guide_family and ancestor::mn:sections and not(parent::mn:sections) and (self::mn:clause or self::mn:terms or self::mn:definitions)">
+				<!-- deeper clauses: the published number is the parent's new
+						number plus the baked tail -->
+				<xsl:variable name="top" select="(ancestor::*[parent::mn:sections])[1]"/>
+				<xsl:variable name="pn" select="1 + count($top/preceding-sibling::*[not(self::mn:references or self::mn:clause[@type = 'revision' or mn:title = 'Appended publications'])][number(@displayorder) &lt; number($top/@displayorder)]) + count(/mn:metanorma/mn:preface/mn:introduction)"/>
+				<xsl:variable name="old" select="normalize-space(mn:fmt-title//mn:span[@class = 'fmt-caption-label'])"/>
+				<xsl:value-of select="$pn"/>
+				<xsl:if test="contains($old, '.')"><xsl:value-of select="concat('.', substring-after($old, '.'))"/></xsl:if>
+			</xsl:when>
+			<xsl:when test="$iala_guide_family and self::mn:references[mn:title = 'Further reading']">
+				<xsl:value-of select="count(parent::mn:sections/*[not(self::mn:references or self::mn:clause[@type = 'revision'])]) + 3 - count(parent::mn:sections/mn:introduction | parent::mn:sections/mn:clause[mn:title = 'Introduction'])"/>
+			</xsl:when>
+			<xsl:when test="$iala_guide_family and self::mn:references[not(mn:title = 'Further reading')]">
+				<xsl:value-of select="count(parent::mn:sections/*[not(self::mn:references or self::mn:clause[@type = 'revision' or mn:title = 'Appended publications'])]) + 2 - count(parent::mn:sections/mn:introduction | parent::mn:sections/mn:clause[mn:title = 'Introduction'])"/>
 			</xsl:when>
 			<xsl:when test="mn:fmt-title">
 				<xsl:variable name="fmt_title_section">
@@ -1776,8 +2185,26 @@
 
 	<xsl:template name="getName">
 		<xsl:choose>
-			<xsl:when test="$iala_guide_family and self::mn:references[@normative = 'true']">References</xsl:when>
-			<xsl:when test="$iala_guide_family and self::mn:references[not(@normative = 'true')]">Further reading</xsl:when>
+			<xsl:when test="$iala_is_model_course and self::mn:clause[mn:title][starts-with(normalize-space(mn:title), 'Part ')][parent::mn:sections]">
+				<!-- the PART banner: the contents print the capitalised
+						remainder (the PART letter is the number column) -->
+				<xsl:variable name="t" select="normalize-space(mn:title)"/>
+				<xsl:choose>
+					<xsl:when test="contains($t, '&#8211;')"><xsl:value-of select="translate(normalize-space(substring-after($t, '&#8211;')), $iala_lower, $iala_upper)"/></xsl:when>
+					<xsl:otherwise><xsl:value-of select="translate(normalize-space(substring-after($t, '- ')), $iala_lower, $iala_upper)"/></xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="$iala_is_model_course and self::mn:clause[mn:title][starts-with(normalize-space(mn:title), 'Module ')][parent::mn:clause[parent::mn:sections]]">
+				<!-- the module row: the printed title, in capitals -->
+				<xsl:choose>
+					<xsl:when test="$iala_mc_module_banner"><xsl:value-of select="translate(normalize-space(substring-after(mn:title, ':')), $iala_lower, $iala_upper)"/></xsl:when>
+					<xsl:otherwise><xsl:value-of select="translate(normalize-space(mn:title), $iala_lower, $iala_upper)"/></xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="$iala_guide_family and self::mn:terms[mn:title = 'Terms and definitions'][parent::mn:sections]">Definitions</xsl:when>
+			<xsl:when test="$iala_guide_family and self::mn:clause[mn:title = 'Appended publications'][parent::mn:sections]">Further reading</xsl:when>
+			<xsl:when test="$iala_guide_family and self::mn:references[mn:title = 'Further reading']">Further reading</xsl:when>
+			<xsl:when test="$iala_guide_family and self::mn:references">References</xsl:when>
 			<xsl:when test="mn:fmt-title//mn:span[@class = 'fmt-caption-delim'][mn:tab]">
 				<xsl:copy-of select="mn:fmt-title//mn:span[@class = 'fmt-caption-delim'][mn:tab][1]/following-sibling::node()"/>
 			</xsl:when>
@@ -1965,13 +2392,26 @@
 		<fo:inline padding-right="5mm" role="SKIP"><xsl:value-of select="$zero_width_space"/></fo:inline>
 	</xsl:template> -->
 	<xsl:template name="refine_table-container-style"><?extend?>
+		<xsl:variable name="in_annex" select="boolean(ancestor::mn:annex)"/>
+		<xsl:variable name="n_cols_">
+			<xsl:choose>
+				<xsl:when test="mn:colgroup"><xsl:value-of select="count(mn:colgroup/mn:col)"/></xsl:when>
+				<xsl:otherwise><xsl:value-of select="count(mn:thead/mn:tr[1]/*)"/></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 		<xsl:attribute name="font-size">
 			<xsl:choose>
-				<!-- reports and manuals rotate their wide tables onto landscape
-						pages at the compact published size, so they keep the
-						published pagination; the standards family keeps the
-						base table size on landscape pages -->
-				<xsl:when test="@landscape = 'true' and $iala_compact_landscape">7.5pt</xsl:when>
+				<!-- the 2021 report prints its gap/measure matrices at the
+						10pt body size -->
+				<xsl:when test="@landscape = 'true' and $iala_is_report">10pt</xsl:when>
+				<!-- the 2017 manual prints the many-column annex radio tables
+						one step below the body size and the few-column annex
+						matrices (the ITU recommendations table) a further step
+						down, and the wide body matrices (Tables 1-2) in
+						miniature -->
+				<xsl:when test="@landscape = 'true' and $iala_is_manual and $in_annex and $n_cols_ &gt;= 8">9.5pt</xsl:when>
+				<xsl:when test="@landscape = 'true' and $iala_is_manual and $in_annex">9pt</xsl:when>
+				<xsl:when test="@landscape = 'true' and $iala_is_manual">6pt</xsl:when>
 				<xsl:otherwise>10pt</xsl:otherwise>
 			</xsl:choose>
 		</xsl:attribute>
@@ -2269,7 +2709,15 @@
 		<xsl:if test="ancestor::mn:table[@landscape = 'true'] and $iala_compact_landscape">
 			<xsl:attribute name="padding-left">2mm</xsl:attribute>
 			<xsl:attribute name="padding-right">2mm</xsl:attribute>
-			<xsl:attribute name="line-height">1.15</xsl:attribute>
+			<xsl:attribute name="padding-top">1.25mm</xsl:attribute>
+			<xsl:attribute name="padding-bottom">1.25mm</xsl:attribute>
+			<xsl:choose>
+				<!-- the manual's dense radio matrices print tight leading;
+						the report's gap/measure tables keep the house
+						line-height of the published 2021 PDF -->
+				<xsl:when test="$iala_is_manual"><xsl:attribute name="line-height">1.15</xsl:attribute></xsl:when>
+				<xsl:otherwise><xsl:attribute name="line-height">1.2</xsl:attribute></xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 		<!-- Published standards print roomy rows (~13mm) with the cell content
 			centred; padding (not row min-height, unsupported by FOP here)
@@ -2325,6 +2773,7 @@
 	<xsl:template name="insertTableColumnWidth">
 		<xsl:param name="colwidths"/>
 		<xsl:variable name="is_landscape_table" select="boolean(self::mn:table[@landscape = 'true'] or ancestor-or-self::mn:table[@landscape = 'true'])"/>
+		<xsl:variable name="n_cols" select="count(xalan:nodeset($colwidths)//column)"/>
 		<xsl:for-each select="xalan:nodeset($colwidths)//column">
 			<xsl:choose>
 				<!-- the letter membership tables print the label column at
@@ -2339,10 +2788,13 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:when>
-				<!-- on the reports/manuals landscape tables the precomputed
+				<!-- on the manuals' many-column landscape tables the precomputed
 						portrait proportions starve the leading column; equal
-						shares reproduce the published layout -->
-				<xsl:when test="$is_landscape_table and $iala_compact_landscape">
+						shares reproduce the published layout. Tables with fewer
+						columns (the four-column ITU recommendations matrix) print
+						pronounced unequal columns and keep the computed
+						proportions -->
+				<xsl:when test="$is_landscape_table and $iala_is_manual and $n_cols &gt;= 8">
 					<fo:table-column column-width="proportional-column-width(20)"/>
 				</xsl:when>
 				<xsl:when test=". = 1 or . = 0">
@@ -2550,6 +3002,50 @@
 					</fo:block-container>
 				</fo:static-content>
 			</xsl:when>
+			<xsl:when test="$iala_is_manual">
+				<!-- Published manual footer: gold rule over the association
+						name and title, then the publication date left and the
+						"____ P N" page stamp right, as printed in the 2017
+						MRCP -->
+				<fo:static-content flow-name="footer" role="artifact">
+					<fo:block-container font-size="7.56pt" font-weight="bold" color="{$color_corporate_blue}" border-top="0.75pt solid {$color_corporate_yellow}" line-height="1.43">
+						<fo:block margin-top="4.5mm">
+							<xsl:text>IALA </xsl:text>
+							<xsl:variable name="title">
+								<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
+							</xsl:variable>
+							<xsl:for-each select="xalan:nodeset($title)/item">
+								<xsl:copy-of select="node()"/>
+							</xsl:for-each>
+						</fo:block>
+						<fo:block text-align-last="justify">
+							<xsl:call-template name="getVariable"><xsl:with-param name="variable">date</xsl:with-param></xsl:call-template>
+							<fo:leader leader-pattern="space"/>
+							<fo:inline color="{$color_corporate_yellow}">____</fo:inline>
+							<xsl:text> P&#xa0;</xsl:text><fo:page-number />
+						</fo:block>
+					</fo:block-container>
+				</fo:static-content>
+			</xsl:when>
+			<xsl:when test="$iala_is_report">
+				<!-- Published 2021-report footer: plain title line, then the
+						centred "Page N" Word stamp -->
+				<fo:static-content flow-name="footer" role="artifact">
+					<fo:block-container font-size="7.56pt" color="{$color_corporate_blue}" line-height="1.43">
+						<fo:block margin-top="4.5mm">
+							<xsl:variable name="title">
+								<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
+							</xsl:variable>
+							<xsl:for-each select="xalan:nodeset($title)/item">
+								<xsl:copy-of select="node()"/>
+							</xsl:for-each>
+						</fo:block>
+						<fo:block text-align="center">
+							<xsl:text>Page </xsl:text><fo:page-number />
+						</fo:block>
+					</fo:block-container>
+				</fo:static-content>
+			</xsl:when>
 			<xsl:otherwise>
 
 		<fo:static-content flow-name="footer" role="artifact">
@@ -2614,6 +3110,101 @@
 				</xsl:if>
 			</fo:block-container>
 		</fo:static-content>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<!-- Reports and manuals carry the printed caption numbers inside the
+			titles themselves ("Table 3 – Gap Analysis...", "Table 6 – System
+			Description Table"); the generated autonum label and its dash
+			delimiter are dropped so the captions print verbatim. The manual's
+			annex subsection headings do the same (the printed "E3 AIS Today"
+			carries its number in the title; the body clauses keep theirs). -->
+	<xsl:template match="mn:table/mn:fmt-name/mn:span[@class = 'fmt-caption-label'][$iala_compact_landscape] |
+			mn:table/mn:fmt-name/mn:span[@class = 'fmt-caption-delim'][$iala_compact_landscape] |
+			mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-label'][$iala_compact_landscape] |
+			mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-delim'][$iala_compact_landscape] |
+			mn:annex//mn:clause/mn:fmt-title/mn:span[@class = 'fmt-caption-label'][$iala_is_manual] |
+			mn:annex//mn:clause/mn:fmt-title/mn:span[@class = 'fmt-caption-delim'][$iala_is_manual] |
+			mn:annex//mn:clause/mn:fmt-title/mn:span[@class = 'fmt-autonum-delim'][$iala_is_manual]" mode="update_xml_step1" priority="3"/>
+
+	<!-- Manuals print annex headings on one line, "ANNEX A – System
+			Description" (the caption-delim break becomes an en dash and
+			the Annex label uppercases), and the printed Contents carries
+			no annex entries at all. -->
+	<xsl:template match="mn:annex/mn:fmt-title/mn:span[@class = 'fmt-caption-delim'][mn:br][$iala_is_manual]" mode="update_xml_step1" priority="4">
+		<span class="fmt-caption-delim"> &#8211; </span>
+	</xsl:template>
+	<xsl:template match="mn:annex/mn:fmt-title/mn:span[@class = 'fmt-caption-label']//mn:span[@class = 'fmt-element-name'][normalize-space() = 'Annex'][$iala_is_manual]" mode="update_xml_step1" priority="4">
+		<span class="fmt-element-name">ANNEX</span>
+	</xsl:template>
+	<xsl:template match="mn:annex[$iala_is_manual]" mode="contents" priority="3">
+		<xsl:apply-templates mode="contents"/>
+	</xsl:template>
+
+	<!-- the printed MRCP Contents carries no level-1 entries (the Word ToC
+			was built from the level 2-4 headings only) and no ANNEX A-E
+			entries themselves, but keeps the annex subsection entries
+			(E.1, E.6.1, ...): the level-1 items are skipped and their
+			children render in their place -->
+	<xsl:template match="mnx:item[$iala_is_manual][@level = '1' or @type = 'annex']" priority="3">
+		<xsl:if test="mnx:item[@display = 'true']">
+			<fo:block role="TOC">
+				<xsl:apply-templates select="mnx:item[@display = 'true']"/>
+			</fo:block>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- List-of sequences per published form:
+			- the 2017 manual closes the Contents with a single combined
+			  LIST OF TABLES AND FIGURES (tables first, then figures);
+			- the 2021 report opens the List of Figures on its own page
+			  with the List of Tables continuing below it;
+			- every other family keeps the base order (tables, figures). -->
+	<xsl:template name="insertListsOf">
+		<xsl:param name="num"/>
+		<xsl:variable name="tables" select="$contents/mnx:doc[@num = $num]/mnx:contents//mnx:tables/mnx:table"/>
+		<xsl:variable name="figures" select="$contents/mnx:doc[@num = $num]/mnx:contents//mnx:figures/mnx:figure"/>
+		<xsl:choose>
+			<xsl:when test="$iala_is_manual">
+				<xsl:if test="$tables or $figures">
+					<fo:block xsl:use-attribute-sets="toc-listof-title-style">
+						<xsl:call-template name="refine_toc-listof-title-style"/>
+						<xsl:text>LIST OF TABLES AND FIGURES</xsl:text>
+					</fo:block>
+					<fo:block role="TOC">
+						<xsl:for-each select="$tables">
+							<xsl:call-template name="insertListOf_Item"/>
+						</xsl:for-each>
+						<xsl:for-each select="$figures">
+							<xsl:call-template name="insertListOf_Item"/>
+						</xsl:for-each>
+					</fo:block>
+				</xsl:if>
+			</xsl:when>
+			<xsl:when test="$iala_is_report">
+				<xsl:if test="$figures">
+					<fo:block break-before="page" font-size="1pt" role="SKIP"/>
+					<xsl:call-template name="insertListOfFigures">
+						<xsl:with-param name="num" select="$num"/>
+					</xsl:call-template>
+				</xsl:if>
+				<xsl:if test="$tables">
+					<xsl:call-template name="insertListOfTables">
+						<xsl:with-param name="num" select="$num"/>
+					</xsl:call-template>
+				</xsl:if>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="insertListOfTables">
+					<xsl:with-param name="num" select="$num"/>
+				</xsl:call-template>
+				<xsl:call-template name="insertListOfFigures">
+					<xsl:with-param name="num" select="$num"/>
+				</xsl:call-template>
+				<xsl:call-template name="insertListOfExamples">
+					<xsl:with-param name="num" select="$num"/>
+				</xsl:call-template>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
