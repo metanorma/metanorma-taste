@@ -890,35 +890,6 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<!-- Published documents number figures and tables sequentially through
-			the document (Figure 1..N, Table 1..N), not per-clause. -->
-	<!-- the caption render resolves the number from @autonum on the
-			figure/table element; renumber it there (sequential 1..N) -->
-	<xsl:template match="mn:figure/@autonum | mn:table/@autonum" mode="update_xml_step1" priority="3">
-		<xsl:attribute name="autonum">
-			<xsl:choose>
-				<xsl:when test="parent::mn:figure">
-					<xsl:value-of select="count(preceding::mn:figure) + 1"/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="count(preceding::mn:table) + 1"/>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:attribute>
-	</xsl:template>
-	<xsl:template match="mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-label']/mn:semx[@element = 'autonum']" mode="update_xml_step1" priority="3">
-		<mn:semx>
-			<xsl:apply-templates select="@*[local-name() != 'source']" mode="update_xml_step1"/>
-			<xsl:value-of select="count(preceding::mn:figure) + 1"/>
-		</mn:semx>
-	</xsl:template>
-	<xsl:template match="mn:table/mn:fmt-name/mn:span[@class = 'fmt-caption-label']/mn:semx[@element = 'autonum']" mode="update_xml_step1" priority="3">
-		<mn:semx>
-			<xsl:apply-templates select="@*[local-name() != 'source']" mode="update_xml_step1"/>
-			<xsl:value-of select="count(preceding::mn:table) + 1"/>
-		</mn:semx>
-	</xsl:template>
-
 	<!-- Published documents print reference entries as
 			"[n] <document identifier> <title>"; the formattedref built by the
 			presentation step carries the title only, so prepend the identifier. -->
