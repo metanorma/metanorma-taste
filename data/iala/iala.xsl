@@ -608,6 +608,19 @@
 		</xsl:if>
 	</xsl:template>
 
+	<!-- the published resolutions number their operative lists "1." "2." ...;
+	     the autonum label does not survive to text, so compute it -->
+	<xsl:template match="mn:ol/mn:li" mode="update_xml_step1" priority="3">
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<xsl:if test="$iala_is_rescirc">
+				<xsl:attribute name="label"><xsl:value-of select="count(preceding-sibling::mn:li) + 1"/>.</xsl:attribute>
+				<xsl:attribute name="full">true</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+
 	<xsl:template match="mn:clause[@type = 'revision']/mn:table[@unnumbered = 'true']" mode="update_xml_step1" priority="3">
 		<xsl:apply-templates select="." mode="document_revision"/>
 	</xsl:template>
@@ -870,9 +883,8 @@
 						</fo:table-row>
 					</fo:table-body>
 				</fo:table>
-				<fo:block-container border-top="0.5pt solid {$color_corporate_blue}" font-size="0pt" margin-top="4mm" role="SKIP">
-					<fo:block role="SKIP">&#xa0;</fo:block>
-				</fo:block-container>
+				<!-- the printed rule: a run of underscores in the published PDF -->
+				<fo:block font-size="10pt" margin-top="4mm" margin-right="2mm" role="SKIP">___________________________________________________________________</fo:block>
 				<fo:block text-align="center" font-weight="bold" font-size="11pt" margin-top="9mm">
 					<xsl:text>Resolution </xsl:text>
 					<xsl:value-of select="$iala_docidentifier"/>
@@ -888,7 +900,7 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:choose>
-					<xsl:when test="number(substring(normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on), 1, 4)) &lt; 2016">
+					<xsl:when test="number($iala_year) &lt; 2016">
 						<!-- Legacy assembly resolutions (A12 era): logo left,
 						     association name block right, resolution and
 						     adoption lines, then the title -->
@@ -1069,6 +1081,60 @@
 				</fo:block>
 			</fo:block-container>
 		</fo:static-content>
+	</xsl:template>
+
+	<!-- ============================================================ -->
+	<!-- Resolutions + circular letters: footer                        -->
+	<!-- ============================================================ -->
+	<!-- The published PDFs carry no footer text for these doctypes (the
+	     address block at the foot is a graphic), except the 2014-era
+	     assembly resolutions, which print the IALA-AISM address. -->
+	<xsl:template name="insertFooter">
+		<xsl:choose>
+			<xsl:when test="$iala_is_rescirc and number(substring(normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on), 1, 4)) &lt; 2016">
+				<fo:static-content flow-name="footer" role="artifact">
+					<fo:block-container border-top="0.2pt solid black" font-size="7.56pt" margin-top="4.5mm" line-height="1.43">
+						<fo:block text-align="right">IALA-AISM</fo:block>
+						<fo:block text-align="center">10, rue des Gaudines &#8211; 78100 Saint-Germain-en-Laye &#8211; France</fo:block>
+						<fo:block text-align="center">Tel.: +33 1 34 51 70 01 &#8211; Fax: +33 1 34 51 82 05</fo:block>
+						<fo:block text-align="center">e-mail: contact@iala-aism.org &#8211; web: www.iala-aism.org</fo:block>
+					</fo:block-container>
+				</fo:static-content>
+			</xsl:when>
+			<xsl:when test="$iala_is_rescirc">
+				<fo:static-content flow-name="footer" role="artifact">
+					<fo:block-container border-top="0.2pt solid black" font-size="0pt" margin-top="4.5mm" role="SKIP">
+						<fo:block role="SKIP"><fo:wrapper role="artifact">&#xa0;</fo:wrapper></fo:block>
+					</fo:block-container>
+				</fo:static-content>
+			</xsl:when>
+			<xsl:otherwise>
+				<fo:static-content flow-name="footer" role="artifact">
+					<fo:block-container font-size="7.56pt" font-weight="bold" color="{$color_corporate_blue}" border-top="0.2pt solid black" line-height="1.43">
+						<fo:block margin-top="4.5mm">
+							<xsl:call-template name="getVariable"><xsl:with-param name="variable">doctype_full</xsl:with-param></xsl:call-template>
+							<xsl:text> </xsl:text>
+							<xsl:call-template name="getVariable"><xsl:with-param name="variable">docidentifier</xsl:with-param></xsl:call-template>
+							<xsl:text> </xsl:text>
+							<xsl:variable name="title">
+								<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
+							</xsl:variable>
+							<xsl:for-each select="xalan:nodeset($title)/item">
+								<xsl:text> </xsl:text>
+								<xsl:copy-of select="node()"/>
+							</xsl:for-each>
+						</fo:block>
+						<fo:block text-align-last="justify">
+							<xsl:call-template name="getVariable"><xsl:with-param name="variable">edition</xsl:with-param></xsl:call-template>
+							<xsl:text> </xsl:text>
+							<fo:inline text-transform="lowercase"><xsl:call-template name="getVariable"><xsl:with-param name="variable">urn</xsl:with-param></xsl:call-template></fo:inline>
+							<fo:leader leader-pattern="space"/>
+							<xsl:text>P&#xa0;</xsl:text><fo:page-number/>
+						</fo:block>
+					</fo:block-container>
+				</fo:static-content>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:variable name="IALA-Logo">
