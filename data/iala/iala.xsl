@@ -43,6 +43,13 @@
 
 	<xsl:variable name="color_toc_title">rgb(0, 159, 227)</xsl:variable>
 
+	<!-- ============================================================ -->
+	<!-- Document kind switches                                       -->
+	<!-- ============================================================ -->
+	<xsl:variable name="iala_doctype_alias" select="normalize-space(/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:doctype-alias)"/>
+	<xsl:variable name="iala_is_report" select="$iala_doctype_alias = 'report'"/>
+	<xsl:variable name="iala_is_manual" select="$iala_doctype_alias = 'manual'"/>
+
 	<xsl:attribute-set name="root-style">
 		<xsl:attribute name="font-family">Calibri, Cambria Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
 		<xsl:attribute name="font-family-generic">Sans</xsl:attribute>
@@ -267,6 +274,17 @@
 				</fo:block-container>
 			</fo:flow>
 		</fo:page-sequence>
+
+		<xsl:if test="$iala_is_report">
+			<!-- Published IALA reports carry a blank verso after the cover;
+					the page still carries the running header and footer. -->
+			<fo:page-sequence master-reference="page" force-page-count="no-force">
+				<xsl:call-template name="insertHeaderFooter"/>
+				<fo:flow flow-name="xsl-region-body">
+					<fo:block/>
+				</fo:flow>
+			</fo:page-sequence>
+		</xsl:if>
 	</xsl:template> <!-- END cover-page -->
 
 	<xsl:template name="inner-cover-page">
@@ -529,12 +547,77 @@
 	<!-- ============================================================ -->
 	<!-- change the order ToC and DOCUMENT REVISION -->
 	<xsl:template match="mn:preface/mn:clause[@type = 'toc']" mode="update_xml_step1" priority="4">
-		<xsl:apply-templates select="../mn:clause[@type = 'revision']" mode="update_xml_step1">
-			<xsl:with-param name="process">true</xsl:with-param>
-		</xsl:apply-templates>
+		<xsl:choose>
+			<xsl:when test="$iala_is_report">
+				<!-- Published IALA reports open with the Executive summary,
+						then the Contents; they carry no Document Revision page
+						and a blank verso follows the cover. -->
+				<xsl:apply-templates select="../mn:executivesummary" mode="update_xml_step1">
+					<xsl:with-param name="process">true</xsl:with-param>
+				</xsl:apply-templates>
+			</xsl:when>
+			<xsl:when test="../mn:clause[@type = 'revision']">
+				<xsl:apply-templates select="../mn:clause[@type = 'revision']" mode="update_xml_step1">
+					<xsl:with-param name="process">true</xsl:with-param>
+				</xsl:apply-templates>
+			</xsl:when>
+			<xsl:when test="$iala_is_manual">
+				<!-- Published IALA manuals print a DOCUMENT HISTORY page
+						before the contents; synthesise it from the bibdata
+						edition when the source carries no revision clause. -->
+				<xsl:variable name="synth_revision">
+					<xsl:call-template name="make_document_history_clause"/>
+				</xsl:variable>
+				<xsl:apply-templates select="xalan:nodeset($synth_revision)/mn:clause" mode="update_xml_step1"/>
+			</xsl:when>
+		</xsl:choose>
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
 		</xsl:copy>
+	</xsl:template>
+
+	<!-- Reports: the Executive summary moves ahead of the Contents -->
+	<xsl:template match="mn:preface/mn:executivesummary" mode="update_xml_step1" priority="4">
+		<xsl:param name="process">false</xsl:param>
+		<xsl:if test="$process = 'true'">
+			<xsl:copy>
+				<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+				<xsl:attribute name="displayorder">-1</xsl:attribute>
+				<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+			</xsl:copy>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- Synthesised DOCUMENT HISTORY clause for manuals: the published
+			manuals print the title above a Date / Details / Approval table. -->
+	<xsl:template name="make_document_history_clause">
+		<mn:clause type="revision" id="__iala_synth_document_revision" displayorder="-1">
+			<mn:title>Document history</mn:title>
+			<mn:fmt-title>Document history</mn:fmt-title>
+			<mn:table id="__iala_synth_document_revision_table" unnumbered="true">
+				<mn:thead>
+					<mn:tr>
+						<mn:td>Date</mn:td>
+						<mn:td>Details</mn:td>
+						<mn:td>Approval</mn:td>
+					</mn:tr>
+				</mn:thead>
+				<mn:tbody>
+					<mn:tr>
+						<mn:td>
+							<xsl:call-template name="convertDate">
+								<xsl:with-param name="date" select="/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on"/>
+							</xsl:call-template>
+						</mn:td>
+						<mn:td>
+							<xsl:text>Edition </xsl:text>
+							<xsl:value-of select="/mn:metanorma/mn:bibdata/mn:edition[normalize-space(@language) != '' or not(@language)][1]"/>
+						</mn:td>
+						<mn:td>Council</mn:td>
+					</mn:tr>
+				</mn:tbody>
+			</mn:table>
+		</mn:clause>
 	</xsl:template>
 	<xsl:template match="mn:preface/mn:clause[@type = 'revision']" mode="update_xml_step1" priority="4">
 		<xsl:param name="process">false</xsl:param>
@@ -628,6 +711,107 @@
 	<!-- ============================================================ -->
 
 	<!-- keep ' — ' -->
+		<!-- ============================================================ -->
+	<!-- Landscape pages for wide tables                              -->
+	<!-- ============================================================ -->
+	<!-- Published IALA documents print wide tables on landscape pages.
+			Inject source-level pagebreaks so the page-sequence splitting
+			machinery of the base stylesheet rotates those tables onto
+			their own landscape sequences.
+			A table is wide when it is a matrix of 10+ columns, a named
+			Taxonomy / Competence table, or a 4+ column table carrying at
+			least two long-text cells (>= 120 chars) - unless it sits in
+			an annex, where only 6+ column tables rotate (the annex
+			frequency-allocation tables stay portrait). -->
+	<xsl:template name="is_iala_wide_table">
+		<xsl:param name="table"/>
+		<xsl:variable name="cols">
+			<xsl:choose>
+				<xsl:when test="$table/mn:colgroup">
+					<xsl:value-of select="count($table/mn:colgroup/mn:col)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<!-- widest of the header row and the body rows -->
+					<xsl:variable name="row_counts_">
+						<r><xsl:value-of select="count($table/mn:thead/mn:tr[1]/*)"/></r>
+						<xsl:for-each select="$table/mn:tbody/mn:tr">
+							<r><xsl:value-of select="count(mn:th | mn:td)"/></r>
+						</xsl:for-each>
+					</xsl:variable>
+					<xsl:for-each select="xalan:nodeset($row_counts_)/r">
+						<xsl:sort select="." data-type="number" order="descending"/>
+						<xsl:if test="position() = 1">
+							<xsl:value-of select="."/>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="long_cells" select="count($table/mn:tbody//mn:td[string-length(normalize-space()) &gt;= 120] | $table/mn:tbody//mn:th[string-length(normalize-space()) &gt;= 120])"/>
+		<xsl:variable name="name" select="normalize-space($table/mn:fmt-name)"/>
+		<xsl:if test="$cols &gt;= 10
+				or contains($name, 'Taxonomy') or contains($name, 'Competence Table')
+				or ($cols &gt;= 4 and $long_cells &gt;= 2 and (not($table/ancestor::mn:annex) or $cols &gt;= 6))">
+			<xsl:text>true</xsl:text>
+		</xsl:if>
+	</xsl:template>
+
+	<xsl:template match="mn:table[not(ancestor::mn:table)][not(ancestor::mn:clause[@type = 'revision'])]" mode="update_xml_step1" priority="1">
+		<xsl:variable name="wide">
+			<xsl:call-template name="is_iala_wide_table">
+				<xsl:with-param name="table" select="."/>
+			</xsl:call-template>
+		</xsl:variable>
+		<!-- when the table opens its annex, the annex-level template
+				below has already rotated the page before the title -->
+		<xsl:variable name="skip_leading_break" select="parent::mn:annex and not(preceding-sibling::*[not(self::mn:fmt-title)])"/>
+		<xsl:if test="normalize-space($wide) = 'true' and not($skip_leading_break)">
+			<mn:pagebreak from_source_xml="true" orientation="landscape"/>
+		</xsl:if>
+		<xsl:copy>
+			<xsl:apply-templates select="@*" mode="update_xml_step1"/>
+			<xsl:if test="normalize-space($wide) = 'true'">
+				<xsl:attribute name="landscape">true</xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates select="node()" mode="update_xml_step1"/>
+		</xsl:copy>
+		<xsl:variable name="next_tbl" select="following-sibling::mn:table[1]"/>
+		<xsl:variable name="next_wide">
+			<xsl:if test="$next_tbl">
+				<xsl:call-template name="is_iala_wide_table">
+					<xsl:with-param name="table" select="$next_tbl"/>
+				</xsl:call-template>
+			</xsl:if>
+		</xsl:variable>
+		<!-- published layout keeps legend paragraphs and small companion
+				tables of a table run on the same landscape spread -->
+		<xsl:variable name="next_wide_id" select="generate-id($next_tbl)"/>
+		<xsl:variable name="between" select="following-sibling::*[generate-id(following-sibling::mn:table[1]) = $next_wide_id]"/>
+		<xsl:variable name="keep_landscape_run" select="normalize-space($next_wide) = 'true' and not($between[not(self::mn:p or self::mn:note)])"/>
+		<xsl:if test="normalize-space($wide) = 'true' and not($keep_landscape_run)">
+			<mn:pagebreak from_source_xml="true" orientation="portrait"/>
+		</xsl:if>
+	</xsl:template>
+	<!-- Annexes that open with a wide table start on the landscape
+			page itself (title and table share it, as published). -->
+	<xsl:template match="mn:annex" mode="update_xml_step1" priority="1">
+		<xsl:variable name="first_tbl" select="mn:table[not(preceding-sibling::*[not(self::mn:fmt-title)])][1]"/>
+		<xsl:if test="$first_tbl">
+			<xsl:variable name="wide">
+				<xsl:call-template name="is_iala_wide_table">
+					<xsl:with-param name="table" select="$first_tbl"/>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:if test="normalize-space($wide) = 'true'">
+				<mn:pagebreak from_source_xml="true" orientation="landscape"/>
+			</xsl:if>
+		</xsl:if>
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()" mode="update_xml_step1"/>
+		</xsl:copy>
+	</xsl:template>
+
+
 	<xsl:template match="mn:figure/mn:fmt-name/mn:span[@class = 'fmt-caption-delim']" mode="update_xml_step1" priority="4">
 		<padding value="5mm"/>
 	</xsl:template>
@@ -658,7 +842,14 @@
 		<fo:inline padding-right="5mm" role="SKIP"><xsl:value-of select="$zero_width_space"/></fo:inline>
 	</xsl:template> -->
 	<xsl:template name="refine_table-container-style"><?extend?>
-		<xsl:attribute name="font-size">10pt</xsl:attribute>
+		<xsl:attribute name="font-size">
+			<xsl:choose>
+				<!-- wide tables rotate onto landscape pages at the compact
+						published size, so they keep the published pagination -->
+				<xsl:when test="@landscape = 'true'">7.5pt</xsl:when>
+				<xsl:otherwise>10pt</xsl:otherwise>
+			</xsl:choose>
+		</xsl:attribute>
 	</xsl:template>
 
 	<xsl:template name="refine_table-header-row-style"><?extend?>
@@ -668,6 +859,10 @@
 	
 	<xsl:template name="refine_table-header-cell-style"><?extend?>
 		<xsl:attribute name="padding-left">4mm</xsl:attribute>
+		<xsl:if test="ancestor::mn:table[@landscape = 'true']">
+			<xsl:attribute name="padding-left">2mm</xsl:attribute>
+			<xsl:attribute name="padding-right">2mm</xsl:attribute>
+		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template name="refine_table-body-row-style"><?extend?>
@@ -681,6 +876,42 @@
 	<xsl:template name="refine_table-cell-style"><?extend?>
 		<xsl:attribute name="padding-left">4mm</xsl:attribute>
 		<xsl:attribute name="display-align">center</xsl:attribute>
+		<xsl:if test="ancestor::mn:table[@landscape = 'true']">
+			<xsl:attribute name="padding-left">2mm</xsl:attribute>
+			<xsl:attribute name="padding-right">2mm</xsl:attribute>
+			<xsl:attribute name="line-height">1.15</xsl:attribute>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- Column widths: the base derives proportional widths from the
+			longest word in each column, which starves the leading text
+			column of wide tables. On landscape tables give the first
+			column double weight, as in the published documents. -->
+	<xsl:template name="insertTableColumnWidth">
+		<xsl:param name="colwidths"/>
+		<xsl:variable name="is_landscape_table" select="boolean(self::mn:table[@landscape = 'true'] or ancestor-or-self::mn:table[@landscape = 'true'])"/>
+		<xsl:for-each select="xalan:nodeset($colwidths)//column">
+			<xsl:choose>
+				<xsl:when test=". = 1 or . = 0">
+					<fo:table-column column-width="proportional-column-width(2)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:variable name="divider">
+						<xsl:value-of select="@divider"/>
+						<xsl:if test="not(@divider)">1</xsl:if>
+					</xsl:variable>
+					<xsl:variable name="w" select="round(. div $divider)"/>
+					<xsl:choose>
+						<xsl:when test="position() = 1 and $is_landscape_table">
+							<fo:table-column column-width="proportional-column-width({round($w * 2)})"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<fo:table-column column-width="proportional-column-width({$w})"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:for-each>
 	</xsl:template>
 
 	<xsl:variable name="ul_labels_">
