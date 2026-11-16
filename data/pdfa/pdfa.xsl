@@ -1226,7 +1226,7 @@
 		<xsl:apply-templates select="processing-instruction('plantuml')/following-sibling::*[local-name() = 'text']" mode="svg_update"/>
 	</xsl:template>
 
-	<xsl:template match="*[local-name() = 'text']" mode="svg_update">
+	<xsl:template match="*[local-name() = 'text' or local-name() = 'g']" mode="svg_update">
 		<xsl:copy>
 			<xsl:copy-of select="@*"/>
 				<xsl:if test="@font-family = 'sans-serif'">
