@@ -172,8 +172,11 @@ module Metanorma
     end
 
     def isodoc_attrs(flavor, format)
-      require "metanorma-standoc" unless defined?(::Metanorma::Standoc)
-      
+      # the guard tests the constant this method uses, not the gem's root
+      # namespace: Metanorma::Standoc can exist partially loaded (a gem
+      # that only evaluated metanorma/standoc/version, as gemspecs do)
+      # while Standoc::Base is still missing
+      require "metanorma-standoc" unless defined?(::Metanorma::Standoc::Base)
       # Define ExtractorHelper class dynamically after metanorma-standoc is loaded
       extractor_class = Class.new do
         include ::Metanorma::Standoc::Base
