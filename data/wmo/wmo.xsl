@@ -2691,15 +2691,23 @@
 	<!-- Cover background layer: the art bitmap for the arc classes,
 	     nothing for the solid Pantone classes. Resolves against the
 	     baseassetpath mn2pdf passes. -->
+	<xsl:variable name="wmo_cover_art_file">
+		<xsl:choose>
+			<xsl:when test="$wmo_cover_class = 'manual'">wmo-cover-art-manual.png</xsl:when>
+			<xsl:when test="$wmo_cover_class = 'guide'">wmo-cover-art-guide.png</xsl:when>
+			<xsl:when test="$wmo_cover_class = 'report-yellow'">wmo-cover-art-p108.png</xsl:when>
+			<xsl:when test="$wmo_cover_class = 'report-pink'">wmo-cover-art-p196.png</xsl:when>
+			<xsl:when test="$wmo_cover_class = 'report-light-green'">wmo-cover-art-p368.png</xsl:when>
+			<xsl:otherwise>wmo-cover-art.png</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
 	<xsl:variable name="wmo_cover_bg_image">
-		<xsl:if test="$wmo_cover_solid = ''">
-			<xsl:choose>
-				<xsl:when test="normalize-space($baseassetpath) != ''">
-					url(<xsl:value-of select="concat($baseassetpath, '/wmo-cover-art.png')"/>)
-				</xsl:when>
-				<xsl:otherwise>url(wmo-cover-art.png)</xsl:otherwise>
-			</xsl:choose>
-		</xsl:if>
+		<xsl:choose>
+			<xsl:when test="normalize-space($baseassetpath) != ''">
+				url(<xsl:value-of select="concat($baseassetpath, '/', $wmo_cover_art_file)"/>)
+			</xsl:when>
+			<xsl:otherwise>url(<xsl:value-of select="$wmo_cover_art_file"/>)</xsl:otherwise>
+		</xsl:choose>
 	</xsl:variable>
 
 	<xsl:variable name="wmo_cover_ink">
