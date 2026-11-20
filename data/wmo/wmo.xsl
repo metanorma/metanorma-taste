@@ -372,19 +372,7 @@
 				<xsl:call-template name="insert_firstpage_id"><xsl:with-param name="num" select="$num"/></xsl:call-template>
 
 				<!-- WMO signature cover: green field with sweeping arcs -->
-				<xsl:choose>
-					<xsl:when test="$wmo_cover_solid != ''">
-						<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" background-color="{$wmo_cover_solid}" font-size="0pt" role="SKIP">
-							<fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block>
-						</fo:block-container>
-					</xsl:when>
-					<xsl:otherwise>
-						<!-- abstract sweeps over the green region background -->
-						<fo:block font-size="0pt" role="SKIP">
-						<fo:external-graphic src="url(wmo-cover-art.png)" width="210mm" content-height="scale-to-fit" scaling="uniform" fox:alt-text="WMO cover art" fox:placement="Block" />
-						</fo:block>
-					</xsl:otherwise>
-				</xsl:choose>
+
 
 
 				<!-- Cover image slot for technical publications: the image
@@ -450,6 +438,19 @@
 						<fo:block>In conjunction with the</fo:block>
 						<fo:block>International Hydrographic Organization</fo:block>
 					</fo:block>
+				<xsl:choose>
+					<xsl:when test="$wmo_cover_solid != ''">
+						<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" background-color="{$wmo_cover_solid}" font-size="0pt" role="SKIP">
+							<fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block>
+						</fo:block-container>
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- abstract sweeps over the green region background -->
+						<fo:block font-size="0pt" role="SKIP">
+						<fo:external-graphic src="url(wmo-cover-art.png)" width="210mm" content-height="scale-to-fit" scaling="uniform" fox:alt-text="WMO cover art" fox:placement="Block" />
+						</fo:block>
+					</xsl:otherwise>
+				</xsl:choose>
 				</fo:block-container>
 			</fo:flow>
 		</fo:page-sequence>
