@@ -380,20 +380,18 @@
 					</xsl:when>
 					<xsl:otherwise>
 						<!-- abstract sweeps over the green region background -->
-						<fo:block font-size="0pt" line-height="0pt" role="SKIP">
-						<fo:instream-foreign-object content-width="205mm" content-height="292mm" fox:alt-text="WMO cover art" fox:placement="Block">
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 205 292">
-								<path d="M0,0 L205,0 L205,25 C138,8 68,8 0,25 Z" fill="#0A6E37" opacity="0.55"/>
-								<path d="M0,202 C68,188 147,227 205,198 L205,292 L0,292 Z" fill="#22A24E" opacity="0.75"/>
-								<path d="M0,242 C78,228 147,261 205,236 L205,292 L0,292 Z" fill="#41B478" opacity="0.8"/>
-								<rect x="0" y="175" width="6" height="12" fill="{$wmo_turquoise}"/>
-								<rect x="0" y="187" width="6" height="12" fill="{$wmo_green}"/>
-								<rect x="0" y="199" width="6" height="12" fill="{$wmo_gold}"/>
-								<rect x="0" y="211" width="6" height="14" fill="{$wmo_blue}"/>
-								<text x="8.5" y="225" transform="rotate(-90 8.5 225)" font-family="Verdana, DejaVu Sans, Arial" font-size="7.5" fill="#FFFFFF" letter-spacing="1">WEATHER&#160;&#160;CLIMATE&#160;&#160;WATER</text>
+						<fo:instream-foreign-object content-height="297mm" fox:alt-text="WMO cover art" fox:placement="Block">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297">
+								<path d="M0,0 L210,0 L210,26 C140,8 70,8 0,26 Z" fill="#0A6E37" opacity="0.55"/>
+								<path d="M0,206 C70,192 150,230 210,202 L210,297 L0,297 Z" fill="#22A24E" opacity="0.75"/>
+								<path d="M0,246 C80,232 150,265 210,240 L210,297 L0,297 Z" fill="#41B478" opacity="0.8"/>
+								<rect x="0" y="181" width="6" height="12" fill="{$wmo_turquoise}"/>
+								<rect x="0" y="193" width="6" height="12" fill="{$wmo_green}"/>
+								<rect x="0" y="205" width="6" height="12" fill="{$wmo_gold}"/>
+								<rect x="0" y="217" width="6" height="14" fill="{$wmo_blue}"/>
+								<text x="9" y="230" transform="rotate(-90 9 230)" font-family="Verdana, DejaVu Sans, Arial" font-size="7.5" fill="#FFFFFF" letter-spacing="1">WEATHER&#160;&#160;CLIMATE&#160;&#160;WATER</text>
 							</svg>
 						</fo:instream-foreign-object>
-						</fo:block>
 					</xsl:otherwise>
 				</xsl:choose>
 
@@ -403,7 +401,7 @@
 				<xsl:if test="$wmo_cover_class = 'technical'">
 					<fo:block-container absolute-position="absolute" left="0mm" top="170mm" width="210mm" height="84mm" font-size="0pt" role="SKIP">
 						<fo:block font-size="0pt" role="SKIP">
-						<fo:instream-foreign-object content-width="210mm" content-height="84mm" scaling="non-uniform" fox:alt-text="Cover image" fox:placement="Block">
+						<fo:instream-foreign-object content-height="84mm" scaling="non-uniform" fox:alt-text="Cover image" fox:placement="Block">
 							<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 210 84">
 								<image xlink:href="cover-image.jpg" x="0" y="0" width="210" height="84" preserveAspectRatio="xMidYMid slice"/>
 							</svg>
