@@ -249,6 +249,9 @@
 <xsl:template name="layout-master-set">
 		<fo:layout-master-set>
 			<!-- cover page -->
+			<fo:simple-page-master master-name="back-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="0mm" margin-bottom="0mm" margin-left="0mm" margin-right="0mm"/>
+			</fo:simple-page-master>
 			<fo:simple-page-master master-name="cover-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
 				<fo:region-body margin-top="0mm" margin-bottom="0mm" margin-left="0mm" margin-right="0mm" background-color="{$wmo_cover_green}">
 					<xsl:if test="normalize-space($wmo_cover_bg_image) != ''">
@@ -2764,9 +2767,7 @@
 		<xsl:attribute name="role">H1</xsl:attribute>
 	</xsl:attribute-set>
 	<xsl:template name="back-page">
-		<fo:page-sequence master-reference="first" force-page-count="no-force">
-			<fo:static-content flow-name="header" role="SKIP"><fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block></fo:static-content>
-			<fo:static-content flow-name="footer" role="SKIP"><fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block></fo:static-content>
+		<fo:page-sequence master-reference="back-page" force-page-count="no-force">
 			<fo:flow flow-name="xsl-region-body">
 				<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" background-color="{$wmo_back_blue}" font-size="0pt" role="SKIP">
 					<fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block>
