@@ -327,10 +327,21 @@
 									<rect x="0" y="0" width="210" height="297" fill="{$wmo_cover_solid}"/>
 								</xsl:when>
 								<xsl:otherwise>
-									<rect x="0" y="0" width="210" height="297" fill="{$wmo_cover_green}"/>
-									<path d="M0,0 L95,0 C65,38 32,62 0,74 Z" fill="{$wmo_cover_green_dark}"/>
-									<path d="M0,118 C70,140 150,108 210,148 L210,297 L0,297 Z" fill="{$wmo_cover_green_mid}"/>
-									<path d="M0,186 C80,208 158,178 210,206 L210,297 L0,297 Z" fill="{$wmo_cover_green_light}"/>
+									<defs>
+										<linearGradient id="wmo-green-base" x1="0" y1="0" x2="0" y2="1">
+											<stop offset="0" stop-color="#0A733A"/>
+											<stop offset="0.45" stop-color="#009B47"/>
+											<stop offset="1" stop-color="#009244"/>
+										</linearGradient>
+										<linearGradient id="wmo-green-sweep" x1="0" y1="0" x2="0.35" y2="1">
+											<stop offset="0" stop-color="#22A24E"/>
+											<stop offset="1" stop-color="#41B478"/>
+										</linearGradient>
+									</defs>
+									<rect x="0" y="0" width="210" height="297" fill="url(#wmo-green-base)"/>
+									<path d="M0,0 L210,0 L210,26 C140,8 70,8 0,26 Z" fill="#0A6E37" opacity="0.6"/>
+									<path d="M0,206 C70,192 150,232 210,202 L210,297 L0,297 Z" fill="url(#wmo-green-sweep)"/>
+									<path d="M0,246 C80,232 150,266 210,240 L210,297 L0,297 Z" fill="#41B478" opacity="0.85"/>
 								</xsl:otherwise>
 							</xsl:choose>
 						</svg>
@@ -354,14 +365,14 @@
 				</xsl:if>
 
 				<!-- Weather Climate Water colour band: turquoise, green, gold, WMO blue -->
-				<fo:block-container absolute-position="absolute" left="0mm" top="179mm" width="6mm" height="68mm" font-size="0pt" role="SKIP">
+				<fo:block-container absolute-position="absolute" left="0mm" top="181mm" width="6mm" height="48mm" font-size="0pt" role="SKIP">
 					<fo:block font-size="0pt" role="SKIP">
-					<fo:instream-foreign-object width="6mm" height="68mm" fox:alt-text="WMO Weather Climate Water colour band">
+					<fo:instream-foreign-object width="6mm" height="48mm" fox:alt-text="WMO Weather Climate Water colour band">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 68">
 							<rect x="0" y="0" width="6" height="16" fill="{$wmo_turquoise}"/>
 							<rect x="0" y="16" width="6" height="16" fill="{$wmo_green}"/>
 							<rect x="0" y="32" width="6" height="16" fill="{$wmo_gold}"/>
-							<rect x="0" y="48" width="6" height="20" fill="{$wmo_blue}"/>
+							<rect x="0" y="36" width="6" height="12" fill="{$wmo_blue}"/>
 						</svg>
 					</fo:instream-foreign-object>
 					</fo:block>
@@ -373,7 +384,7 @@
 				</fo:block-container>
 
 				<!-- Title: Level 1 (25 pts), left-aligned, white -->
-				<fo:block-container absolute-position="absolute" left="30mm" top="53mm" width="150mm" height="70mm">
+				<fo:block-container absolute-position="absolute" left="29mm" top="58mm" width="150mm" height="70mm">
 					<fo:block color="{$wmo_cover_ink}" font-size="25pt" line-height="30pt" font-weight="normal">
 						<xsl:variable name="title">
 							<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title</xsl:with-param></xsl:call-template>
@@ -387,16 +398,16 @@
 				</fo:block-container>
 
 				<!-- Edition line, mid page as in the printed series -->
-				<fo:block-container absolute-position="absolute" left="30mm" top="152mm" width="120mm">
+				<fo:block-container absolute-position="absolute" left="29mm" top="149mm" width="120mm">
 					<fo:block color="{$wmo_cover_ink}" font-size="10pt" font-weight="bold">
 						<xsl:value-of select="substring(normalize-space(/mn:metanorma/mn:bibdata/mn:date[@type = 'published']/mn:on), 1, 4)"/><xsl:text> edition</xsl:text>
 					</fo:block>
 				</fo:block-container>
 
 				<!-- WMO logotype in reverse: emblem above the full name -->
-				<fo:block-container absolute-position="absolute" left="30mm" top="226mm" width="80mm">
+				<fo:block-container absolute-position="absolute" left="29mm" top="224mm" width="80mm">
 					<fo:block font-size="0pt" role="SKIP">
-						<fo:instream-foreign-object content-width="13mm" fox:alt-text="World Meteorological Organization emblem" fox:placement="Block">
+						<fo:instream-foreign-object content-width="16mm" fox:alt-text="World Meteorological Organization emblem" fox:placement="Block">
 							<xsl:copy-of select="$wmo_cover_emblem"/>
 						</fo:instream-foreign-object>
 					</fo:block>
@@ -2621,6 +2632,7 @@
 
 	<!-- WMO publication-class colours (Pantone Coated approximations,
 	     B5 of the corporate visual identity guidelines). -->
+	<xsl:variable name="wmo_back_blue">rgb(0, 91, 170)</xsl:variable>
 	<xsl:variable name="wmo_pantone_187">rgb(200, 16, 46)</xsl:variable>
 	<xsl:variable name="wmo_pantone_341">rgb(0, 118, 114)</xsl:variable>
 	<xsl:variable name="wmo_pantone_108">rgb(254, 209, 65)</xsl:variable>
@@ -2725,4 +2737,31 @@
 		<xsl:attribute name="margin-bottom">7.5pt</xsl:attribute>
 		<xsl:attribute name="role">H1</xsl:attribute>
 	</xsl:attribute-set>
+	<xsl:template name="back-page">
+		<fo:page-sequence master-reference="first" force-page-count="no-force">
+			<fo:static-content flow-name="header" role="SKIP"><fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block></fo:static-content>
+			<fo:static-content flow-name="footer" role="SKIP"><fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block></fo:static-content>
+			<fo:flow flow-name="xsl-region-body">
+				<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" font-size="0pt" role="SKIP">
+					<fo:block font-size="0pt" role="SKIP">
+					<fo:instream-foreign-object width="210mm" height="297mm" fox:alt-text="WMO back cover" fox:placement="Block">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297">
+							<rect x="0" y="0" width="210" height="297" fill="{$wmo_back_blue}"/>
+						</svg>
+					</fo:instream-foreign-object>
+					</fo:block>
+				</fo:block-container>
+				<fo:block-container absolute-position="absolute" left="60mm" top="216mm" width="120mm">
+					<fo:block color="white" font-size="7pt" text-align="right">For more information, please contact:</fo:block>
+					<fo:block color="white" font-size="10pt" font-weight="bold" text-align="right" margin-top="1.5mm">World Meteorological Organization</fo:block>
+					<fo:block color="white" font-size="7pt" text-align="right" margin-top="0.8mm">7 bis, avenue de la Paix &#8211; P.O. Box 2300 &#8211; CH-1211 Geneva 2 &#8211; Switzerland</fo:block>
+					<fo:block color="white" font-size="7.5pt" font-weight="bold" text-align="right" margin-top="2.2mm">Strategic Communications Office</fo:block>
+					<fo:block color="white" font-size="7pt" text-align="right" margin-top="0.8mm">Tel.: +41 (0) 22 730 83 14</fo:block>
+					<fo:block color="white" font-size="7pt" text-align="right">Email: spa@wmo.int</fo:block>
+					<fo:block color="white" font-size="8pt" font-weight="bold" text-align="right" margin-top="1.5mm">wmo.int</fo:block>
+				</fo:block-container>
+			</fo:flow>
+		</fo:page-sequence>
+	</xsl:template>
+
 </xsl:stylesheet>
