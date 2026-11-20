@@ -241,75 +241,7 @@
 		</xsl:for-each>
 	</xsl:variable>
 
-	<xsl:template name="layout-master-set">
-		<fo:layout-master-set>
-				
-			<!-- Cover page -->
-			<fo:simple-page-master master-name="cover-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
-				<fo:region-body margin-top="48mm" margin-bottom="31mm" margin-left="6mm" margin-right="7mm"/>
-				<fo:region-before region-name="cover-page-header" extent="48mm" />
-				<fo:region-after region-name="cover-page-footer" extent="31mm"/>
-				<fo:region-start extent="6mm"/>
-				<fo:region-end extent="7mm"/>
-			</fo:simple-page-master>
-		
-			<fo:simple-page-master master-name="page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
-				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
-				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
-				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
-				<fo:region-start region-name="left-region" extent="{$marginLeftRight1}mm"/>
-				<fo:region-end region-name="right-region" extent="{$marginLeftRight2}mm"/>
-			</fo:simple-page-master>
-			
-			<fo:simple-page-master master-name="page-landscape" page-width="{$pageHeight}mm" page-height="{$pageWidth}mm">
-				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
-				<fo:region-before region-name="header" extent="{$marginTop}mm"/> 
-				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
-				<fo:region-start region-name="left-region" extent="{$marginLeftRight1}mm"/>
-				<fo:region-end region-name="right-region" extent="{$marginLeftRight2}mm"/>
-			</fo:simple-page-master>
-			
-			<!-- Preface pages -->
-			<fo:page-sequence-master master-name="preface">
-				<fo:repeatable-page-master-alternatives>
-					<fo:conditional-page-master-reference odd-or-even="even" master-reference="page"/>
-					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="page"/>
-				</fo:repeatable-page-master-alternatives>
-			</fo:page-sequence-master>
-			<fo:page-sequence-master master-name="preface-landscape">
-				<fo:repeatable-page-master-alternatives>
-					<fo:conditional-page-master-reference odd-or-even="even" master-reference="page-landscape"/>
-					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="page-landscape"/>
-				</fo:repeatable-page-master-alternatives>
-			</fo:page-sequence-master>
-			<!-- Document pages -->
-			<fo:page-sequence-master master-name="document">
-				<fo:repeatable-page-master-alternatives>
-					<fo:conditional-page-master-reference odd-or-even="even" master-reference="page"/>
-					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="page"/>
-				</fo:repeatable-page-master-alternatives>
-			</fo:page-sequence-master>
-			<fo:page-sequence-master master-name="document-portrait">
-				<fo:repeatable-page-master-alternatives>
-					<fo:conditional-page-master-reference odd-or-even="even" master-reference="page"/>
-					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="page"/>
-				</fo:repeatable-page-master-alternatives>
-			</fo:page-sequence-master>
-			<fo:page-sequence-master master-name="document-landscape">
-				<fo:repeatable-page-master-alternatives>
-					<fo:conditional-page-master-reference odd-or-even="even" master-reference="page-landscape"/>
-					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="page-landscape"/>
-				</fo:repeatable-page-master-alternatives>
-			</fo:page-sequence-master>
-			
-			<fo:page-sequence-master master-name="index">
-				<fo:repeatable-page-master-alternatives>
-					<fo:conditional-page-master-reference odd-or-even="even" master-reference="page"/>
-					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="page"/>
-				</fo:repeatable-page-master-alternatives>
-			</fo:page-sequence-master>
-		</fo:layout-master-set>
-	</xsl:template><!-- END layout-master-set -->
+<!-- END layout-master-set -->
 
 	<!-- Shadow of the base layout-master-set: identical masters except
 	     the cover page, which is full-bleed with the WMO green field as
