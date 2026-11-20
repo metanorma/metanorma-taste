@@ -319,6 +319,7 @@
 
 				<!-- WMO signature cover: green field with sweeping arcs -->
 				<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" font-size="0pt" role="SKIP">
+					<fo:block font-size="0pt" role="SKIP">
 					<fo:instream-foreign-object width="210mm" height="297mm" fox:alt-text="WMO cover background" fox:placement="Block">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297">
 							<rect x="0" y="0" width="210" height="297" fill="{$wmo_cover_green}"/>
@@ -327,10 +328,12 @@
 							<path d="M0,186 C80,208 158,178 210,206 L210,297 L0,297 Z" fill="{$wmo_cover_green_light}"/>
 						</svg>
 					</fo:instream-foreign-object>
+					</fo:block>
 				</fo:block-container>
 
 				<!-- Weather Climate Water colour band: turquoise, green, gold, WMO blue -->
 				<fo:block-container absolute-position="absolute" left="0mm" top="179mm" width="6mm" height="68mm" font-size="0pt" role="SKIP">
+					<fo:block font-size="0pt" role="SKIP">
 					<fo:instream-foreign-object width="6mm" height="68mm" fox:alt-text="WMO Weather Climate Water colour band">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 68">
 							<rect x="0" y="0" width="6" height="16" fill="{$wmo_turquoise}"/>
@@ -339,6 +342,7 @@
 							<rect x="0" y="48" width="6" height="20" fill="{$wmo_blue}"/>
 						</svg>
 					</fo:instream-foreign-object>
+					</fo:block>
 				</fo:block-container>
 
 				<!-- WMO subtitle along the band, reading bottom-up -->
