@@ -446,9 +446,11 @@
 					</xsl:when>
 					<xsl:otherwise>
 						<!-- abstract sweeps over the green region background -->
-						<fo:block font-size="0pt" role="SKIP">
-						<fo:external-graphic src="url(wmo-cover-art.png)" width="210mm" content-height="scale-to-fit" scaling="uniform" fox:alt-text="WMO cover art" fox:placement="Block" />
-						</fo:block>
+						<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" font-size="0pt" start-indent="0pt" role="SKIP">
+							<fo:block font-size="0pt" start-indent="0pt" role="SKIP">
+							<fo:external-graphic src="url(wmo-cover-art.png)" content-width="210mm" content-height="297mm" scaling="non-uniform" fox:alt-text="WMO cover art" fox:placement="Block" />
+							</fo:block>
+						</fo:block-container>
 					</xsl:otherwise>
 				</xsl:choose>
 				</fo:block-container>
