@@ -320,7 +320,7 @@
 				<!-- WMO signature cover: green field with sweeping arcs -->
 				<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" font-size="0pt" role="SKIP">
 					<fo:block font-size="0pt" role="SKIP">
-					<fo:instream-foreign-object width="210mm" height="297mm" fox:alt-text="WMO cover background" fox:placement="Block">
+					<fo:instream-foreign-object content-width="210mm" content-height="297mm" fox:alt-text="WMO cover background" fox:placement="Block">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297">
 							<xsl:choose>
 								<xsl:when test="$wmo_cover_solid != ''">
@@ -355,7 +355,7 @@
 				<xsl:if test="$wmo_cover_class = 'technical'">
 					<fo:block-container absolute-position="absolute" left="0mm" top="170mm" width="210mm" height="84mm" font-size="0pt" role="SKIP">
 						<fo:block font-size="0pt" role="SKIP">
-						<fo:instream-foreign-object width="210mm" height="84mm" fox:alt-text="Cover image" fox:placement="Block">
+						<fo:instream-foreign-object content-width="210mm" content-height="84mm" fox:alt-text="Cover image" fox:placement="Block">
 							<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 210 84">
 								<image xlink:href="cover-image.jpg" x="0" y="0" width="210" height="84" preserveAspectRatio="xMidYMid slice"/>
 							</svg>
@@ -367,7 +367,7 @@
 				<!-- Weather Climate Water colour band: turquoise, green, gold, WMO blue -->
 				<fo:block-container absolute-position="absolute" left="0mm" top="181mm" width="6mm" height="48mm" font-size="0pt" role="SKIP">
 					<fo:block font-size="0pt" role="SKIP">
-					<fo:instream-foreign-object width="6mm" height="48mm" fox:alt-text="WMO Weather Climate Water colour band">
+					<fo:instream-foreign-object content-width="6mm" content-height="48mm" fox:alt-text="WMO Weather Climate Water colour band">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 68">
 							<rect x="0" y="0" width="6" height="16" fill="{$wmo_turquoise}"/>
 							<rect x="0" y="16" width="6" height="16" fill="{$wmo_green}"/>
@@ -2744,7 +2744,7 @@
 			<fo:flow flow-name="xsl-region-body">
 				<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" font-size="0pt" role="SKIP">
 					<fo:block font-size="0pt" role="SKIP">
-					<fo:instream-foreign-object width="210mm" height="297mm" fox:alt-text="WMO back cover" fox:placement="Block">
+					<fo:instream-foreign-object content-width="210mm" content-height="297mm" fox:alt-text="WMO back cover" fox:placement="Block">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297">
 							<rect x="0" y="0" width="210" height="297" fill="{$wmo_back_blue}"/>
 						</svg>
