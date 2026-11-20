@@ -311,6 +311,128 @@
 		</fo:layout-master-set>
 	</xsl:template><!-- END layout-master-set -->
 
+	<!-- Shadow of the base layout-master-set: identical masters except
+	     the cover page, which is full-bleed with the WMO green field as
+	     the region background. -->
+<xsl:template name="layout-master-set">
+		<fo:layout-master-set>
+			<!-- cover page -->
+			<fo:simple-page-master master-name="cover-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="0mm" margin-bottom="0mm" margin-left="0mm" margin-right="0mm" background-color="{$wmo_cover_green}"/>
+			</fo:simple-page-master>
+
+			<fo:simple-page-master master-name="first" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header" extent="{$marginTop}mm"/>
+				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
+				<fo:region-start region-name="left-region" extent="{$marginLeftRight1}mm"/>
+				<fo:region-end region-name="right-region" extent="{$marginLeftRight2}mm"/>
+			</fo:simple-page-master>
+			<fo:simple-page-master master-name="odd" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header-odd" extent="{$marginTop}mm"/>
+				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
+				<fo:region-start region-name="left-region" extent="{$marginLeftRight1}mm"/>
+				<fo:region-end region-name="right-region" extent="{$marginLeftRight2}mm"/>
+			</fo:simple-page-master>
+			<fo:simple-page-master master-name="odd-landscape" page-width="{$pageHeight}mm" page-height="{$pageWidth}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm"/>
+				<fo:region-before region-name="header-odd" extent="{$marginTop}mm"/>
+				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
+				<fo:region-start region-name="left-region" extent="{$marginLeftRight1}mm"/>
+				<fo:region-end region-name="right-region" extent="{$marginLeftRight2}mm"/>
+			</fo:simple-page-master>
+			<fo:simple-page-master master-name="even" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight2}mm" margin-right="{$marginLeftRight1}mm"/>
+				<fo:region-before region-name="header-even" extent="{$marginTop}mm"/>
+				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
+				<fo:region-start region-name="left-region" extent="{$marginLeftRight2}mm"/>
+				<fo:region-end region-name="right-region" extent="{$marginLeftRight1}mm"/>
+			</fo:simple-page-master>
+			<fo:simple-page-master master-name="even-landscape" page-width="{$pageHeight}mm" page-height="{$pageWidth}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight2}mm" margin-right="{$marginLeftRight1}mm"/>
+				<fo:region-before region-name="header-even" extent="{$marginTop}mm"/>
+				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
+				<fo:region-start region-name="left-region" extent="{$marginLeftRight2}mm"/>
+				<fo:region-end region-name="right-region" extent="{$marginLeftRight1}mm"/>
+			</fo:simple-page-master>
+			<fo:simple-page-master master-name="blankpage" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight2}mm" margin-right="{$marginLeftRight1}mm"/>
+				<fo:region-before region-name="header-blank" extent="{$marginTop}mm"/>
+				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
+				<fo:region-start region-name="left-region" extent="{$marginLeftRight2}mm"/>
+				<fo:region-end region-name="right-region" extent="{$marginLeftRight1}mm"/>
+			</fo:simple-page-master>
+			<fo:simple-page-master master-name="blankpage-landscape" page-width="{$pageHeight}mm" page-height="{$pageWidth}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight2}mm" margin-right="{$marginLeftRight1}mm"/>
+				<fo:region-before region-name="header-blank" extent="{$marginTop}mm"/>
+				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
+				<fo:region-start region-name="left-region" extent="{$marginLeftRight2}mm"/>
+				<fo:region-end region-name="right-region" extent="{$marginLeftRight1}mm"/>
+			</fo:simple-page-master>
+			<!-- Preface pages -->
+			<fo:page-sequence-master master-name="preface">
+				<fo:repeatable-page-master-alternatives>
+					<!-- <fo:conditional-page-master-reference master-reference="first" page-position="first"/> -->
+					<fo:conditional-page-master-reference master-reference="blankpage" blank-or-not-blank="blank"/>
+					<fo:conditional-page-master-reference odd-or-even="even" master-reference="even"/>
+					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="odd"/>
+				</fo:repeatable-page-master-alternatives>
+			</fo:page-sequence-master>
+			<fo:page-sequence-master master-name="preface-landscape">
+				<fo:repeatable-page-master-alternatives>
+					<fo:conditional-page-master-reference master-reference="blankpage-landscape" blank-or-not-blank="blank"/>
+					<fo:conditional-page-master-reference odd-or-even="even" master-reference="even-landscape"/>
+					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="odd-landscape"/>
+				</fo:repeatable-page-master-alternatives>
+			</fo:page-sequence-master>
+			<!-- Document pages -->
+			<fo:page-sequence-master master-name="document">
+				<fo:repeatable-page-master-alternatives>
+					<fo:conditional-page-master-reference master-reference="blankpage" blank-or-not-blank="blank"/>
+					<fo:conditional-page-master-reference odd-or-even="even" master-reference="even"/>
+					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="odd"/>
+				</fo:repeatable-page-master-alternatives>
+			</fo:page-sequence-master>
+			<fo:page-sequence-master master-name="document-portrait">
+				<fo:repeatable-page-master-alternatives>
+					<fo:conditional-page-master-reference master-reference="blankpage" blank-or-not-blank="blank"/>
+					<fo:conditional-page-master-reference odd-or-even="even" master-reference="even"/>
+					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="odd"/>
+				</fo:repeatable-page-master-alternatives>
+			</fo:page-sequence-master>
+			<fo:page-sequence-master master-name="document-landscape">
+				<fo:repeatable-page-master-alternatives>
+					<fo:conditional-page-master-reference master-reference="blankpage-landscape" blank-or-not-blank="blank"/>
+					<fo:conditional-page-master-reference odd-or-even="even" master-reference="even-landscape"/>
+					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="odd-landscape"/>
+				</fo:repeatable-page-master-alternatives>
+			</fo:page-sequence-master>
+
+			<!-- Index pages (two columns) -->
+			<fo:simple-page-master master-name="index-odd" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight1}mm" margin-right="{$marginLeftRight2}mm" xsl:use-attribute-sets="indexsect-region-body-style"/>
+				<fo:region-before region-name="header-odd" extent="{$marginTop}mm"/>
+				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
+				<fo:region-start region-name="left-region" extent="{$marginLeftRight1}mm"/>
+				<fo:region-end region-name="right-region" extent="{$marginLeftRight2}mm"/>
+			</fo:simple-page-master>
+			<fo:simple-page-master master-name="index-even" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
+				<fo:region-body margin-top="{$marginTop}mm" margin-bottom="{$marginBottom}mm" margin-left="{$marginLeftRight2}mm" margin-right="{$marginLeftRight1}mm" xsl:use-attribute-sets="indexsect-region-body-style"/>
+				<fo:region-before region-name="header-even" extent="{$marginTop}mm"/>
+				<fo:region-after region-name="footer" extent="{$marginBottom}mm"/>
+				<fo:region-start region-name="left-region" extent="{$marginLeftRight2}mm"/>
+				<fo:region-end region-name="right-region" extent="{$marginLeftRight1}mm"/>
+			</fo:simple-page-master>
+			<fo:page-sequence-master master-name="index">
+				<fo:repeatable-page-master-alternatives>
+					<fo:conditional-page-master-reference odd-or-even="even" master-reference="index-even"/>
+					<fo:conditional-page-master-reference odd-or-even="odd" master-reference="index-odd"/>
+				</fo:repeatable-page-master-alternatives>
+			</fo:page-sequence-master>
+		</fo:layout-master-set>
+	</xsl:template>
+
 	<xsl:template name="cover-page">
 		<xsl:param name="num"/>
 		<fo:page-sequence master-reference="cover-page" force-page-count="no-force" initial-page-number="1">
@@ -318,36 +440,25 @@
 				<xsl:call-template name="insert_firstpage_id"><xsl:with-param name="num" select="$num"/></xsl:call-template>
 
 				<!-- WMO signature cover: green field with sweeping arcs -->
-				<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" font-size="0pt" role="SKIP">
-					<fo:block font-size="0pt" role="SKIP">
-					<fo:instream-foreign-object content-width="210mm" content-height="297mm" fox:alt-text="WMO cover background" fox:placement="Block">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297">
-							<xsl:choose>
-								<xsl:when test="$wmo_cover_solid != ''">
-									<rect x="0" y="0" width="210" height="297" fill="{$wmo_cover_solid}"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<defs>
-										<linearGradient id="wmo-green-base" x1="0" y1="0" x2="0" y2="1">
-											<stop offset="0" stop-color="#0A733A"/>
-											<stop offset="0.45" stop-color="#009B47"/>
-											<stop offset="1" stop-color="#009244"/>
-										</linearGradient>
-										<linearGradient id="wmo-green-sweep" x1="0" y1="0" x2="0.35" y2="1">
-											<stop offset="0" stop-color="#22A24E"/>
-											<stop offset="1" stop-color="#41B478"/>
-										</linearGradient>
-									</defs>
-									<rect x="0" y="0" width="210" height="297" fill="url(#wmo-green-base)"/>
-									<path d="M0,0 L210,0 L210,26 C140,8 70,8 0,26 Z" fill="#0A6E37" opacity="0.6"/>
-									<path d="M0,206 C70,192 150,232 210,202 L210,297 L0,297 Z" fill="url(#wmo-green-sweep)"/>
-									<path d="M0,246 C80,232 150,266 210,240 L210,297 L0,297 Z" fill="#41B478" opacity="0.85"/>
-								</xsl:otherwise>
-							</xsl:choose>
-						</svg>
-					</fo:instream-foreign-object>
-					</fo:block>
-				</fo:block-container>
+				<xsl:choose>
+					<xsl:when test="$wmo_cover_solid != ''">
+						<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" background-color="{$wmo_cover_solid}" font-size="0pt" role="SKIP">
+							<fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block>
+						</fo:block-container>
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- abstract sweeps over the green region background -->
+						<fo:block font-size="0pt" line-height="0pt" role="SKIP">
+						<fo:instream-foreign-object content-width="205mm" content-height="292mm" fox:alt-text="WMO cover art" fox:placement="Block">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 205 292">
+								<path d="M0,0 L205,0 L205,25 C138,8 68,8 0,25 Z" fill="#0A6E37" opacity="0.55"/>
+								<path d="M0,202 C68,188 147,227 205,198 L205,292 L0,292 Z" fill="#22A24E" opacity="0.75"/>
+								<path d="M0,242 C78,228 147,261 205,236 L205,292 L0,292 Z" fill="#41B478" opacity="0.8"/>
+							</svg>
+						</fo:instream-foreign-object>
+						</fo:block>
+					</xsl:otherwise>
+				</xsl:choose>
 
 
 				<!-- Cover image slot for technical publications: the image
@@ -2742,14 +2853,8 @@
 			<fo:static-content flow-name="header" role="SKIP"><fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block></fo:static-content>
 			<fo:static-content flow-name="footer" role="SKIP"><fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block></fo:static-content>
 			<fo:flow flow-name="xsl-region-body">
-				<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" font-size="0pt" role="SKIP">
-					<fo:block font-size="0pt" role="SKIP">
-					<fo:instream-foreign-object content-width="210mm" content-height="297mm" fox:alt-text="WMO back cover" fox:placement="Block">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297">
-							<rect x="0" y="0" width="210" height="297" fill="{$wmo_back_blue}"/>
-						</svg>
-					</fo:instream-foreign-object>
-					</fo:block>
+				<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" background-color="{$wmo_back_blue}" font-size="0pt" role="SKIP">
+					<fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block>
 				</fo:block-container>
 				<fo:block-container absolute-position="absolute" left="60mm" top="216mm" width="120mm">
 					<fo:block color="white" font-size="7pt" text-align="right">For more information, please contact:</fo:block>
