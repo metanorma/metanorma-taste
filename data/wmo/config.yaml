@@ -7,9 +7,21 @@ base-override:
     copyright-notice: copyright.adoc
     i18n-dictionary: i18n.yaml
     publisher-logo: logo-wmo.svg
+    # WMO-taste PDF cover: standalone stylesheet (fork of the IALA one)
+    # applied over the base iho XSL via the xsl-file-override flag.
+    # The IHO stylesheets are never modified.
+    pdf-stylesheet-override: wmo.xsl
   value-attributes:
     publisher: World Meteorological Organization
     publisher_abbr: WMO
+    # A5: WMO documentation sets Verdana, 10 pts. Verdana ships with
+    # the operating systems; DejaVu Sans is its metric-compatible open
+    # companion for the Linux toolchain (the Carlito-for-Calibri
+    # pattern).
+    body-font: Verdana, DejaVu Sans, Arial, sans-serif
+    header-font: Verdana, DejaVu Sans, Arial, sans-serif
+    monospace-font: '"Source Code Pro", monospace'
+    fonts: DejaVu Sans;Source Code Pro;Source Han Sans;STIX Two Math
     output-extensions: xml,html,pdf,doc
 doctypes:
 - taste: standard
