@@ -250,7 +250,14 @@
 		<fo:layout-master-set>
 			<!-- cover page -->
 			<fo:simple-page-master master-name="cover-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
-				<fo:region-body margin-top="0mm" margin-bottom="0mm" margin-left="0mm" margin-right="0mm" background-color="{$wmo_cover_green}"/>
+				<fo:region-body margin-top="0mm" margin-bottom="0mm" margin-left="0mm" margin-right="0mm" background-color="{$wmo_cover_green}">
+					<xsl:if test="normalize-space($wmo_cover_bg_image) != ''">
+						<xsl:attribute name="background-image"><xsl:value-of select="normalize-space($wmo_cover_bg_image)"/></xsl:attribute>
+						<xsl:attribute name="background-width">210mm</xsl:attribute>
+						<xsl:attribute name="background-height">297mm</xsl:attribute>
+						<xsl:attribute name="background-repeat">no-repeat</xsl:attribute>
+					</xsl:if>
+				</fo:region-body>
 			</fo:simple-page-master>
 
 			<fo:simple-page-master master-name="first" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
@@ -438,21 +445,7 @@
 						<fo:block>In conjunction with the</fo:block>
 						<fo:block>International Hydrographic Organization</fo:block>
 					</fo:block>
-				<xsl:choose>
-					<xsl:when test="$wmo_cover_solid != ''">
-						<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" background-color="{$wmo_cover_solid}" font-size="0pt" role="SKIP">
-							<fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block>
-						</fo:block-container>
-					</xsl:when>
-					<xsl:otherwise>
-						<!-- abstract sweeps over the green region background -->
-						<fo:block-container absolute-position="absolute" left="0mm" top="0mm" width="210mm" height="297mm" font-size="0pt" start-indent="0pt" role="SKIP">
-							<fo:block font-size="0pt" start-indent="0pt" role="SKIP">
-							<fo:external-graphic src="url(wmo-cover-art.png)" content-width="210mm" content-height="297mm" scaling="non-uniform" fox:alt-text="WMO cover art" fox:placement="Block" />
-							</fo:block>
-						</fo:block-container>
-					</xsl:otherwise>
-				</xsl:choose>
+
 				</fo:block-container>
 			</fo:flow>
 		</fo:page-sequence>
@@ -2692,6 +2685,20 @@
 
 	<!-- Ink on the cover: white on the dark classes, WMO blue on the
 	     light Pantone solids (yellow, pink, light green). -->
+	<!-- Cover background layer: the art bitmap for the arc classes,
+	     nothing for the solid Pantone classes. Resolves against the
+	     baseassetpath mn2pdf passes. -->
+	<xsl:variable name="wmo_cover_bg_image">
+		<xsl:if test="$wmo_cover_solid = ''">
+			<xsl:choose>
+				<xsl:when test="normalize-space($baseassetpath) != ''">
+					url(<xsl:value-of select="concat($baseassetpath, '/wmo-cover-art.png')"/>)
+				</xsl:when>
+				<xsl:otherwise>url(wmo-cover-art.png)</xsl:otherwise>
+			</xsl:choose>
+		</xsl:if>
+	</xsl:variable>
+
 	<xsl:variable name="wmo_cover_ink">
 		<xsl:choose>
 			<xsl:when test="$wmo_cover_class = 'report-yellow' or $wmo_cover_class = 'report-pink' or $wmo_cover_class = 'report-light-green'"><xsl:value-of select="$wmo_blue"/></xsl:when>
