@@ -419,7 +419,7 @@
 				</fo:block-container>
 
 				<!-- WMO logotype in reverse: emblem above the full name -->
-				<fo:block-container absolute-position="absolute" left="29mm" top="224mm" width="80mm">
+				<fo:block-container absolute-position="absolute" left="29mm" top="200mm" width="80mm">
 					<fo:block font-size="0pt" role="SKIP">
 						<fo:instream-foreign-object content-width="16mm" fox:alt-text="World Meteorological Organization emblem" fox:placement="Block">
 							<xsl:copy-of select="$wmo_cover_emblem"/>
@@ -430,7 +430,9 @@
 						<fo:block>METEOROLOGICAL</fo:block>
 						<fo:block>ORGANIZATION</fo:block>
 					</fo:block>
-					<fo:block color="{$wmo_cover_ink}" font-size="9pt" font-weight="bold" margin-top="2.5mm">
+				</fo:block-container>
+				<fo:block-container absolute-position="absolute" left="30mm" top="272mm" width="80mm">
+					<fo:block color="{$wmo_cover_ink}" font-size="9pt" font-weight="bold">
 						<xsl:call-template name="getVariable"><xsl:with-param name="variable">docidentifier</xsl:with-param></xsl:call-template>
 					</fo:block>
 				</fo:block-container>
