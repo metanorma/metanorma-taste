@@ -24,6 +24,21 @@ base-override:
     fonts: DejaVu Sans;Source Code Pro;Source Han Sans;STIX Two Math
     output-extensions: xml,html,pdf,doc
 doctypes:
+  # Governance publications (B5): solid Pantone covers
+- taste: manual
+  base: manual            # Pantone 187 red
+- taste: guide
+  base: guideline         # Pantone 341 green
+  # Constituent-body session reports (B5)
+- taste: ec-report
+  base: report            # Executive Council; Pantone 108 yellow
+- taste: congress-report
+  base: report            # Congress; Pantone 108 yellow
+- taste: ra-report
+  base: report            # Regional Association; Pantone 196 pink
+- taste: tc-report
+  base: report            # Technical Commission; Pantone 368 light green
+  # Technical publications (B14): green abstract + cover image
 - taste: standard
   base: standard
 - taste: specification
