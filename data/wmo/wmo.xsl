@@ -253,8 +253,6 @@
 				<fo:region-body margin-top="0mm" margin-bottom="0mm" margin-left="0mm" margin-right="0mm" background-color="{$wmo_cover_green}">
 					<xsl:if test="normalize-space($wmo_cover_bg_image) != ''">
 						<xsl:attribute name="background-image"><xsl:value-of select="normalize-space($wmo_cover_bg_image)"/></xsl:attribute>
-						<xsl:attribute name="background-width">210mm</xsl:attribute>
-						<xsl:attribute name="background-height">297mm</xsl:attribute>
 						<xsl:attribute name="background-repeat">no-repeat</xsl:attribute>
 					</xsl:if>
 				</fo:region-body>
