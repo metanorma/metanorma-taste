@@ -380,6 +380,7 @@
 					</xsl:when>
 					<xsl:otherwise>
 						<!-- abstract sweeps over the green region background -->
+						<fo:block font-size="0pt" role="SKIP">
 						<fo:instream-foreign-object content-height="297mm" fox:alt-text="WMO cover art" fox:placement="Block">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297">
 								<path d="M0,0 L210,0 L210,26 C140,8 70,8 0,26 Z" fill="#0A6E37" opacity="0.55"/>
@@ -392,6 +393,7 @@
 								<text x="9" y="230" transform="rotate(-90 9 230)" font-family="Verdana, DejaVu Sans, Arial" font-size="7.5" fill="#FFFFFF" letter-spacing="1">WEATHER&#160;&#160;CLIMATE&#160;&#160;WATER</text>
 							</svg>
 						</fo:instream-foreign-object>
+						</fo:block>
 					</xsl:otherwise>
 				</xsl:choose>
 
