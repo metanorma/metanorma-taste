@@ -21,7 +21,9 @@ base-override:
     body-font: Verdana, DejaVu Sans, Arial, sans-serif
     header-font: Verdana, DejaVu Sans, Arial, sans-serif
     monospace-font: '"Source Code Pro", monospace'
-    fonts: DejaVu Sans;Source Code Pro;Source Han Sans;STIX Two Math
+    # Verdana first (the WMO body face); DejaVu Sans is its
+    # metric-compatible open companion on the Linux toolchain.
+    fonts: Verdana;DejaVu Sans;Source Code Pro;Source Han Sans;STIX Two Math
     output-extensions: xml,html,pdf,doc
 doctypes:
   # Governance publications (B5): plain Pantone covers

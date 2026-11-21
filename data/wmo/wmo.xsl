@@ -46,7 +46,9 @@
 	<xsl:variable name="color_secondary_gray_20">rgb(218, 218, 218)</xsl:variable>
 	<xsl:variable name="color_secondary_gray_10">rgb(237, 237, 237)</xsl:variable>
 
-	<xsl:variable name="color_toc_title">rgb(32, 86, 174)</xsl:variable>
+	<xsl:variable name="color_toc_title">rgb(47, 84, 150)</xsl:variable>
+	<!-- Heading blue measured off WMO-No. 1364: rgb(47, 84, 150). -->
+	<xsl:variable name="color_heading_blue">rgb(47, 84, 150)</xsl:variable>
 
 	<!-- ============================================================ -->
 	<!-- Document kind switches                                       -->
@@ -544,13 +546,11 @@
 	<xsl:template match="mn:clause[@type = 'annex-contents']/mn:fmt-title" priority="3">
 		<!-- the printed annex contents title is 20pt, one step below the
 			section-title style -->
-		<fo:block xsl:use-attribute-sets="toc-title-style" font-size="20pt" margin-top="13mm" margin-bottom="8mm">
+		<fo:block xsl:use-attribute-sets="toc-title-style" margin-top="13mm" margin-bottom="8mm">
 			<xsl:call-template name="refine_toc-title-style"/>
-			<fo:block-container width="100%" border-bottom="1.25pt solid {$color_corporate_blue}" role="SKIP">
-				<fo:block margin-bottom="2mm" role="SKIP">
-					<xsl:apply-templates />
-				</fo:block>
-			</fo:block-container>
+			<fo:block role="SKIP">
+				<xsl:apply-templates />
+			</fo:block>
 		</fo:block>
 	</xsl:template>
 	<xsl:template match="mn:annex" mode="iala_annex_contents">
@@ -564,7 +564,7 @@
 			<xsl:choose>
 				<xsl:when test="mn:fmt-title[@depth = '3']">
 					<!-- sub-clause entries: 11pt regular, titles as typed -->
-					<fo:inline font-size="11pt" color="{$color_corporate_blue}">
+					<fo:inline font-size="11pt" color="black">
 						<xsl:copy-of select="mn:fmt-title/mn:span[@class = 'fmt-caption-label']/node()"/>
 						<xsl:text>&#160;</xsl:text>
 						<xsl:copy-of select="mn:fmt-title/node()[not(self::mn:span[@class = 'fmt-caption-label'] or self::mn:span[@class = 'fmt-caption-delim'])]"/>
@@ -572,7 +572,7 @@
 				</xsl:when>
 				<xsl:otherwise>
 					<!-- top-level annex clause entries: 12pt bold, titles upper case -->
-					<fo:inline font-size="12pt" font-weight="bold" color="{$color_corporate_blue}">
+					<fo:inline font-size="12pt" font-weight="bold" color="black">
 						<xsl:copy-of select="mn:fmt-title/mn:span[@class = 'fmt-caption-label']/node()"/>
 						<xsl:text>&#160;&#160;</xsl:text>
 						<fo:inline text-transform="uppercase">
@@ -581,7 +581,7 @@
 					</fo:inline>
 				</xsl:otherwise>
 			</xsl:choose>
-			<fo:leader leader-pattern="dots" font-size="11pt" color="{$color_corporate_blue}"/>
+			<fo:leader leader-pattern="dots" font-size="11pt" color="black"/>
 			<fo:page-number-citation ref-id="{@id}"/>
 		</fo:block>
 		<xsl:apply-templates select="mn:clause" mode="iala_annex_contents"/>
@@ -639,8 +639,8 @@
 			<fo:table-header>
 				<fo:table-row>
 					<xsl:for-each select="mn:table/mn:thead/mn:tr[1]/*">
-						<fo:table-cell border="0.5pt solid black" padding-left="2mm" padding-top="1.5mm" padding-bottom="1.5mm" display-align="center">
-							<fo:block font-size="10pt" font-weight="bold" color="{$color_corporate_blue}"><xsl:value-of select="normalize-space(.)"/></fo:block>
+						<fo:table-cell border-left="none" border-right="none" padding-left="2mm" padding-top="1.5mm" padding-bottom="1.5mm" display-align="center">
+							<fo:block font-size="10pt" font-style="italic" color="black"><xsl:value-of select="normalize-space(.)"/></fo:block>
 						</fo:table-cell>
 					</xsl:for-each>
 				</fo:table-row>
@@ -648,47 +648,45 @@
 			<fo:table-body>
 				<fo:table-row min-height="12mm">
 					<xsl:for-each select="mn:table/mn:tbody/mn:tr[1]/*">
-						<fo:table-cell border="0.5pt solid black" padding-left="2mm" padding-top="1.5mm" display-align="center">
+						<fo:table-cell border-left="none" border-right="none" padding-left="2mm" padding-top="1.5mm" display-align="center">
 							<fo:block font-size="10pt"><xsl:value-of select="normalize-space(.)"/></fo:block>
 						</fo:table-cell>
 					</xsl:for-each>
 				</fo:table-row>
 				<fo:table-row min-height="12mm">
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
 				</fo:table-row>
 				<fo:table-row min-height="12mm">
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
 				</fo:table-row>
 				<fo:table-row min-height="12mm">
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
 				</fo:table-row>
 				<fo:table-row min-height="12mm">
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
 				</fo:table-row>
 				<fo:table-row min-height="12mm">
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
-					<fo:table-cell border="0.5pt solid black" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
+					<fo:table-cell border-left="none" border-right="none" padding-left="2mm" display-align="center"><fo:block font-size="10pt">&#xa0;</fo:block></fo:table-cell>
 				</fo:table-row>
 			</fo:table-body>
 		</fo:table>
 	</xsl:template>
 	<xsl:template match="mn:clause[@type = 'revision']/mn:fmt-title" priority="3">
-		<fo:block xsl:use-attribute-sets="toc-title-style"  margin-top="13mm" margin-bottom="4.5mm">
+		<fo:block xsl:use-attribute-sets="toc-title-style" margin-top="13mm" margin-bottom="4.5mm">
 			<xsl:call-template name="refine_toc-title-style"/>
-			<fo:block-container width="100%" border-bottom="1.25pt solid {$color_corporate_blue}" role="SKIP">
-				<fo:block margin-bottom="2mm" role="SKIP">
-					<xsl:apply-templates />
-				</fo:block>
-			</fo:block-container>
+			<fo:block role="SKIP">
+				<xsl:apply-templates />
+			</fo:block>
 		</fo:block>
 	</xsl:template>
 	
@@ -721,9 +719,9 @@
 	<xsl:attribute-set name="toc-title-style"><?extend?>
 		<!-- WMO contents heading: blue capitals at regular heading
 			 weight (WMO-No. 1364), no rule beneath. -->
-		<xsl:attribute name="font-size">13pt</xsl:attribute>
+		<xsl:attribute name="font-size">14pt</xsl:attribute>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
-		<xsl:attribute name="color"><xsl:value-of select="$color_toc_title"/></xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_heading_blue"/></xsl:attribute>
 		<xsl:attribute name="margin-bottom">8mm</xsl:attribute>
 		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
 	</xsl:attribute-set>
@@ -773,11 +771,11 @@
 
 	<xsl:template name="refine_toc-listof-title-style"><?extend?>
 		<!-- WMO: the list headings match the section-heading voice. -->
-		<xsl:attribute name="font-size">13pt</xsl:attribute>
+		<xsl:attribute name="font-size">14pt</xsl:attribute>
 		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="margin-top">9mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">6mm</xsl:attribute>
-		<xsl:attribute name="color"><xsl:value-of select="$color_toc_title"/></xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_heading_blue"/></xsl:attribute>
 	</xsl:template>
 
 	<xsl:template name="refine_toc-listof-item-style"><?extend?>
@@ -897,22 +895,100 @@
 			 black bold in the authored case. -->
 		<xsl:if test="$level = 1">
 			<xsl:attribute name="text-transform">uppercase</xsl:attribute>
-			<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+			<xsl:attribute name="color"><xsl:value-of select="$color_heading_blue"/></xsl:attribute>
 			<xsl:attribute name="font-weight">normal</xsl:attribute>
-			<xsl:attribute name="font-size">13pt</xsl:attribute>
+			<xsl:attribute name="font-size">14pt</xsl:attribute>
 		</xsl:if>
 		<xsl:if test="$level = 2">
 			<xsl:attribute name="color">black</xsl:attribute>
+			<xsl:attribute name="font-weight">normal</xsl:attribute>
 			<xsl:attribute name="font-size">12pt</xsl:attribute>
 		</xsl:if>
-		<xsl:if test="$level = 3">
-			<xsl:attribute name="color">black</xsl:attribute>
-			<xsl:attribute name="font-size">11pt</xsl:attribute>
-		</xsl:if>
-		<xsl:if test="$level = 4">
+		<xsl:if test="$level &gt;= 3">
 			<xsl:attribute name="color">black</xsl:attribute>
 			<xsl:attribute name="font-size">10pt</xsl:attribute>
 		</xsl:if>
+	</xsl:template>
+
+	<!-- WMO running header (named-template shadows of the base, which
+	     prints 8pt): 9pt with the title in capitals, as on the 1364
+	     body pages. -->
+	<xsl:template name="insertHeader">
+		<xsl:param name="orientation"/>
+		<xsl:variable name="title_header">
+			<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title_header</xsl:with-param></xsl:call-template>
+		</xsl:variable>
+		<fo:static-content flow-name="header-odd" role="artifact">
+			<fo:block-container height="100%" font-size="9pt">
+				<fo:block padding-top="12.5mm">
+					<fo:table table-layout="fixed" width="100%">
+						<fo:table-column column-width="proportional-column-width(1)"/>
+						<fo:table-column column-width="proportional-column-width(10)"/>
+						<fo:table-column column-width="proportional-column-width(1)"/>
+						<fo:table-body>
+							<fo:table-row>
+								<fo:table-cell><fo:block> </fo:block></fo:table-cell>
+								<fo:table-cell text-align="center"><fo:block text-transform="uppercase"><xsl:copy-of select="$title_header"/></fo:block></fo:table-cell>
+								<fo:table-cell text-align="right"><fo:block><fo:page-number/></fo:block></fo:table-cell>
+							</fo:table-row>
+						</fo:table-body>
+					</fo:table>
+				</fo:block>
+			</fo:block-container>
+		</fo:static-content>
+		<fo:static-content flow-name="header-even" role="artifact">
+			<fo:block-container height="100%" font-size="9pt">
+				<fo:block padding-top="12.5mm">
+					<fo:table table-layout="fixed" width="100%">
+						<fo:table-column column-width="proportional-column-width(1)"/>
+						<fo:table-column column-width="proportional-column-width(10)"/>
+						<fo:table-column column-width="proportional-column-width(1)"/>
+						<fo:table-body>
+							<fo:table-row>
+								<fo:table-cell><fo:block><fo:page-number/></fo:block></fo:table-cell>
+								<fo:table-cell text-align="center"><fo:block text-transform="uppercase"><xsl:copy-of select="$title_header"/></fo:block></fo:table-cell>
+								<fo:table-cell><fo:block> </fo:block></fo:table-cell>
+							</fo:table-row>
+						</fo:table-body>
+					</fo:table>
+				</fo:block>
+			</fo:block-container>
+		</fo:static-content>
+		<xsl:call-template name="insertHeaderBlank">
+			<xsl:with-param name="orientation" select="$orientation"/>
+		</xsl:call-template>
+	</xsl:template>
+
+	<xsl:template name="insertHeaderBlank">
+		<xsl:param name="orientation"/>
+		<xsl:variable name="title_header">
+			<xsl:call-template name="getVariableCopyOf"><xsl:with-param name="variable">title_header</xsl:with-param></xsl:call-template>
+		</xsl:variable>
+		<fo:static-content flow-name="header-blank" role="artifact">
+			<fo:block-container height="100%" font-size="9pt">
+				<fo:block padding-top="12.5mm">
+					<fo:table table-layout="fixed" width="100%">
+						<fo:table-column column-width="proportional-column-width(1)"/>
+						<fo:table-column column-width="proportional-column-width(10)"/>
+						<fo:table-column column-width="proportional-column-width(1)"/>
+						<fo:table-body>
+							<fo:table-row>
+								<fo:table-cell><fo:block><fo:page-number/></fo:block></fo:table-cell>
+								<fo:table-cell text-align="center"><fo:block text-transform="uppercase"><xsl:copy-of select="$title_header"/></fo:block></fo:table-cell>
+								<fo:table-cell><fo:block> </fo:block></fo:table-cell>
+							</fo:table-row>
+						</fo:table-body>
+					</fo:table>
+				</fo:block>
+			</fo:block-container>
+			<fo:block-container position="absolute" left="40.5mm" top="130mm" height="4mm" width="79mm" border="0.75pt solid black" text-align="center" display-align="center" line-height="100%">
+				<xsl:if test="$orientation = '-landscape'">
+					<xsl:attribute name="left">84mm</xsl:attribute>
+					<xsl:attribute name="top">87mm</xsl:attribute>
+				</xsl:if>
+				<fo:block>Page intentionally left blank</fo:block>
+			</fo:block-container>
+		</fo:static-content>
 	</xsl:template>
 
 	<!-- Tabulation processing -->
@@ -1028,16 +1104,27 @@
 		<xsl:attribute name="text-align">center</xsl:attribute>
 	</xsl:attribute-set>
 
-	<!-- WMO link colour: corporate blue replaces the base generic blue. -->
+	<!-- WMO links: plain hyperlink blue as published (1364 URLs). -->
 	<xsl:attribute-set name="link-style"><?extend?>
-		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+		<xsl:attribute name="color">rgb(0, 0, 255)</xsl:attribute>
 		<xsl:attribute name="text-decoration">underline</xsl:attribute>
+	</xsl:attribute-set>
+
+	<!-- WMO monospace: Source Code Pro leads (the taste monospace
+	     face); the base sets lead Courier New and ignores the
+	     monospace-font attribute. -->
+	<xsl:attribute-set name="pre-style"><?extend?>
+		<xsl:attribute name="font-family">Source Code Pro, Courier New, DejaVu Sans Mono, <xsl:value-of select="$font_noto_sans_mono"/></xsl:attribute>
+	</xsl:attribute-set>
+
+	<xsl:attribute-set name="tt-style"><?extend?>
+		<xsl:attribute name="font-family">Source Code Pro, Courier New, DejaVu Sans Mono, <xsl:value-of select="$font_noto_sans_mono"/></xsl:attribute>
 	</xsl:attribute-set>
 
 	<!-- WMO admonitions: the box line and the label take the corporate
 	     blue; the body text stays black on white (no tint fill). -->
 	<xsl:attribute-set name="admonition-style"><?extend?>
-		<xsl:attribute name="border">0.5pt solid {$color_corporate_blue}</xsl:attribute>
+		<xsl:attribute name="border">0.5pt solid {$color_heading_blue}</xsl:attribute>
 		<xsl:attribute name="color">black</xsl:attribute>
 		<xsl:attribute name="margin-left">16mm</xsl:attribute>
 		<xsl:attribute name="margin-right">16mm</xsl:attribute>
@@ -1045,7 +1132,7 @@
 	</xsl:attribute-set>
 
 	<xsl:attribute-set name="admonition-name-style"><?extend?>
-		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+		<xsl:attribute name="color"><xsl:value-of select="$color_heading_blue"/></xsl:attribute>
 	</xsl:attribute-set>
 
 
@@ -1270,9 +1357,9 @@
 			<xsl:attribute name="line-height">122%</xsl:attribute>
 		</xsl:if>
 		<xsl:if test="not(ancestor::mn:table) and not(ancestor::mn:boilerplate) and not(ancestor::mn:feedback-statement) and not(ancestor::mn:note) and not(ancestor::mn:termnote) and not(ancestor::mn:admonition) and not(ancestor::mn:li)">
-			<!-- WMO body: Verdana on the open 130% pitch with a full
-				 paragraph step (WMO-No. 1364) -->
-			<xsl:attribute name="line-height">130%</xsl:attribute>
+			<!-- WMO body: Verdana on the measured 121% pitch (12.1pt
+				 on 10pt in WMO-No. 1364) with a full paragraph step -->
+			<xsl:attribute name="line-height">121%</xsl:attribute>
 			<xsl:attribute name="space-after">10pt</xsl:attribute>
 		</xsl:if>
 		<xsl:attribute name="text-align">
@@ -2406,9 +2493,12 @@
 	<xsl:template name="refine_table-header-cell-style"><?extend?>
 		<xsl:attribute name="padding-left">4mm</xsl:attribute>
 		<!-- WMO tables rule like booktabs (WMO-No. 1364): horizontal
-			 rules only, no verticals and no outer side frame. -->
+			 rules only, no verticals and no outer side frame; header
+			 cells print italic, not bold. -->
 		<xsl:attribute name="border-left">none</xsl:attribute>
 		<xsl:attribute name="border-right">none</xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
+		<xsl:attribute name="font-style">italic</xsl:attribute>
 		<xsl:if test="ancestor::mn:table[@landscape = 'true'] and $iala_compact_landscape">
 			<xsl:attribute name="padding-left">2mm</xsl:attribute>
 			<xsl:attribute name="padding-right">2mm</xsl:attribute>
