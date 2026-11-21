@@ -4,6 +4,9 @@ owner: World Meteorological Organization
 base-flavor: iho
 base-override:
   filename-attributes:
+    # Flavor processor config: fonts, doctype registry, namespaces,
+    # stages (the IALA taste's customize metanorma.yml pattern).
+    customize: metanorma.yml
     copyright-notice: copyright.adoc
     i18n-dictionary: i18n.yaml
     publisher-logo: logo-wmo.svg

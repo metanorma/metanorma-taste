@@ -1,0 +1,67 @@
+organization_name_short: WMO
+organization_name_long: World Meteorological Organization
+document_namespace: https://www.metanorma.org/ns/wmo
+xml_root_tag: wmo-standard
+html_bodyfont: 'Verdana, DejaVu Sans, Arial, sans-serif'
+html_headerfont: 'Verdana, DejaVu Sans, Arial, sans-serif'
+html_monospacefont: '"Source Code Pro", Menlo, Monaco, Consolas, monospace'
+html_normalfontsize: "15px"
+html_footnotefontsize: "0.9em"
+i18nyaml: i18n.yaml
+boilerplate: copyright.adoc
+# The S-100 identifiers (S-411) mint through the base iho flavor's
+# pubid wiring; no docid_template override.
+word_bodyfont: 'Verdana, DejaVu Sans, Arial, sans-serif'
+word_headerfont: 'Verdana, DejaVu Sans, Arial, sans-serif'
+word_monospacefont: '"Source Code Pro", "Courier New", monospace'
+word_normalfontsize: "11.0pt"
+word_smallerfontsize: "10.0pt"
+word_monospacefontsize: "10.0pt"
+word_footnotefontsize: "10.0pt"
+formats:
+  - html
+  - doc
+published_stages:
+  - published
+  - withdrawn
+default_stage: published
+stage_abbreviations:
+  draft:
+  published:
+  withdrawn:
+committee_types:
+  - committee
+  - workgroup
+doctypes:
+  standard:
+  specification:
+  resolution:
+  regulation:
+  manual:
+  guide:
+  guideline:
+  report:
+  annex:
+default_doctype: standard
+symbols_titles:
+  - Abbreviations
+  - Abbreviations and acronyms
+  - Symbols
+termsdefs_titles:
+  - Definitions
+normref_titles:
+  - References
+  - Further reading
+fonts_manifest:
+  Verdana:
+  DejaVu Sans:
+  Arial:
+  Source Code Pro:
+  Source Han Sans:
+  STIX Two Math:
+metadata_extensions:
+  structuredidentifier:
+    docnumber:
+    partnumber:
+      _output: part
+logo_path: ""
