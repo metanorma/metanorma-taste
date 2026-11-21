@@ -388,11 +388,7 @@
 				<xsl:if test="$wmo_cover_class = 'technical'">
 					<fo:block-container absolute-position="absolute" left="0mm" top="170mm" width="210mm" height="84mm" font-size="0pt" role="SKIP">
 						<fo:block font-size="0pt" role="SKIP">
-						<fo:instream-foreign-object content-height="84mm" scaling="non-uniform" fox:alt-text="Cover image" fox:placement="Block">
-							<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 210 84">
-								<image xlink:href="{$baseassetpath}/cover-image.jpg" x="0" y="0" width="210" height="84" preserveAspectRatio="xMidYMid slice"/>
-							</svg>
-						</fo:instream-foreign-object>
+						<fo:external-graphic src="url({concat($baseassetpath, '/cover-image.jpg')})" content-width="210mm" content-height="84mm" scaling="non-uniform" fox:alt-text="Cover image" fox:placement="Block" />
 						</fo:block>
 					</fo:block-container>
 				</xsl:if>
