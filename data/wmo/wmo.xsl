@@ -379,6 +379,26 @@
 			<fo:flow flow-name="xsl-region-body">
 				<xsl:call-template name="insert_firstpage_id"><xsl:with-param name="num" select="$num"/></xsl:call-template>
 
+					<!-- Weather Climate Water colour band on the plain covers:
+					     content-stream geometry and colours -->
+					<xsl:if test="$wmo_cover_solid != ''">
+						<fo:block-container absolute-position="absolute" left="0mm" top="183.75mm" width="6mm" height="16mm" background-color="rgb(0, 181, 213)" font-size="0pt" role="SKIP">
+							<fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block>
+						</fo:block-container>
+						<fo:block-container absolute-position="absolute" left="0mm" top="199.87mm" width="6mm" height="16mm" background-color="rgb(112, 191, 84)" font-size="0pt" role="SKIP">
+							<fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block>
+						</fo:block-container>
+						<fo:block-container absolute-position="absolute" left="0mm" top="215.81mm" width="6mm" height="16mm" background-color="rgb(250, 166, 26)" font-size="0pt" role="SKIP">
+							<fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block>
+						</fo:block-container>
+						<fo:block-container absolute-position="absolute" left="0mm" top="230mm" width="6mm" height="67mm" background-color="{$wmo_back_blue}" font-size="0pt" role="SKIP">
+							<fo:block font-size="0pt" role="SKIP"><fo:wrapper role="artifact">&#160;</fo:wrapper></fo:block>
+						</fo:block-container>
+						<fo:block-container absolute-position="absolute" left="{$wmo_band_subtitle_x}" top="184mm" width="120mm" height="8mm" reference-orientation="270" font-size="0pt" role="SKIP">
+							<fo:block font-size="7.5pt" color="{$wmo_cover_ink}" text-align="center" letter-spacing="1pt" role="SKIP">WEATHER&#160;&#160;CLIMATE&#160;&#160;WATER</fo:block>
+						</fo:block-container>
+					</xsl:if>
+
 				<!-- WMO signature cover: green field with sweeping arcs -->
 
 
