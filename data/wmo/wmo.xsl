@@ -253,7 +253,7 @@
 				<fo:region-body margin-top="0mm" margin-bottom="0mm" margin-left="0mm" margin-right="0mm"/>
 			</fo:simple-page-master>
 			<fo:simple-page-master master-name="cover-page" page-width="{$pageWidth}mm" page-height="{$pageHeight}mm">
-				<fo:region-body margin-top="0mm" margin-bottom="0mm" margin-left="0mm" margin-right="0mm" background-color="{$wmo_cover_green}">
+				<fo:region-body margin-top="0mm" margin-bottom="0mm" margin-left="0mm" margin-right="0mm" background-color="{$wmo_cover_region_color}">
 					<xsl:if test="normalize-space($wmo_cover_bg_image) != ''">
 						<xsl:attribute name="background-image"><xsl:value-of select="normalize-space($wmo_cover_bg_image)"/></xsl:attribute>
 						<xsl:attribute name="background-repeat">no-repeat</xsl:attribute>
@@ -2653,22 +2653,21 @@
 	<xsl:variable name="wmo_pantone_368">rgb(162, 214, 45)</xsl:variable>
 
 	<!-- Document-class detection: the bibdata doctype, refined by the
-	     doctype-alias presentation metadata for the constituent-body
-	     session reports (all of which render as doctype report). -->
+	     wmo-cover-class presentation metadata, which carries the WMO
+	     publication class injected per doctype by the taste config
+	     (the presentation stage overwrites doctype-alias, so this
+	     dedicated carrier key is used instead). -->
 	<xsl:variable name="wmo_doctype" select="normalize-space(/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''])"/>
-	<!-- Class carrier: the keywords injected per doctype by the taste
-	     config; the presentation stage overwrites doctype-alias, so a
-	     bibdata-level carrier is used instead. -->
-	<xsl:variable name="wmo_doctype_alias" select="normalize-space(/mn:metanorma/mn:bibdata/mn:keywords/mn:keyword[starts-with(normalize-space(), 'wmo-')])"/>
+	<xsl:variable name="wmo_doctype_alias" select="normalize-space(/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:wmo-cover-class)"/>
 
 	<xsl:variable name="wmo_cover_class">
 		<xsl:choose>
-			<xsl:when test="$wmo_doctype = 'manual' or contains($wmo_doctype_alias, 'wmo-manual')">manual</xsl:when>
-			<xsl:when test="$wmo_doctype = 'guide' or contains($wmo_doctype_alias, 'wmo-guide')">guide</xsl:when>
-			<xsl:when test="contains($wmo_doctype_alias, 'wmo-ec-report') or contains($wmo_doctype_alias, 'wmo-congress-report')">report-yellow</xsl:when>
-			<xsl:when test="contains($wmo_doctype_alias, 'wmo-ra-report')">report-pink</xsl:when>
-			<xsl:when test="contains($wmo_doctype_alias, 'wmo-tc-report')">report-light-green</xsl:when>
-			<xsl:when test="$wmo_doctype = 'guideline' or contains($wmo_doctype_alias, 'wmo-guideline')">guideline</xsl:when>
+			<xsl:when test="$wmo_doctype = 'manual' or $wmo_doctype_alias = 'manual'">manual</xsl:when>
+			<xsl:when test="$wmo_doctype = 'guide' or $wmo_doctype_alias = 'guide'">guide</xsl:when>
+			<xsl:when test="$wmo_doctype_alias = 'ec-report' or $wmo_doctype_alias = 'congress-report'">report-yellow</xsl:when>
+			<xsl:when test="$wmo_doctype_alias = 'ra-report'">report-pink</xsl:when>
+			<xsl:when test="$wmo_doctype_alias = 'tc-report'">report-light-green</xsl:when>
+			<xsl:when test="$wmo_doctype = 'guideline' or $wmo_doctype_alias = 'guideline'">guideline</xsl:when>
 			<xsl:otherwise>technical</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
@@ -2685,27 +2684,32 @@
 		</xsl:choose>
 	</xsl:variable>
 
-	<!-- Ink on the cover: white on the dark classes, WMO blue on the
-	     light Pantone solids (yellow, pink, light green). -->
-	<!-- Cover background layer: the art bitmap for the arc classes,
-	     nothing for the solid Pantone classes. Resolves against the
-	     baseassetpath mn2pdf passes. -->
+	<!-- Cover background layer: the green arcs bitmap for the guideline
+	     and technical classes only; all other classes are plain Pantone
+	     solids with no raster image. Resolves against the baseassetpath
+	     mn2pdf passes. -->
 	<xsl:variable name="wmo_cover_art_file">
 		<xsl:choose>
-			<xsl:when test="$wmo_cover_class = 'manual'">wmo-cover-art-manual.png</xsl:when>
-			<xsl:when test="$wmo_cover_class = 'guide'">wmo-cover-art-guide.png</xsl:when>
-			<xsl:when test="$wmo_cover_class = 'report-yellow'">wmo-cover-art-p108.png</xsl:when>
-			<xsl:when test="$wmo_cover_class = 'report-pink'">wmo-cover-art-p196.png</xsl:when>
-			<xsl:when test="$wmo_cover_class = 'report-light-green'">wmo-cover-art-p368.png</xsl:when>
-			<xsl:otherwise>wmo-cover-art.png</xsl:otherwise>
+			<xsl:when test="$wmo_cover_class = 'guideline' or $wmo_cover_class = 'technical'">wmo-cover-art.png</xsl:when>
+			<xsl:otherwise/>
 		</xsl:choose>
 	</xsl:variable>
 	<xsl:variable name="wmo_cover_bg_image">
 		<xsl:choose>
+			<xsl:when test="normalize-space($wmo_cover_art_file) = ''"/>
 			<xsl:when test="normalize-space($baseassetpath) != ''">
 				url(<xsl:value-of select="concat($baseassetpath, '/', $wmo_cover_art_file)"/>)
 			</xsl:when>
 			<xsl:otherwise>url(<xsl:value-of select="$wmo_cover_art_file"/>)</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+
+	<!-- Region paint: the class Pantone on the plain covers, the green
+	     field under the arcs bitmap on the arc covers. -->
+	<xsl:variable name="wmo_cover_region_color">
+		<xsl:choose>
+			<xsl:when test="normalize-space($wmo_cover_solid) != ''"><xsl:value-of select="$wmo_cover_solid"/></xsl:when>
+			<xsl:otherwise><xsl:value-of select="$wmo_cover_green"/></xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
 
