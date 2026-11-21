@@ -24,21 +24,37 @@ base-override:
     fonts: DejaVu Sans;Source Code Pro;Source Han Sans;STIX Two Math
     output-extensions: xml,html,pdf,doc
 doctypes:
-  # Governance publications (B5): solid Pantone covers
+  # Governance publications (B5): plain Pantone covers
 - taste: manual
   base: manual            # Pantone 187 red
+  override-attributes:
+  - ":presentation-metadata-doctype-alias: manual"
 - taste: guide
   base: guideline         # Pantone 341 green
-  # Constituent-body session reports (B5)
+  override-attributes:
+  - ":presentation-metadata-doctype-alias: guide"
+- taste: guideline
+  base: guideline         # abstract background in shades of green
+  override-attributes:
+  - ":presentation-metadata-doctype-alias: guideline"
+  # Constituent-body session reports (B5): plain Pantone covers
 - taste: ec-report
   base: report            # Executive Council; Pantone 108 yellow
+  override-attributes:
+  - ":presentation-metadata-doctype-alias: ec-report"
 - taste: congress-report
   base: report            # Congress; Pantone 108 yellow
+  override-attributes:
+  - ":presentation-metadata-doctype-alias: congress-report"
 - taste: ra-report
   base: report            # Regional Association; Pantone 196 pink
+  override-attributes:
+  - ":presentation-metadata-doctype-alias: ra-report"
 - taste: tc-report
   base: report            # Technical Commission; Pantone 368 light green
-  # Technical publications (B14): green abstract + cover image
+  override-attributes:
+  - ":presentation-metadata-doctype-alias: tc-report"
+  # Technical publications (B14): abstract background + cover image
 - taste: standard
   base: standard
 - taste: specification
