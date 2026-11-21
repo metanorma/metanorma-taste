@@ -236,6 +236,18 @@
 		<xsl:attribute name="font-size">11pt</xsl:attribute>
 	</xsl:attribute-set>
 
+	<!-- The taste declares Source Code Pro as its monospace face, but
+	     the base pre/tt styles hardcode Courier New first and never
+	     consult the monospace-font attribute; lead with the declared
+	     face so the provisioned font is actually used. -->
+	<xsl:attribute-set name="pre-style"><?extend?>
+		<xsl:attribute name="font-family">Source Code Pro, Courier New, <xsl:value-of select="$font_noto_sans_mono"/></xsl:attribute>
+	</xsl:attribute-set>
+
+	<xsl:attribute-set name="tt-style"><?extend?>
+		<xsl:attribute name="font-family">Source Code Pro, Courier New, <xsl:value-of select="$font_noto_sans_mono"/></xsl:attribute>
+	</xsl:attribute-set>
+
 		<xsl:variable name="variables_">
 		<xsl:for-each select="//mn:metanorma">
 			<xsl:variable name="num"><xsl:number level="any" count="mn:metanorma"/></xsl:variable>
