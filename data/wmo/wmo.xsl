@@ -2656,16 +2656,19 @@
 	     doctype-alias presentation metadata for the constituent-body
 	     session reports (all of which render as doctype report). -->
 	<xsl:variable name="wmo_doctype" select="normalize-space(/mn:metanorma/mn:bibdata/mn:ext/mn:doctype[normalize-space(@language) = ''])"/>
-	<xsl:variable name="wmo_doctype_alias" select="normalize-space(/mn:metanorma/mn:metanorma-extension/mn:presentation-metadata/mn:doctype-alias)"/>
+	<!-- Class carrier: the keywords injected per doctype by the taste
+	     config; the presentation stage overwrites doctype-alias, so a
+	     bibdata-level carrier is used instead. -->
+	<xsl:variable name="wmo_doctype_alias" select="normalize-space(/mn:metanorma/mn:bibdata/mn:keywords/mn:keyword[starts-with(normalize-space(), 'wmo-')])"/>
 
 	<xsl:variable name="wmo_cover_class">
 		<xsl:choose>
-			<xsl:when test="$wmo_doctype = 'manual' or $wmo_doctype_alias = 'manual'">manual</xsl:when>
-			<xsl:when test="$wmo_doctype = 'guide' or $wmo_doctype_alias = 'guide'">guide</xsl:when>
-			<xsl:when test="$wmo_doctype_alias = 'ec-report' or $wmo_doctype_alias = 'congress-report'">report-yellow</xsl:when>
-			<xsl:when test="$wmo_doctype_alias = 'ra-report'">report-pink</xsl:when>
-			<xsl:when test="$wmo_doctype_alias = 'tc-report'">report-light-green</xsl:when>
-			<xsl:when test="$wmo_doctype = 'guideline' or $wmo_doctype_alias = 'guideline'">guideline</xsl:when>
+			<xsl:when test="$wmo_doctype = 'manual' or contains($wmo_doctype_alias, 'wmo-manual')">manual</xsl:when>
+			<xsl:when test="$wmo_doctype = 'guide' or contains($wmo_doctype_alias, 'wmo-guide')">guide</xsl:when>
+			<xsl:when test="contains($wmo_doctype_alias, 'wmo-ec-report') or contains($wmo_doctype_alias, 'wmo-congress-report')">report-yellow</xsl:when>
+			<xsl:when test="contains($wmo_doctype_alias, 'wmo-ra-report')">report-pink</xsl:when>
+			<xsl:when test="contains($wmo_doctype_alias, 'wmo-tc-report')">report-light-green</xsl:when>
+			<xsl:when test="$wmo_doctype = 'guideline' or contains($wmo_doctype_alias, 'wmo-guideline')">guideline</xsl:when>
 			<xsl:otherwise>technical</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
