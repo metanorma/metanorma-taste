@@ -390,7 +390,7 @@
 						<fo:block font-size="0pt" role="SKIP">
 						<fo:instream-foreign-object content-height="84mm" scaling="non-uniform" fox:alt-text="Cover image" fox:placement="Block">
 							<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 210 84">
-								<image xlink:href="cover-image.jpg" x="0" y="0" width="210" height="84" preserveAspectRatio="xMidYMid slice"/>
+								<image xlink:href="{$baseassetpath}/cover-image.jpg" x="0" y="0" width="210" height="84" preserveAspectRatio="xMidYMid slice"/>
 							</svg>
 						</fo:instream-foreign-object>
 						</fo:block>
