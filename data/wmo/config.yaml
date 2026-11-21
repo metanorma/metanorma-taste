@@ -28,32 +28,32 @@ doctypes:
 - taste: manual
   base: manual            # Pantone 187 red
   override-attributes:
-  - ":presentation-metadata-doctype-alias: manual"
+  - ":keywords: wmo-manual"
 - taste: guide
   base: guideline         # Pantone 341 green
   override-attributes:
-  - ":presentation-metadata-doctype-alias: guide"
+  - ":keywords: wmo-guide"
 - taste: guideline
   base: guideline         # abstract background in shades of green
   override-attributes:
-  - ":presentation-metadata-doctype-alias: guideline"
+  - ":keywords: wmo-guide"line
   # Constituent-body session reports (B5): plain Pantone covers
 - taste: ec-report
   base: report            # Executive Council; Pantone 108 yellow
   override-attributes:
-  - ":presentation-metadata-doctype-alias: ec-report"
+  - ":keywords: wmo-ec-report"
 - taste: congress-report
   base: report            # Congress; Pantone 108 yellow
   override-attributes:
-  - ":presentation-metadata-doctype-alias: congress-report"
+  - ":keywords: wmo-congress-report"
 - taste: ra-report
   base: report            # Regional Association; Pantone 196 pink
   override-attributes:
-  - ":presentation-metadata-doctype-alias: ra-report"
+  - ":keywords: wmo-ra-report"
 - taste: tc-report
   base: report            # Technical Commission; Pantone 368 light green
   override-attributes:
-  - ":presentation-metadata-doctype-alias: tc-report"
+  - ":keywords: wmo-tc-report"
   # Technical publications (B14): abstract background + cover image
 - taste: standard
   base: standard
