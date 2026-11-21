@@ -208,6 +208,10 @@
 							</item>
 						</xsl:for-each>
 					</title>
+					
+					<!-- WMO running header: the main title, as printed centred
+					     in the page head (WMO-No. 1364). -->
+					<title_header><xsl:value-of select="normalize-space(/mn:metanorma/mn:bibdata/mn:title[@type = 'main' and (@language = 'en' or normalize-space(@language) = '')])"/></title_header>
 
 					<!-- Example: Edition 1.0 -->
 					<edition>
@@ -715,26 +719,23 @@
 	</xsl:template>
 
 	<xsl:attribute-set name="toc-title-style"><?extend?>
-		<xsl:attribute name="font-size">28pt</xsl:attribute>
+		<!-- WMO contents heading: blue capitals at regular heading
+			 weight (WMO-No. 1364), no rule beneath. -->
+		<xsl:attribute name="font-size">13pt</xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_toc_title"/></xsl:attribute>
-		<xsl:attribute name="margin-bottom">0</xsl:attribute>
+		<xsl:attribute name="margin-bottom">8mm</xsl:attribute>
 		<xsl:attribute name="text-transform">uppercase</xsl:attribute>
 	</xsl:attribute-set>
 
 	<xsl:attribute-set name="toc-style"><?extend?>
-		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+		<xsl:attribute name="color">black</xsl:attribute>
 		<xsl:attribute name="margin-top">6mm</xsl:attribute>
-		<!-- 
-		<xsl:attribute name="border-right">1pt solid black</xsl:attribute> -->
 	</xsl:attribute-set>
 
 	<xsl:template name="refine_toc-item-block-style">
-		<!-- Guide-family contents print typed case; only the top level
-				prints in capitals. Manual and report ToCs keep the authored
-				title case. Every other doctype was tuned with all-capitals. -->
-		<xsl:if test="(not($iala_guide_family) or @level = 1) and not($iala_is_report) and not($iala_is_manual)">
-			<xsl:attribute name="text-transform">uppercase</xsl:attribute>
-		</xsl:if>
+		<!-- WMO contents entries print black in the authored case with
+			 dot leaders (WMO-No. 1364); no bold, no capitalisation. -->
 		<xsl:attribute name="line-height">1.4</xsl:attribute>
 		<xsl:attribute name="margin-right">8mm</xsl:attribute>
 		<xsl:attribute name="provisional-distance-between-starts">
@@ -748,9 +749,6 @@
 			</xsl:choose>
 		</xsl:attribute>
 		
-		<xsl:if test="@level = 1">
-			<xsl:attribute name="font-weight">bold</xsl:attribute>
-		</xsl:if>
 		<xsl:if test="@level &gt;= 3">
 			<xsl:attribute name="font-size">9pt</xsl:attribute>
 		</xsl:if>
@@ -774,17 +772,12 @@
 	</xsl:template>
 
 	<xsl:template name="refine_toc-listof-title-style"><?extend?>
-		<xsl:attribute name="font-size">20pt</xsl:attribute>
-		<xsl:attribute name="font-weight">bold</xsl:attribute>
+		<!-- WMO: the list headings match the section-heading voice. -->
+		<xsl:attribute name="font-size">13pt</xsl:attribute>
+		<xsl:attribute name="font-weight">normal</xsl:attribute>
 		<xsl:attribute name="margin-top">9mm</xsl:attribute>
 		<xsl:attribute name="margin-bottom">6mm</xsl:attribute>
 		<xsl:attribute name="color"><xsl:value-of select="$color_toc_title"/></xsl:attribute>
-		<!-- the manual's combined LIST OF TABLES AND FIGURES prints in the
-				Contents tail at the heading size of the section lists; the
-				report's page placement is handled by insertListsOf -->
-		<xsl:if test="$iala_is_manual">
-			<xsl:attribute name="font-size">14pt</xsl:attribute>
-		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="refine_toc-listof-item-style"><?extend?>
@@ -892,32 +885,33 @@
 	<xsl:template match="mn:preface//mn:clause[@type = 'toc']/mn:fmt-title" priority="3">
 		<fo:block xsl:use-attribute-sets="toc-title-style">
 			<xsl:call-template name="refine_toc-title-style"/>
-			<fo:block-container width="100%" border-bottom="1.25pt solid {$color_corporate_blue}" role="SKIP">
-				<fo:block margin-bottom="2mm" role="SKIP">
-					<xsl:apply-templates />
-				</fo:block>
-			</fo:block-container>
+			<fo:block role="SKIP">
+				<xsl:apply-templates />
+			</fo:block>
 		</fo:block>
 	</xsl:template>
 
 	<xsl:template name="refine_title-style"><?extend?>
-		<!-- the standards/guideline/resolution families print headings in
-				caps; the published manuals and reports keep the authored
-				title case ("Scope and Objectives", "Session 1 - Opening of
-				the Workshop") -->
-		<xsl:if test="not($iala_is_report) and not($iala_is_manual)">
-			<xsl:attribute name="text-transform">uppercase</xsl:attribute>
-		</xsl:if>
-		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+		<!-- WMO headings (WMO-No. 1364 body pages): level 1 prints in the
+			 WMO blue in capitals at regular weight; deeper levels are
+			 black bold in the authored case. -->
 		<xsl:if test="$level = 1">
-			<xsl:attribute name="font-size">14pt</xsl:attribute>
+			<xsl:attribute name="text-transform">uppercase</xsl:attribute>
+			<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+			<xsl:attribute name="font-weight">normal</xsl:attribute>
+			<xsl:attribute name="font-size">13pt</xsl:attribute>
 		</xsl:if>
-		<xsl:if test="$level = 2 or $level = 3">
-			<!-- <xsl:attribute name="font-size">11pt</xsl:attribute> To do --> 
+		<xsl:if test="$level = 2">
+			<xsl:attribute name="color">black</xsl:attribute>
 			<xsl:attribute name="font-size">12pt</xsl:attribute>
 		</xsl:if>
-		<xsl:if test="$level = 4">
+		<xsl:if test="$level = 3">
+			<xsl:attribute name="color">black</xsl:attribute>
 			<xsl:attribute name="font-size">11pt</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="$level = 4">
+			<xsl:attribute name="color">black</xsl:attribute>
+			<xsl:attribute name="font-size">10pt</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
 
@@ -1027,9 +1021,31 @@
 	</xsl:template>
 
 	<xsl:attribute-set name="figure-name-style"><?extend?>
-		<xsl:attribute name="font-weight">normal</xsl:attribute>
-		<xsl:attribute name="font-style">italic</xsl:attribute>
-		<xsl:attribute name="color"><xsl:value-of select="$color_secondary_gray"/></xsl:attribute>
+		<!-- WMO figure captions: bold black, centred (WMO-No. 1364). -->
+		<xsl:attribute name="font-weight">bold</xsl:attribute>
+		<xsl:attribute name="font-style">normal</xsl:attribute>
+		<xsl:attribute name="color">black</xsl:attribute>
+		<xsl:attribute name="text-align">center</xsl:attribute>
+	</xsl:attribute-set>
+
+	<!-- WMO link colour: corporate blue replaces the base generic blue. -->
+	<xsl:attribute-set name="link-style"><?extend?>
+		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+		<xsl:attribute name="text-decoration">underline</xsl:attribute>
+	</xsl:attribute-set>
+
+	<!-- WMO admonitions: the box line and the label take the corporate
+	     blue; the body text stays black on white (no tint fill). -->
+	<xsl:attribute-set name="admonition-style"><?extend?>
+		<xsl:attribute name="border">0.5pt solid {$color_corporate_blue}</xsl:attribute>
+		<xsl:attribute name="color">black</xsl:attribute>
+		<xsl:attribute name="margin-left">16mm</xsl:attribute>
+		<xsl:attribute name="margin-right">16mm</xsl:attribute>
+		<xsl:attribute name="margin-bottom">12pt</xsl:attribute>
+	</xsl:attribute-set>
+
+	<xsl:attribute-set name="admonition-name-style"><?extend?>
+		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
 	</xsl:attribute-set>
 
 
@@ -1252,6 +1268,12 @@
 					tighter and the body drifts ahead of the published
 					pagination -->
 			<xsl:attribute name="line-height">122%</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="not(ancestor::mn:table) and not(ancestor::mn:boilerplate) and not(ancestor::mn:feedback-statement) and not(ancestor::mn:note) and not(ancestor::mn:termnote) and not(ancestor::mn:admonition) and not(ancestor::mn:li)">
+			<!-- WMO body: Verdana on the open 130% pitch with a full
+				 paragraph step (WMO-No. 1364) -->
+			<xsl:attribute name="line-height">130%</xsl:attribute>
+			<xsl:attribute name="space-after">10pt</xsl:attribute>
 		</xsl:if>
 		<xsl:attribute name="text-align">
 			<xsl:choose>
@@ -2369,11 +2391,24 @@
 
 	<xsl:template name="refine_table-header-row-style"><?extend?>
 		<xsl:attribute name="background-color">transparent</xsl:attribute>
-		<xsl:attribute name="color"><xsl:value-of select="$color_corporate_blue"/></xsl:attribute>
+		<!-- WMO: bold black header row (WMO-No. 1364), no fill. -->
+		<xsl:attribute name="color">black</xsl:attribute>
 	</xsl:template>
-	
+
+	<xsl:attribute-set name="table-style"><?extend?>
+		<!-- WMO tables rule like booktabs: the table frame keeps the top
+			 and bottom rules; the side frame drops (FOP resolves the
+			 internal verticals against the table-level border too). -->
+		<xsl:attribute name="border-left">none</xsl:attribute>
+		<xsl:attribute name="border-right">none</xsl:attribute>
+	</xsl:attribute-set>
+
 	<xsl:template name="refine_table-header-cell-style"><?extend?>
 		<xsl:attribute name="padding-left">4mm</xsl:attribute>
+		<!-- WMO tables rule like booktabs (WMO-No. 1364): horizontal
+			 rules only, no verticals and no outer side frame. -->
+		<xsl:attribute name="border-left">none</xsl:attribute>
+		<xsl:attribute name="border-right">none</xsl:attribute>
 		<xsl:if test="ancestor::mn:table[@landscape = 'true'] and $iala_compact_landscape">
 			<xsl:attribute name="padding-left">2mm</xsl:attribute>
 			<xsl:attribute name="padding-right">2mm</xsl:attribute>
@@ -2402,6 +2437,9 @@
 	<xsl:template name="refine_table-cell-style"><?extend?>
 		<xsl:attribute name="padding-left">4mm</xsl:attribute>
 		<xsl:attribute name="display-align">center</xsl:attribute>
+		<!-- WMO tables rule like booktabs: horizontal rules only. -->
+		<xsl:attribute name="border-left">none</xsl:attribute>
+		<xsl:attribute name="border-right">none</xsl:attribute>
 		<xsl:if test="ancestor::mn:table[@landscape = 'true'] and $iala_compact_landscape">
 			<xsl:attribute name="padding-left">2mm</xsl:attribute>
 			<xsl:attribute name="padding-right">2mm</xsl:attribute>
@@ -2468,17 +2506,8 @@
 
 	<xsl:template name="refine_list-item-label-style"><?extend?>
 		<xsl:if test="parent::mn:ul">
-			<xsl:attribute name="color">
-				<xsl:choose>
-					<xsl:when test="@label = '&#x25CB;'">black</xsl:when>
-					<xsl:when test="parent::mn:ul/parent::mn:li/@label = '&#x2022;'">
-						<xsl:value-of select="$color_primary_guideline_50"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="$color_corporate_blue"/>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:attribute>
+			<!-- WMO lists print black markers (WMO-No. 1364) -->
+			<xsl:attribute name="color">black</xsl:attribute>
 		</xsl:if>
 	</xsl:template>
 
