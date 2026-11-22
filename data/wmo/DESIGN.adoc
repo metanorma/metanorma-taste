@@ -1,0 +1,128 @@
+= WMO taste design
+
+This document records the design of the WMO taste's PDF stylesheet
+(`wmo.xsl`): what it renders, how it is wired, and how it is verified.
+The binding specification is the WMO corporate visual identity
+guidelines (June 2016), whose technical-publication requirements are
+transcribed on metanorma/metanorma-taste#273 together with the
+element-by-element analysis of the published samples WMO-No. 1364
+(2025 edition) and WMO-No. 574 (2024 edition).
+
+== Scope and mechanism
+
+The WMO taste gives S-41X product specifications published by WMO their
+own cover and interior design instead of the inherited IHO geometry.
+The stylesheet is a fork of `data/iala/iala.xsl` selected through
+`pdf-stylesheet-override: wmo.xsl` in `config.yaml` — the same override
+mechanism the IALA taste uses. isodoc passes the override to mn2pdf as
+`--xsl-file-override`; mn2pdf merges it onto the base
+`iho.standard.xsl` / `iho.specification.xsl` at run time. The IHO
+stylesheets are never modified.
+
+== Cover classes
+
+The cover class is injected per doctype through
+`presentation-metadata-wmo-cover-class` override attributes in
+`config.yaml`; it survives into the presentation XML as
+`metanorma-extension/presentation-metadata/wmo-cover-class`, and
+`wmo.xsl` matches the plain values exactly (`manual`, `guide`,
+`ec-report`, `ra-report`, `tc-report`, `guideline`, `technical`).
+
+Per the visual identity section B5:
+
+[cols="2,3"]
+|===
+|Class |Cover
+
+|manual |Plain Pantone 187 red solid
+|guide |Plain Pantone 341 teal solid
+|ec-report |Plain Pantone 108 yellow solid (Executive Council and Congress)
+|ra-report |Plain Pantone 196 pink solid (regional associations)
+|tc-report |Plain Pantone 368 light green solid (technical commissions)
+|guideline |Abstract background in shades of green (arcs)
+|technical |Arcs + cover image (`cover-image.jpg` slot, 170mm × 84mm, via `baseassetpath`)
+|===
+
+The plain solids carry no raster art: the band chips and the emblem
+(blue ink with the blue/gold emblem on the three light solids) are
+drawn in the stylesheet. The technical class takes the publication's
+own cover image through the `baseassetpath` parameter.
+
+== Palette
+
+Sampled off the published WMO-No. 574 and WMO-No. 1364 PDFs:
+
+[cols="2,2"]
+|===
+|Element |Value
+
+|cover green |#229A3B
+|band chips |turquoise #26B8D7, green #66C544, gold #F89C0E, blue #2056AE
+|heading blue |rgb(47, 84, 150) (#2F5496, measured off WMO-No. 1364 body text — not the cover chip)
+|back page |#005BAA
+|===
+
+== Typography
+
+Verdana 10 pt per the owner ruling (the A5 proprietary fonts — Bague
+Sans Pro, Univers, ITC Stone Sans — are not redistributable; published
+Word-template WMO documents measure Verdana), with DejaVu Sans as the
+Linux companion. The taste `fonts:` provisioning list must include both
+or FOP silently falls back to Noto Sans for the entire body.
+
+Measured off WMO-No. 1364 (mutool stext per-line extraction):
+
+* Heading ladder: H1 14 pt regular caps; H2 12 pt regular black; H3+
+  10 pt bold black.
+* Body pitch 121% (12.1 pt on 10 pt) with a 10 pt paragraph step.
+* Tables: booktabs style — horizontal rules only, no verticals at cell
+  or table level (FOP resolves internal verticals against the table
+  border); black italic header row without fill; captions bold above.
+* Figure captions bold black centred below; links corporate blue.
+* Running header: outer page number + centred caps title (9 pt).
+* Admonitions: blue box rule (0.5pt) + blue label, black body text;
+  plain notes remain plain, per published WMO practice.
+
+== Override mechanics
+
+mn2pdf's `merge_override.xsl` does not use import precedence:
+
+* Named `xsl:template[@name]` merge by name — the override body
+  replaces the base unless the override carries the `<?extend?>`
+  processing instruction, in which case the base nodes and override
+  nodes concatenate (the later same-named `xsl:attribute` wins).
+* Match templates and attribute-sets absent from the base append with
+  higher precedence.
+* An attribute-set carrying `<?extend?>` concatenates base attributes
+  and override attributes.
+* The merged sheet is written to a temporary `.xsl` at run time and
+  deleted. Local reproduction requires Xalan (xsltproc lacks the
+  nodeset extension): `java -cp <mn2pdf.jar>:<xalan.jar>
+  org.apache.xalan.xslt.Process -IN <base.xsl> -XSL merge_override.xsl
+  -OUT merged.xsl -PARAM override_xsl <wmo.xsl>`.
+
+== Verification instruments
+
+* Ghostscript rasterization (`gs -sDEVICE=png16m`) at ≥200 DPI — never
+  `sips`, which silently drops overlaid images and sub-pixel-renders
+  0.5pt rules.
+* `mutool stext` per-line dumps for published-PDF typography
+  measurement.
+* Pixel sampling off the rendered PNGs (python + PIL cluster counts)
+  against the palette table above.
+
+== Known pitfalls
+
+* IFO scaling responds to `content-height` only; full-page absolute SVG
+  inline foreign objects shift and clip — full-bleed art belongs in a
+  region-body `background-image` sized at 96 dpi pixels
+  (794×1123 px = 210×297 mm); `background-width/height` are invalid on
+  region-body and fatal.
+* The art graphic must be the last flow child of the page; anything
+  after it spills to a new page taking absolute containers along.
+* Duplicate `master-name` in the layout master set is a fatal FOP
+  error; the fork removes the inherited IALA master set in favour of
+  the shadowed layout-master-set carrying the full-bleed cover master.
+* macOS `sips` PDF rasterization can silently drop overlaid images.
+* The `fonts:` list must provision Verdana and DejaVu Sans (the root
+  style font-family alone does not provision).
