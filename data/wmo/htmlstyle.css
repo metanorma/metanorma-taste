@@ -2,12 +2,12 @@
 /*
     WMO HTML presentation stylesheet (metanorma-taste data/wmo)
 
-    Mirrors the wmo.xsl PDF system measured off WMO-No. 1364: heading
-    blue rgb(47, 84, 150), regular-weight capitals on level 1, black
-    deeper levels, plain hyperlink blue for content links, booktabs
-    tables (horizontal rules only, italic header row). Body and
-    monospace faces come from the flavor metanorma.yml through the
-    liquid variables.
+    Design system for the wmo flavor: the print cover's device set in
+    HTML (green field, sweeping arcs, white lockup, IHO conjunction),
+    a fixed contents panel, and the measured WMO document typography
+    (heading blue rgb(47,84,150), caps-regular level 1, booktabs
+    tables with italic headers, plain hyperlink blue). Body and
+    monospace faces arrive per document through the liquid variables.
 
     0 CSS RESET
 */
@@ -478,251 +478,156 @@ dfn {
   border-bottom: solid 3px #2E382E;
 }
 
+/* 1. Base
+---------------------------------------------------------------------- */
 body {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 100%;
+  font-family: "{{bodyfont}}";
   font-size: "{{normalfontsize}}";
-  font-weight: 300;
-  line-height: 1.3;
-  color: #212529;
-  background-color: #ffffff;
-}
-body main {
-  margin: 0 3em 0 6em;
+  line-height: 1.6;
+  color: #1a2430;
+  background: #ffffff;
+  -webkit-font-smoothing: antialiased;
 }
 
-main {
-  margin: 0 3em 0 6em;
+/* 2. Contents sidebar
+---------------------------------------------------------------------- */
+.prefatory-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 300px;
+  background: #f6f8fa;
+  border-right: 1px solid #d7dde3;
+  overflow-y: auto;
+  padding: 2.25rem 1.5rem 2rem;
 }
 
-/* Headings: level 1 in the heading blue in capitals at regular
-   weight; deeper levels black, as on the printed pages. */
-h1, h2, h3, h4, h5, h6 {
-  line-height: 1.3;
+.prefatory-section .rule {
+  display: none;
 }
 
-h1 {
-  color: #2F5496;
-  font-weight: normal;
+nav {
+  margin: 0;
+}
+nav #toc h1.IntroTitle {
+  display: none;
+}
+nav h1 {
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  color: #5b6b7b;
+  border-bottom: 1px solid #d7dde3;
+  padding-bottom: 0.6em;
+  margin: 0 0 1em;
+}
+nav h1 a {
+  color: inherit;
+  text-decoration: none;
+}
+nav h1 .header {
+  display: none;
 }
 
-h2, h3, h4, h5, h6 {
-  color: #212529;
+#toc {
+  font-family: "{{headerfont}}";
+  font-size: 0.86em;
 }
-
-/* Content links keep the plain hyperlink blue of the published
-   documents. */
-.main-content a:not(.toc-link) {
-  color: rgb(0, 0, 255);
-  text-decoration: underline;
-}
-
-/* Booktabs tables: horizontal rules only, italic header row. */
-table {
-  border-collapse: collapse;
-}
-table th, table td {
-  border-left: none;
-  border-right: none;
-}
-table th {
-  border-top: 1px solid #212529;
-  border-bottom: 1px solid #212529;
-  font-weight: normal;
-  font-style: italic;
-  text-align: left;
-}
-table tbody td {
-  border-bottom: 1px solid #212529;
-}
-table thead th, table thead td {
-  background: none;
-}
-
-.figure-caption, figcaption, p.Figure-caption, p.Table-caption {
-  font-weight: bold;
-  text-align: center;
-}
-
-#toc ul, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) ul {
+#toc ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
-#toc ul li a, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) ul li a {
-  padding: 5px 10px;
+#toc ul ul {
+  padding-left: 0.9em;
 }
-#toc ul a, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) ul a {
-  color: #2F5496;
-  text-decoration: none;
+#toc a {
   display: block;
+  color: #1a2430;
+  text-decoration: none;
+  padding: 0.28em 0.6em;
+  border-radius: 4px;
+  line-height: 1.35;
 }
-#toc ul a:hover, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) ul a:hover {
-  box-shadow: none;
+#toc a:hover {
+  background: #e9eef3;
   color: #2F5496;
 }
-#toc .h2, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) .h2 {
-  padding-left: 30px;
+#toc a:focus-visible {
+  outline: 2px solid #2F5496;
+  outline-offset: 1px;
 }
-#toc .h3, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) .h3 {
-  padding-left: 50px;
+#toc .toc-active a {
+  background: #2F5496;
+  color: #ffffff;
+  font-weight: 600;
 }
-#toc .h4, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) .h4 {
-  padding-left: 70px;
-}
-#toc .h5, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) .h5 {
-  padding-left: 90px;
-}
-#toc .h6, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) .h6 {
-  padding-left: 110px;
-}
-#toc .toc-active, #toc li:hover, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) .toc-active, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) li:hover {
-  background: rgb(34, 154, 59);
-  box-shadow: inset -5px 0px 10px -5px rgb(34, 154, 59) !important;
-}
-#toc .toc-active a, #toc li:hover a, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) .toc-active a, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) li:hover a {
+#toc > ul > li > a {
   color: #2F5496;
-}
-@media print {
-  #toc .toc-active, #toc li:hover, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) .toc-active, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) li:hover {
-    background: white;
-    box-shadow: none !important;
-  }
-  #toc .toc-active a, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) .toc-active a {
-    color: #2F5496;
-  }
-  #toc li:hover a, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) li:hover a {
-    color: black;
-  }
-}
-#toc, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) {
-  font-family: "{{bodyfont}}";
-  font-weight: 400;
-}
-@media screen and (max-width: 768px) {
-  #toc, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) {
-    padding: 0 1.5em;
-    overflow: visible;
-  }
-}
-#toc .toc-active a, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) .toc-active a {
-  color: #2F5496;
-}
-#toc ul a:hover, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) ul a:hover {
-  box-shadow: none;
-  color: #2F5496;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
-#toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) {
-  margin-top: 0;
-  margin-bottom: 0;
-  font-size: 100%;
-}
-
-@media screen and (min-width: 768px) {
-  nav {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 323px;
-    font-size: 0.9em;
-    overflow: auto;
-    padding: 0 0 0 30px;
-    background-color: #f7f7f7;
-  }
-}
-@media print {
-  nav {
-    position: relative;
-    width: auto;
-    font-size: 0.9em;
-    overflow: auto;
-    padding: 0;
-    margin-right: 0;
-    background-color: white;
-  }
-}
-
-@media screen and (min-width: 768px) {
-  #toggle {
-    position: fixed;
-    height: 100%;
-    width: 30px;
-    background-color: #2F5496;
-    color: white !important;
-    cursor: pointer;
-    left: 0;
-    top: 0;
-    z-index: 103;
-  }
-  #toggle span {
-    text-align: center;
-    width: 100%;
-    position: absolute;
-    top: 50%;
-    transform: translate(0, -50%);
-  }
-}
-@media screen and (max-width: 768px) {
-  #toggle {
-    display: none;
-  }
-}
-@media print {
-  #toggle {
-    display: none;
-  }
+#toggle {
+  display: none;
 }
 
 #myBtn {
-  font-family: "{{monospacefont}}";
-  font-variant-ligatures: none;
-  display: none;
   position: fixed;
-  bottom: 20px;
-  right: 30px;
-  z-index: 99;
-  font-size: 12px;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 20;
+  background: #2F5496;
+  color: #ffffff;
   border: none;
-  outline: none;
-  background-color: #2F5496;
-  opacity: 0.15;
-  color: white;
+  border-radius: 6px;
+  padding: 0.55em 0.9em;
+  font-family: "{{headerfont}}";
+  font-size: 0.8em;
+  letter-spacing: 0.06em;
   cursor: pointer;
-  padding: 10px 15px 10px 15px;
-  border-radius: 4px;
 }
 #myBtn:hover {
-  opacity: 1;
+  background: #25457e;
 }
-@media print {
-  #myBtn {
-    display: none;
-  }
-}
-#myBtn {
-  text-transform: uppercase;
-}
-#myBtn a.anchorjs-link:hover {
-  background: none;
-  color: #2F5496;
-  box-shadow: none;
+#myBtn:focus-visible {
+  outline: 2px solid rgb(34, 154, 59);
+  outline-offset: 2px;
 }
 
-@media screen and (min-width: 768px) {
-  .container {
-    padding-left: 360px;
+/* 3. Layout
+---------------------------------------------------------------------- */
+.container {
+  padding: 0;
+}
+
+.title-section {
+  padding: 0;
+}
+
+.document-stage-band {
+  margin-left: 0;
+}
+
+@media screen and (min-width: 901px) {
+  .title-section {
+    margin-left: 300px;
   }
 }
-/*
-    Cover page (htmlcoverpage.html): the print cover's device set in
-    HTML - the green field with the sweeping arcs as the hero, white
-    lockup and title on the field, the IHO conjunction chip bottom
-    right, the docidentifier bottom left.
-*/
+.main-section {
+  margin-left: 300px;
+  padding: 0 clamp(2rem, 4vw, 4rem) 4rem;
+  max-width: 62rem;
+}
+
+.rule {
+  display: none;
+}
+
+/* 4. Cover
+---------------------------------------------------------------------- */
 .wmo-cover {
   margin: 0;
 }
@@ -730,8 +635,8 @@ table thead th, table thead td {
 .wmo-hero {
   position: relative;
   margin: 0;
-  min-height: 620px;
-  background: rgb(34, 154, 59);
+  min-height: 600px;
+  background: linear-gradient(160deg, rgb(34, 154, 59) 0%, rgb(34, 154, 59) 55%, rgb(24, 120, 48) 100%);
   color: #ffffff;
   overflow: hidden;
 }
@@ -746,20 +651,20 @@ table thead th, table thead td {
 
 .wmo-lockup {
   position: absolute;
-  top: 3em;
+  top: 3.2em;
   left: 4em;
   z-index: 2;
 }
 
 .wmo-lockup .logo-img svg {
-  width: 210px;
+  width: 200px;
   height: auto;
   display: block;
 }
 
 .wmo-title-block {
   position: absolute;
-  top: 10em;
+  top: 9.5em;
   left: 4em;
   right: 4em;
   z-index: 2;
@@ -767,17 +672,16 @@ table thead th, table thead td {
 
 .wmo-title {
   display: block;
-  max-width: 26em;
   color: #ffffff;
   font-family: "{{headerfont}}";
-  font-size: 2.05em;
+  font-size: clamp(1.7em, 3.2vw, 2.2em);
   font-weight: 400;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 .wmo-edition {
   position: absolute;
-  top: 21em;
+  top: 17.5em;
   left: 4em;
   z-index: 2;
 }
@@ -787,6 +691,7 @@ table thead th, table thead td {
   font-family: "{{headerfont}}";
   font-weight: 700;
   font-size: 0.95em;
+  letter-spacing: 0.03em;
 }
 
 .wmo-draft {
@@ -796,82 +701,401 @@ table thead th, table thead td {
   margin-top: 0.4em;
 }
 
-.wmo-conjunction {
-  position: absolute;
-  right: 4em;
-  bottom: 3em;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 0.7em;
-}
-
-.wmo-iho-chip {
+.wmo-iho-plate {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 3px 6px;
+  padding: 0.3em 0.5em;
   background: #ffffff;
+  border-radius: 3px;
 }
 
-.wmo-iho-tile {
-  width: 11px;
-  height: 13px;
-  display: inline-block;
-}
-
-.wmo-iho-tile-1 {
-  background: #00538A;
-}
-
-.wmo-iho-tile-2 {
-  background: #FFD200;
-}
-
-.wmo-iho-tile-3 {
-  background: #6CB33F;
-}
-
-.wmo-iho-word {
-  color: #00538A;
-  font-weight: 700;
-  font-size: 0.62em;
-  letter-spacing: 0.08em;
-  margin-left: 3px;
+.wmo-iho-plate svg {
+  height: 1.2em;
+  width: auto;
+  display: block;
 }
 
 .wmo-conjunction-text {
   color: #ffffff;
   font-family: "{{headerfont}}";
-  font-size: 0.66em;
+  font-size: 0.68em;
   line-height: 1.45;
-}
-
-.wmo-docidentifier {
-  position: absolute;
-  left: 4em;
-  bottom: 3em;
-  z-index: 2;
-  color: #ffffff;
-  font-family: "{{headerfont}}";
-  font-weight: 700;
-  font-size: 0.9em;
 }
 
 .wmo-wordmark {
   display: flex;
   justify-content: flex-end;
   gap: 2.5em;
-  margin: 2.2em 6em 0.5em;
-  color: #212529;
+  margin: 1.6em clamp(2rem, 4vw, 4rem) 0.6em;
+  color: #1a2430;
   font-family: "{{headerfont}}";
-  font-size: 0.85em;
+  font-size: 0.82em;
   font-weight: 700;
   letter-spacing: 0.34em;
 }
 
-.wmo-cover .document-type-band {
-  background: #2F5496;
+.document-type-band,
+.document-type-band[id$=-band] {
+  background: #2F5496 !important;
+  color: #ffffff !important;
+  font-family: "{{headerfont}}" !important;
+  text-align: center;
+  padding: 0.6em 2em;
+  margin: 1.4em 0 0;
+  font-size: 0.9em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.document-type-band p.document-type,
+.document-type-band[id$=-band] p.document-type {
+  margin: 0;
+}
+
+/* 5. Front matter blocks
+---------------------------------------------------------------------- */
+.document-stage-band {
+  background: rgb(24, 120, 48);
+  color: #ffffff;
   font-family: "{{headerfont}}";
-  margin-top: 1.5em;
+  text-align: center;
+  padding: 0.6em;
+  font-size: 0.9em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.coverpage-doc-identity {
+  padding: 1.6em clamp(2rem, 4vw, 4rem) 0.4em;
+}
+.coverpage-doc-identity .doc-number {
+  font-family: "{{headerfont}}";
+  font-size: 0.9em;
+  color: #2F5496;
+  font-weight: 600;
+}
+.coverpage-doc-identity .doc-number .docyear {
+  color: #1a2430;
+  font-weight: 400;
+  margin-left: 0.6em;
+}
+
+.coverpage-stage-block {
+  padding: 0.15em clamp(2rem, 4vw, 4rem);
+}
+.coverpage-stage-block .coverpage-stage {
+  font-family: "{{headerfont}}";
+  font-weight: 700;
+  color: #2F5496;
+}
+.coverpage-stage-block .coverpage-maturity {
+  color: #1a2430;
+}
+
+.authority {
+  background: #f6f8fa;
+  border: 1px solid #d7dde3;
+  border-radius: 6px;
+  padding: 1.5rem 1.75rem;
+  margin: 2rem 0 3rem;
+  font-size: 0.88em;
+  line-height: 1.55;
+}
+.authority h1.IntroTitle {
+  font-size: 0.95em;
+  font-weight: 700;
+  color: #2F5496;
+  margin: 0 0 0.75em;
+  text-transform: none;
+}
+
+/* 5b. Hero meta row
+---------------------------------------------------------------------- */
+.wmo-hero-meta {
+  position: absolute;
+  left: 4em;
+  right: 4em;
+  bottom: 2.6em;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5em;
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  padding-top: 1.1em;
+}
+
+.wmo-docidentifier {
+  color: #ffffff;
+  font-family: "{{headerfont}}";
+  font-weight: 700;
+  font-size: 0.92em;
+  letter-spacing: 0.05em;
+}
+
+.wmo-conjunction-group {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+
+.wmo-conjunction-text {
+  color: #ffffff;
+  font-family: "{{headerfont}}";
+  font-size: 0.68em;
+  line-height: 1.45;
+}
+
+/* 5c. Boilerplate block
+---------------------------------------------------------------------- */
+.WordSection11 {
+  padding: 1.75rem clamp(2rem, 4vw, 4rem) 2rem;
+  font-size: 0.88em;
+  color: #3c4854;
+  line-height: 1.6;
+}
+
+/* 6. Typography
+---------------------------------------------------------------------- */
+main {
+  margin: 0;
+  padding-top: 2.5rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "{{headerfont}}";
+  color: #1a2430;
+  line-height: 1.3;
+  scroll-margin-top: 2rem;
+}
+
+h1 {
+  color: #2F5496;
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: 1.75em;
+  margin: 3.5rem 0 1.4rem;
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid #d7dde3;
+}
+
+h2 {
+  font-weight: 600;
+  font-size: 1.32em;
+  margin: 2.6rem 0 1rem;
+}
+
+h3 {
+  font-weight: 600;
+  font-size: 1.14em;
+  margin: 2.1rem 0 0.9rem;
+}
+
+h4 {
+  font-weight: 600;
+  font-size: 1em;
+  margin: 1.8rem 0 0.8rem;
+}
+
+h5, h6 {
+  font-weight: 600;
+  font-size: 0.95em;
+  margin: 1.6rem 0 0.7rem;
+}
+
+p {
+  margin: 0 0 1.05em;
+}
+
+main > div[class^=sec-] {
+  margin-bottom: 3.25rem;
+}
+
+/* 7. Links
+---------------------------------------------------------------------- */
+a {
+  color: rgb(5, 80, 200);
+  text-decoration: underline;
+  text-decoration-color: rgba(5, 80, 200, 0.35);
+  text-underline-offset: 2px;
+}
+a:hover {
+  text-decoration-color: currentColor;
+}
+a:focus-visible {
+  outline: 2px solid #2F5496;
+  outline-offset: 1px;
+}
+
+/* 8. Lists
+---------------------------------------------------------------------- */
+ul, ol {
+  margin: 0 0 1.1em;
+  padding-left: 1.6em;
+}
+ul li, ol li {
+  margin-bottom: 0.4em;
+}
+ul ul, ul ol, ol ul, ol ol {
+  margin-bottom: 0.2em;
+}
+
+/* 9. Tables: booktabs
+---------------------------------------------------------------------- */
+table {
+  border-collapse: collapse;
+  margin: 1.6em 0 2em;
+  width: 100%;
+  font-size: 0.92em;
+}
+table th, table td {
+  border-left: none;
+  border-right: none;
+  padding: 0.62em 0.9em;
+  vertical-align: top;
+}
+table th {
+  border-top: 1.5pt solid #1a2430;
+  border-bottom: 1pt solid #1a2430;
+  font-weight: normal;
+  font-style: italic;
+  text-align: left;
+  background: none;
+}
+table tbody td {
+  border-bottom: 0.5pt solid #d7dde3;
+}
+table tbody tr:last-child td {
+  border-bottom: 1.5pt solid #1a2430;
+}
+table thead th, table thead td {
+  background: none;
+}
+
+/* 10. Figures and captions
+---------------------------------------------------------------------- */
+figure {
+  margin: 1.8em 0 1.8em;
+  text-align: center;
+}
+
+figure img, main img {
+  max-width: 100%;
+  height: auto;
+}
+
+figcaption, p.Figure-caption, p.Table-caption {
+  font-family: "{{headerfont}}";
+  font-weight: 700;
+  font-size: 0.88em;
+  text-align: center;
+  color: #1a2430;
+  margin: 0.8em auto 1.6em;
+}
+
+/* 11. Source code and formulas
+---------------------------------------------------------------------- */
+pre.sourcecode,
+pre {
+  background: #f6f8fa;
+  border: 1px solid #d7dde3;
+  border-radius: 6px;
+  padding: 1em 1.25em;
+  font-family: "{{monospacefont}}";
+  font-size: 0.85em;
+  line-height: 1.5;
+  overflow-x: auto;
+  margin: 1.2em 0 1.6em;
+}
+
+code, tt {
+  font-family: "{{monospacefont}}";
+  font-size: 0.88em;
+  background: #f6f8fa;
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+.formula, dl.formula {
+  text-align: center;
+  margin: 1.4em 0;
+}
+
+/* 12. Notes and admonitions
+---------------------------------------------------------------------- */
+.note, .admonition {
+  border-left: 3px solid #2F5496;
+  background: #f6f8fa;
+  padding: 0.75em 1.1em;
+  margin: 1.2em 0 1.4em;
+  font-size: 0.92em;
+  border-radius: 0 4px 4px 0;
+}
+
+/* 13. Definition lists and metadata blocks
+---------------------------------------------------------------------- */
+dl {
+  margin: 1em 0 1.5em;
+}
+dl dt {
+  font-family: "{{headerfont}}";
+  font-weight: 700;
+  margin-top: 0.9em;
+}
+dl dd {
+  margin: 0.25em 0 0.5em 1.4em;
+}
+
+/* 14. Footnotes
+---------------------------------------------------------------------- */
+#footnotes, .footnotes {
+  border-top: 1px solid #d7dde3;
+  margin-top: 3rem;
+  padding-top: 1rem;
+  font-size: 0.85em;
+}
+
+/* 15. Responsive
+---------------------------------------------------------------------- */
+@media screen and (max-width: 900px) {
+  .prefatory-section {
+    position: static;
+    width: auto;
+    border-right: none;
+    border-bottom: 1px solid #d7dde3;
+  }
+  .main-section {
+    margin-left: 0;
+    padding: 2rem 1.4rem 3rem;
+  }
+  .wmo-hero {
+    min-height: 420px;
+  }
+  .wmo-lockup {
+    top: 2em;
+    left: 2em;
+  }
+  .wmo-lockup .logo-img svg {
+    width: 160px;
+  }
+  .wmo-title-block {
+    top: 8em;
+    left: 2em;
+    right: 2em;
+  }
+  .wmo-edition {
+    top: 15em;
+    left: 2em;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }
