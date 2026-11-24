@@ -17,6 +17,8 @@ module Metanorma
       # load time by TasteRegister, so by the time a config reaches consumers
       # it is already flattened; kept here only so the key validates.
       attribute :base_taste, :string
+      attribute :html_engine, :string
+      attribute :labeler, :string
       attribute :base_override, BaseOverride
       attribute :doctypes, DoctypeConfig, collection: true
       attribute :stages, StageConfig, collection: true
@@ -28,6 +30,8 @@ module Metanorma
         map "owner", to: :owner
         map "base-flavor", to: :base_flavor
         map "base-taste", to: :base_taste
+        map "html-engine", to: :html_engine
+        map "labeler", to: :labeler
         map "base-override", to: :base_override
         map "doctypes", to: :doctypes
         map "stages", to: :stages

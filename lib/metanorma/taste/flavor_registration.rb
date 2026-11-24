@@ -56,6 +56,7 @@ module Metanorma
             publisher_abbr: abbrev,
             branding_dir: directory,
             doctype_map: doctype_map(config),
+            **engine_options(config),
             renderers: {
               html: lambda do |document, **_options|
                 next nil unless abbrev
@@ -72,6 +73,13 @@ module Metanorma
             taste_name = safe_read(dt, :taste)
             base_name = safe_read(dt, :base)
             map[taste_name.to_sym] = base_name.to_sym if taste_name && base_name
+          end
+        end
+
+        def engine_options(config)
+          %i[html_engine labeler].each_with_object({}) do |key, options|
+            value = safe_read(config, key)
+            options[key] = value if value
           end
         end
 

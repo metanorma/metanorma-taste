@@ -4,6 +4,66 @@ RSpec.describe Metanorma::TasteRegister do
 
   let(:register) { described_class.instance }
 
+  describe "migration engine registration" do
+    let(:config) do
+      Metanorma::Taste::TasteConfig.from_yaml(<<~YAML)
+        flavor: engine-test
+        owner: Test organization
+        base-flavor: iso
+        html-engine: document
+        labeler: ladl
+      YAML
+    end
+
+    it "maps optional HTML-engine and labeler choices from taste data" do
+      expect(config.html_engine).to eq("document")
+      expect(config.labeler).to eq("ladl")
+      expect(Metanorma::Taste::FlavorRegistration.send(:engine_options, config))
+        .to eq(html_engine: "document", labeler: "ladl")
+    end
+
+    it "does not pass new keywords for existing unconfigured tastes" do
+      config.html_engine = nil
+      config.labeler = nil
+      expect(Metanorma::Taste::FlavorRegistration.send(:engine_options, config))
+        .to eq({})
+    end
+
+    it "inherits parent taste choices while allowing an explicit child override" do
+      raw = {
+        "parent" => {
+          "hash" => { "flavor" => "parent", "html-engine" => "document",
+                      "labeler" => "ladl", "base-flavor" => "iso" },
+          "directory" => "/parent",
+        },
+        "child" => {
+          "hash" => { "flavor" => "child", "base-taste" => "parent",
+                      "labeler" => "xref" },
+          "directory" => "/child",
+        },
+      }
+      merged, = register.send(:resolve_raw_config, "child", raw, [])
+      child = Metanorma::Taste::TasteConfig.from_yaml(merged.to_yaml)
+      expect(child.html_engine).to eq("document")
+      expect(child.labeler).to eq("xref")
+      expect(raw["parent"]["hash"]["labeler"]).to eq("ladl")
+    end
+
+    it "forwards supplied choices into the central flavor registration" do
+      allow(Metanorma::TasteRegister).to receive(:get_config)
+        .with(:"engine-test").and_return(config)
+      allow(register).to receive(:config_directory_for)
+        .with(:"engine-test").and_return("/taste")
+      expect(Metanorma::Core::Flavors).to receive(:register) do |entry|
+        expect(entry.name).to eq(:"engine-test")
+        expect(entry.base_flavor).to eq(:iso)
+        expect(entry.html_engine).to eq(:document)
+        expect(entry.labeler).to eq(:ladl)
+      end
+      Metanorma::Taste::FlavorRegistration.send(:register_taste, :"engine-test")
+    end
+  end
+
   describe "#available_tastes" do
     it "returns available tastes" do
       expect(register.available_tastes).to include(:icc)
