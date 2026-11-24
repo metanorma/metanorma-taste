@@ -128,3 +128,155 @@ nav {
     padding-left: 360px;
   }
 }
+
+/*
+    Cover page (htmlcoverpage.html): the print cover's device set in
+    HTML - the green field with the sweeping arcs as the hero, white
+    lockup and title on the field, the IHO conjunction chip bottom
+    right, the docidentifier bottom left.
+*/
+
+.wmo-cover {
+  margin: 0;
+}
+
+.wmo-hero {
+  position: relative;
+  margin: 0;
+  min-height: 620px;
+  background: rgb(34, 154, 59);
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.wmo-hero-arcs,
+.wmo-hero-arcs svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.wmo-lockup {
+  position: absolute;
+  top: 3em;
+  left: 4em;
+  z-index: 2;
+}
+
+.wmo-lockup .logo-img svg {
+  width: 210px;
+  height: auto;
+  display: block;
+}
+
+.wmo-title-block {
+  position: absolute;
+  top: 10em;
+  left: 4em;
+  right: 4em;
+  z-index: 2;
+}
+
+.wmo-title {
+  display: block;
+  max-width: 26em;
+  color: #ffffff;
+  font-family: $headerfont;
+  font-size: 2.05em;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.wmo-edition {
+  position: absolute;
+  top: 21em;
+  left: 4em;
+  z-index: 2;
+}
+
+.wmo-edition-line {
+  color: #ffffff;
+  font-family: $headerfont;
+  font-weight: 700;
+  font-size: 0.95em;
+}
+
+.wmo-draft {
+  display: block;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8em;
+  margin-top: 0.4em;
+}
+
+.wmo-conjunction {
+  position: absolute;
+  right: 4em;
+  bottom: 3em;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+
+.wmo-iho-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 6px;
+  background: #ffffff;
+}
+
+.wmo-iho-tile {
+  width: 11px;
+  height: 13px;
+  display: inline-block;
+}
+
+.wmo-iho-tile-1 { background: #00538A; }
+.wmo-iho-tile-2 { background: #FFD200; }
+.wmo-iho-tile-3 { background: #6CB33F; }
+
+.wmo-iho-word {
+  color: #00538A;
+  font-weight: 700;
+  font-size: 0.62em;
+  letter-spacing: 0.08em;
+  margin-left: 3px;
+}
+
+.wmo-conjunction-text {
+  color: #ffffff;
+  font-family: $headerfont;
+  font-size: 0.66em;
+  line-height: 1.45;
+}
+
+.wmo-docidentifier {
+  position: absolute;
+  left: 4em;
+  bottom: 3em;
+  z-index: 2;
+  color: #ffffff;
+  font-family: $headerfont;
+  font-weight: 700;
+  font-size: 0.9em;
+}
+
+.wmo-wordmark {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2.5em;
+  margin: 2.2em 6em 0.5em;
+  color: #212529;
+  font-family: $headerfont;
+  font-size: 0.85em;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+}
+
+.wmo-cover .document-type-band {
+  background: #2F5496;
+  font-family: $headerfont;
+  margin-top: 1.5em;
+}
