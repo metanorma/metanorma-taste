@@ -148,7 +148,7 @@ RSpec.describe Metanorma::TasteRegister do
                            headerfont: "Lato,\"Source Sans Pro\",sans-serif",
                            htmlcoverpage: "#{dir}/csa/html_csa_titlepage.html",
                            htmlintropage: "#{dir}/csa/html_csa_intro.html",
-                           htmlstylesheet: "#{dir}/csa/htmlstyle.scss",
+                           htmlstylesheet: "#{dir}/csa/htmlstyle.css",
                            monospacefont: "\"Source Code Pro\",monospace",
                            sourcehighlighter: true,
                            suppressasciimathdup: false,
@@ -164,10 +164,10 @@ RSpec.describe Metanorma::TasteRegister do
                            header: "#{dir}/csa/header.html",
                            headerfont: "Lato,\"Source Sans Pro\",sans-serif",
                            monospacefont: "\"Source Code Pro\",monospace",
-                           standardstylesheet: "#{dir}/csa/csa.scss",
+                           standardstylesheet: "#{dir}/csa/csa.css",
                            wordcoverpage: "#{dir}/csa/word_csa_titlepage.html",
                            wordintropage: "#{dir}/csa/word_csa_intro.html",
-                           wordstylesheet: "#{dir}/csa/wordstyle.scss" })
+                           wordstylesheet: "#{dir}/csa/wordstyle.css" })
       info = register.isodoc_attrs(:csa, :presentation).compact.transform_values do |v|
         v.is_a?(String) && File.exist?(v) ? File.expand_path(v) : v
       end
