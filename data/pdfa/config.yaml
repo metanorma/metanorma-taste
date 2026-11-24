@@ -8,7 +8,7 @@ base-override:
     i18n-dictionary: i18n.yaml
     publisher-logo: pdfa-logo.svg
     htmlcoverpage: htmlcoverpage.html
-    htmlstylesheet-override: htmlstylesheet-override.scss
+    htmlstylesheet-override: htmlstylesheet-override.css
     pdf-stylesheet-override: pdfa.xsl
     # relaton-render-config: relaton-render-config.yaml
   value-attributes:
