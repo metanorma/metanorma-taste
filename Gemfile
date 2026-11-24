@@ -13,6 +13,8 @@ gem "metanorma-core", "~> 0.2.7" # published flavor/taste table (metanorma-core#
 gem "metanorma", github: "metanorma/metanorma", branch: "main"
 
 group :development do
+  # Build-time SCSS compiler for rake build_scss: never a runtime
+  # dependency - the gem ships precompiled CSS only.
   gem "canon", "~> 0.3"
   gem "debug"
   gem "metanorma", github: "metanorma/metanorma", branch: "main"
@@ -28,6 +30,8 @@ group :development do
   gem "rspec-command", "~> 1.0"
   gem "rubocop", "~> 1"
   gem "rubocop-performance"
+  # Build-time SCSS compiler for rake build_scss: never a runtime
+  # dependency - the gem ships precompiled CSS only.
   gem "sassc-embedded", "~> 1"
   gem "simplecov", "~> 0.15"
 end

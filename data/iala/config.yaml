@@ -17,7 +17,7 @@ base-override:
     publisher-logo: iala-logo.svg
     pdf-stylesheet-override: iala.xsl
     htmlcoverpage: html_iala_titlepage.html
-    htmlstylesheet: htmlstyle.scss
+    htmlstylesheet: htmlstyle.css
   value-attributes:
     publisher: International Organization for Marine Aids to Navigation
     publisher_abbr: IALA
