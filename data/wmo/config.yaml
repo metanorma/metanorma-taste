@@ -7,6 +7,7 @@ base-override:
     # Flavor processor config: fonts, doctype registry, namespaces,
     # stages (the IALA taste's customize metanorma.yml pattern).
     customize: metanorma.yml
+    htmlstylesheet: htmlstyle.css
     copyright-notice: copyright.adoc
     i18n-dictionary: i18n.yaml
     publisher-logo: logo-wmo.svg

@@ -1,0 +1,130 @@
+/*
+    WMO HTML presentation stylesheet (metanorma-taste data/wmo)
+
+    Mirrors the wmo.xsl PDF system measured off WMO-No. 1364: heading
+    blue rgb(47, 84, 150), regular-weight capitals on level 1, black
+    deeper levels, plain hyperlink blue for content links, booktabs
+    tables (horizontal rules only, italic header row). Body and
+    monospace faces come from the flavor metanorma.yml through the
+    liquid variables.
+
+    0 CSS RESET
+*/
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+@use 'base_style/all' as *;
+
+$wmo_heading_blue: #2F5496;
+$wmo_cover_green: rgb(34, 154, 59);
+$wmo_link_blue: rgb(0, 0, 255);
+
+body {
+  @include bodyStyle1($normalfontsize, 1.3, #212529, #ffffff, 300);
+}
+
+main {
+  margin: 0 3em 0 6em;
+}
+
+/* Headings: level 1 in the heading blue in capitals at regular
+   weight; deeper levels black, as on the printed pages. */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.3;
+}
+
+h1 {
+  color: $wmo_heading_blue;
+  font-weight: normal;
+  text-transform: uppercase;
+}
+
+h2, h3, h4, h5, h6 {
+  color: #212529;
+}
+
+/* Content links keep the plain hyperlink blue of the published
+   documents. */
+.main-content a:not(.toc-link) {
+  color: $wmo_link_blue;
+  text-decoration: underline;
+}
+
+/* Booktabs tables: horizontal rules only, italic header row. */
+table {
+  border-collapse: collapse;
+
+  th, td {
+    border-left: none;
+    border-right: none;
+  }
+
+  th {
+    border-top: 1px solid #212529;
+    border-bottom: 1px solid #212529;
+    font-weight: normal;
+    font-style: italic;
+    text-align: left;
+  }
+
+  tbody td {
+    border-bottom: 1px solid #212529;
+  }
+
+  thead th, thead td {
+    background: none;
+  }
+}
+
+.figure-caption, figcaption, p.Figure-caption, p.Table-caption {
+  font-weight: bold;
+  text-align: center;
+}
+
+#toc, #toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) {
+  @include toc($wmo_heading_blue, $wmo_cover_green, $wmo_heading_blue);
+  @include sidebarToc();
+
+  .toc-active a {
+    color: $wmo_heading_blue;
+  }
+
+  ul {
+    a:hover {
+      box-shadow: none;
+      color: $wmo_heading_blue;
+    }
+  }
+}
+
+#toc > ul :is(.h1, .h2, .h3, .h4, .h5, .h6) {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 100%;
+}
+
+nav {
+  @include sidebarNav(#f7f7f7, 323px, 30px);
+}
+
+#toggle {
+  @include sidebarNavToggle(white, $wmo_heading_blue)
+}
+
+#myBtn {
+  @include toTopBtn(white, $wmo_heading_blue);
+  text-transform: uppercase;
+
+  a.anchorjs-link {
+    @include anchorLink($wmo_heading_blue)
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .container {
+    padding-left: 360px;
+  }
+}
