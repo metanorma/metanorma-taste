@@ -975,8 +975,20 @@ table thead th, table thead td {
 /* 10. Figures and captions
 ---------------------------------------------------------------------- */
 figure {
-  margin: 1.8em 0 1.8em;
+  margin: 1.8em 0;
   text-align: center;
+}
+
+/* code figures render as left-aligned panels - the blanket figure
+   centering must not reach the code */
+figure.sourcecode {
+  text-align: left;
+  margin: 1.2em 0 1.6em;
+}
+
+figure.sourcecode pre {
+  text-align: left;
+  margin: 0;
 }
 
 figure img, main img {
