@@ -7,7 +7,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}" }
 gemspec
 
 gem "metanorma-core", github: "metanorma/metanorma-core",
-                       ref: "231ea6e236a6ccb199ff236df675b6a1edc0240a" # engine dispatch candidate
+                       ref: "404908addacc4168a034f1399f19d4f800c20c04" # combined engine dispatch (metanorma-core#38)
 # TEMPORARY pin for the compile fix (implicit presentation dependency +
 # non-mutating output_formats, metanorma#602, rebase-merged into
 # feat/flavors-table); drop when that branch reaches rubygems.
