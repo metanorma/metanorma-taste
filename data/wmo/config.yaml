@@ -3,6 +3,10 @@ flavor: wmo
 owner: World Meteorological Organization
 base-flavor: iho
 base-override:
+  # Word output is the uniword DOCX package (metanorma-iso#1728 ruling:
+  # uniword is the only DOCX engine; the legacy isodoc HTML-as-.doc
+  # fallback ships unreadable text files).
+  doc-engine: uniword
   filename-attributes:
     # Flavor processor config: fonts, doctype registry, namespaces,
     # stages (the IALA taste's customize metanorma.yml pattern).

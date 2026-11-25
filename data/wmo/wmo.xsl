@@ -1121,6 +1121,13 @@
 		<xsl:attribute name="font-family">Source Code Pro, Courier New, DejaVu Sans Mono, <xsl:value-of select="$font_noto_sans_mono"/></xsl:attribute>
 	</xsl:attribute-set>
 
+	<!-- Sourcecode blocks carry their own set: the base styles them
+	     "Fira Code, NotoSansMono", neither provisioned for WMO, and the
+	     code fell back to the proportional Noto Sans. -->
+	<xsl:attribute-set name="sourcecode-style"><?extend?>
+		<xsl:attribute name="font-family">Source Code Pro, Courier New, DejaVu Sans Mono, <xsl:value-of select="$font_noto_sans_mono"/></xsl:attribute>
+	</xsl:attribute-set>
+
 	<!-- WMO admonitions: the box line and the label take the corporate
 	     blue; the body text stays black on white (no tint fill). -->
 	<xsl:attribute-set name="admonition-style"><?extend?>

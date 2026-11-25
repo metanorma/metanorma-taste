@@ -91,7 +91,7 @@ RSpec.describe Metanorma::Taste::DocEngine do
     end
 
     it "returns nil for tastes that declare no doc-engine" do
-      expect(described_class.engine_for(:doc, supplied_type: :wmo))
+      expect(described_class.engine_for(:doc, supplied_type: :csa))
         .to be_nil
     end
 
@@ -137,7 +137,7 @@ RSpec.describe Metanorma::Taste::DocEngine do
     end
 
     it "keeps the base flavor's own pipeline for other tastes" do
-      run_engine_output(:doc, :wmo)
+      run_engine_output(:doc, :csa)
       expect(File.read(outname)).to eq("legacy output")
     end
 
