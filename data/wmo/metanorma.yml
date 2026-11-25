@@ -7,6 +7,13 @@ html_headerfont: 'Verdana, DejaVu Sans, Arial, sans-serif'
 html_monospacefont: '"Source Code Pro", Menlo, Monaco, Consolas, monospace'
 html_normalfontsize: "15px"
 html_footnotefontsize: "0.9em"
+# The customize metanorma.yml replaces the base processor config, so
+# the WMO HTML furniture must be declared here: the IHO cover and
+# stylesheet this file replaces carry the iho paths.
+htmlcoverpage: htmlcoverpage.html
+htmlstylesheet: htmlstyle.css
+webfont:
+  - "https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap"
 i18nyaml: i18n.yaml
 boilerplate: copyright.adoc
 # The S-100 identifiers (S-411) mint through the base iho flavor's
