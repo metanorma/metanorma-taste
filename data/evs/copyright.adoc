@@ -1,0 +1,6 @@
+== feedback-statement
+
+=== {blank}
+
+Tagasisidet standardi sisu kohta on võimalik edastada, kasutades EVS-i veebilehel asuvat tagasiside vormi
+või saates e-kirja meiliaadressile link:mailto:standardiosakond@evs.ee[standardiosakond@evs.ee].
