@@ -1,0 +1,300 @@
+// IALA guideline-family label style (metanorma-taste IALA, G-doctype)
+//
+// Evidence: IALA G1199 Ed 1.0 (the corpus's designated newest template,
+// mn-samples-iala reference-docs/guidelines) rendered HTML and the
+// deposited reference PDF:
+//
+// * Body clauses: "1", "3.1", "3.1.1" — bare dotted hierarchical
+//   numbers, no trailing dot; the renderer joins the number to the
+//   title with a nbsp+space ("3.1  Managing a mix of voice...").
+// * Preface (Contents, Introduction): unnumbered.
+// * Figures: per-chapter numbers "Figure 3-1", "Figure 3-2" with an
+//   em-dash caption join ("Figure 3-1 — Example of Digital
+//   Communication Principle").
+// * Notes: ISO/IEC-inherited NOTE/NOTE n conditional form.
+//
+// Tables: no G1199 corpus evidence yet — ISO-style hierarchical form
+// pending corpus verification.
+//
+// The S-family (IALA standards, e.g. S1040 Ed 2.0: "1.  TITLE") has its
+// own profile: iala_standard_label_style.lml.
+
+instance IALAGuidelineLabelStyle < LabelStyle {
+  name = "IALA Guideline Label Style"
+  definition {
+    The IALA guideline label style implements the numbering conventions
+    of the newest IALA guideline template (G1199 Ed 1.0 and later):
+    bare dotted clause numbers, unnumbered preface sections,
+    per-chapter figure numbers, and ISO/IEC-inherited note numbering.
+  }
+
+  labellers = [
+    "id:clause_labeller",
+    "id:subclause_labeller",
+    "id:annex_labeller",
+    "id:annex_clause_labeller",
+    "id:annex_subclause_labeller",
+    "id:figure_labeller",
+    "id:annex_figure_labeller",
+    "id:table_labeller",
+    "id:annex_table_labeller",
+    "id:note_labeller"
+  ]
+
+  sequences = [
+    DecimalNumericSequence,
+    AlphaUpperNumericSequence
+  ]
+
+  templates = [
+    ClauseLabelTemplate,
+    ClauseGlobalLabelTemplate,
+    SubclauseLabelTemplate,
+    SubclauseGlobalLabelTemplate,
+    AnnexLabelTemplate,
+    AnnexGlobalLabelTemplate,
+    AnnexClauseLabelTemplate,
+    AnnexClauseGlobalLabelTemplate,
+    AnnexSubclauseLabelTemplate,
+    AnnexSubclauseGlobalLabelTemplate,
+    FigureLabelTemplate,
+    FigureGlobalLabelTemplate,
+    AnnexFigureLabelTemplate,
+    TableLabelTemplate,
+    AnnexTableLabelTemplate,
+    NoteSingleLabelTemplate,
+    NoteMultipleLabelTemplate
+  ]
+
+  contexts = [
+    DocumentContext,
+    ClauseContext,
+    SubclauseContext,
+    AnnexContext,
+    AnnexClauseContext
+  ]
+}
+
+instance DocumentContext < LabelContext {
+  name = "document"
+  definition "Top-level document context for IALA guidelines"
+}
+
+instance ClauseContext < LabelContext {
+  name = "clause"
+  parent = DocumentContext
+  definition "Context for numbered body clauses"
+}
+
+instance SubclauseContext < LabelContext {
+  name = "subclause"
+  parent = ClauseContext
+  definition "Context for subclauses within clauses"
+}
+
+instance AnnexContext < LabelContext {
+  name = "annex"
+  parent = DocumentContext
+  definition "Context for annexes"
+}
+
+instance AnnexClauseContext < LabelContext {
+  name = "annex_clause"
+  parent = AnnexContext
+  definition "Context for clauses within annexes"
+}
+
+// Bare dotted numbers: the renderer joins label and title.
+instance ClauseLabelTemplate < LabelTemplate {
+  pattern = "%n"
+  definition "Template for clause labels"
+}
+
+instance ClauseGlobalLabelTemplate < LabelTemplate {
+  pattern = "Clause %n"
+  definition "Template for clause cross-references"
+}
+
+instance ClauseLabeller < Labeller {
+  id = "clause_labeller"
+  sequence = DecimalNumericSequence
+  context = DocumentContext
+  type = "clause"
+  template = ClauseLabelTemplate
+  global_template = ClauseGlobalLabelTemplate
+  definition "Labeller for body clauses"
+}
+
+instance SubclauseLabelTemplate < LabelTemplate {
+  pattern = "%pn.%n"
+  definition "Template for subclause labels"
+}
+
+instance SubclauseGlobalLabelTemplate < LabelTemplate {
+  pattern = "Clause %pn.%n"
+  definition "Template for subclause cross-references"
+}
+
+instance SubclauseLabeller < Labeller {
+  id = "subclause_labeller"
+  sequence = DecimalNumericSequence
+  context = ClauseContext
+  parent = ClauseLabeller
+  type = "subclause"
+  template = SubclauseLabelTemplate
+  global_template = SubclauseGlobalLabelTemplate
+  definition "Labeller for subclauses"
+}
+
+instance AnnexLabelTemplate < LabelTemplate {
+  pattern = "Annex %n"
+  definition "Template for annex labels"
+}
+
+instance AnnexGlobalLabelTemplate < LabelTemplate {
+  pattern = "Annex %n"
+  definition "Template for annex cross-references"
+}
+
+instance AnnexLabeller < Labeller {
+  id = "annex_labeller"
+  sequence = AlphaUpperNumericSequence
+  context = DocumentContext
+  type = "annex"
+  template = AnnexLabelTemplate
+  global_template = AnnexGlobalLabelTemplate
+  definition "Labeller for annexes"
+}
+
+instance AnnexClauseLabelTemplate < LabelTemplate {
+  pattern = "%pn.%n"
+  definition "Template for annex clause labels"
+}
+
+instance AnnexClauseGlobalLabelTemplate < LabelTemplate {
+  pattern = "Clause %pn.%n"
+  definition "Template for annex clause cross-references"
+}
+
+instance AnnexClauseLabeller < Labeller {
+  id = "annex_clause_labeller"
+  sequence = DecimalNumericSequence
+  context = AnnexContext
+  parent = AnnexLabeller
+  type = "clause"
+  template = AnnexClauseLabelTemplate
+  global_template = AnnexClauseGlobalLabelTemplate
+  definition "Labeller for clauses within annexes"
+}
+
+instance AnnexSubclauseLabelTemplate < LabelTemplate {
+  pattern = "%pn.%n"
+  definition "Template for annex subclause labels"
+}
+
+instance AnnexSubclauseGlobalLabelTemplate < LabelTemplate {
+  pattern = "Clause %pn.%n"
+  definition "Template for annex subclause cross-references"
+}
+
+instance AnnexSubclauseLabeller < Labeller {
+  id = "annex_subclause_labeller"
+  sequence = DecimalNumericSequence
+  context = AnnexClauseContext
+  parent = AnnexClauseLabeller
+  type = "subclause"
+  template = AnnexSubclauseLabelTemplate
+  global_template = AnnexSubclauseGlobalLabelTemplate
+  definition "Labeller for subclauses within annex clauses"
+}
+
+// Per-chapter figure numbers: "Figure 3-1".
+instance FigureLabelTemplate < LabelTemplate {
+  pattern = "Figure %pn-%n"
+  definition "Template for figure caption labels (chapter-prefixed)"
+}
+
+instance FigureGlobalLabelTemplate < LabelTemplate {
+  pattern = "Figure %pn-%n"
+  definition "Template for figure cross-references"
+}
+
+instance FigureLabeller < Labeller {
+  id = "figure_labeller"
+  sequence = DecimalNumericSequence
+  context = ClauseContext
+  parent = ClauseLabeller
+  type = "figure"
+  template = FigureLabelTemplate
+  global_template = FigureGlobalLabelTemplate
+  definition "Labeller for figures, numbered per chapter"
+}
+
+instance AnnexFigureLabelTemplate < LabelTemplate {
+  pattern = "Figure %pn-%n"
+  definition "Template for figure caption labels in annexes"
+}
+
+instance AnnexFigureLabeller < Labeller {
+  id = "annex_figure_labeller"
+  sequence = DecimalNumericSequence
+  context = AnnexContext
+  parent = AnnexLabeller
+  type = "figure"
+  template = AnnexFigureLabelTemplate
+  definition "Labeller for figures in annexes"
+}
+
+// Tables: ISO-style hierarchical form pending corpus evidence.
+instance TableLabelTemplate < LabelTemplate {
+  pattern = "Table %n"
+  definition "Template for table caption labels"
+}
+
+instance TableLabeller < Labeller {
+  id = "table_labeller"
+  sequence = DecimalNumericSequence
+  context = DocumentContext
+  type = "table"
+  template = TableLabelTemplate
+  definition "Labeller for tables"
+}
+
+instance AnnexTableLabelTemplate < LabelTemplate {
+  pattern = "Table %pn.%n"
+  definition "Template for table caption labels in annexes"
+}
+
+instance AnnexTableLabeller < Labeller {
+  id = "annex_table_labeller"
+  sequence = DecimalNumericSequence
+  context = AnnexContext
+  parent = AnnexLabeller
+  type = "table"
+  template = AnnexTableLabelTemplate
+  definition "Labeller for tables in annexes"
+}
+
+// Notes: ISO/IEC-inherited conditional form.
+instance NoteSingleLabelTemplate < LabelTemplate {
+  pattern = "NOTE"
+  definition "Template for a lone note"
+}
+
+instance NoteMultipleLabelTemplate < LabelTemplate {
+  pattern = "NOTE %n"
+  definition "Template for repeated notes"
+  condition = {
+    type = "element_count_gt"
+    threshold = 1
+  }
+}
+
+instance NoteLabeller < Labeller {
+  id = "note_labeller"
+  sequence = DecimalNumericSequence
+  context = ClauseContext
+  type = "note"
+  template = [NoteSingleLabelTemplate, NoteMultipleLabelTemplate]
+  definition "Labeller for notes with a counter only when repeated"
+}
