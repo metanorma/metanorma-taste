@@ -1114,18 +1114,18 @@
 	     face); the base sets lead Courier New and ignores the
 	     monospace-font attribute. -->
 	<xsl:attribute-set name="pre-style"><?extend?>
-		<xsl:attribute name="font-family">Source Code Pro, Courier New, DejaVu Sans Mono, <xsl:value-of select="$font_noto_sans_mono"/></xsl:attribute>
+		<xsl:attribute name="font-family">Source Code Pro, Courier New, <xsl:value-of select="$font_noto_sans_mono"/></xsl:attribute>
 	</xsl:attribute-set>
 
 	<xsl:attribute-set name="tt-style"><?extend?>
-		<xsl:attribute name="font-family">Source Code Pro, Courier New, DejaVu Sans Mono, <xsl:value-of select="$font_noto_sans_mono"/></xsl:attribute>
+		<xsl:attribute name="font-family">Source Code Pro, Courier New, <xsl:value-of select="$font_noto_sans_mono"/></xsl:attribute>
 	</xsl:attribute-set>
 
 	<!-- Sourcecode blocks carry their own set: the base styles them
 	     "Fira Code, NotoSansMono", neither provisioned for WMO, and the
 	     code fell back to the proportional Noto Sans. -->
 	<xsl:attribute-set name="sourcecode-style"><?extend?>
-		<xsl:attribute name="font-family">Source Code Pro, Courier New, DejaVu Sans Mono, <xsl:value-of select="$font_noto_sans_mono"/></xsl:attribute>
+		<xsl:attribute name="font-family">Source Code Pro, Courier New, <xsl:value-of select="$font_noto_sans_mono"/></xsl:attribute>
 	</xsl:attribute-set>
 
 	<!-- WMO admonitions: the box line and the label take the corporate
