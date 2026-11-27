@@ -64,11 +64,31 @@ Sampled off the published WMO-No. 574 and WMO-No. 1364 PDFs:
 
 == Typography
 
-Verdana 10 pt per the owner ruling (the A5 proprietary fonts — Bague
-Sans Pro, Univers, ITC Stone Sans — are not redistributable; published
-Word-template WMO documents measure Verdana), with DejaVu Sans as the
-Linux companion. The taste `fonts:` provisioning list must include both
-or FOP silently falls back to Noto Sans for the entire body.
+Brand rule (WMO Visual Identity June 2016, A5 "Fonts", transcribed on
+metanorma/metanorma-taste#273): governance and technical publications
+set titles and body in the ITC Stone Sans family — body text Stone
+Sans Medium at 10 pt, table headings Stone Sans Italic; graphs, tables
+and charts ITC Stone Sans. Verdana is the guide's font for session
+documents only; Bague Sans Pro is brochure titles and the logo only.
+
+Measured (pdffonts, WMO-No. 574, 2024 edition — the sample attached on
+metanorma/metanorma-taste#273): 12 embedded faces — StoneSansITC
+Medium, SemiBold, Bold, MediumItalic, BoldItalic (body and headings,
+per the A5 rule), PFBagueSansPro Regular and Medium (cover and logo
+elements, per B5), UniversLTCYR 55Roman and 65Bold. No monospace face
+is embedded anywhere in the publication; a WMO code-text face is
+simply not evidenced by this sample.
+
+Provisioning: Stone Sans, Bague Sans Pro and Univers LT are commercial
+and not redistributable, so the taste cannot provision them. The
+`fonts:` substitution stack (Verdana, DejaVu Sans, Source Code Pro,
+Source Han Sans, STIX Two Math) is toolchain state pending the owner's
+font ruling for the S-41X lane — it brands nothing. The 2014 S-411
+deposit predates the June 2016 guide and evidences nothing about the
+brand; the renders under the S-411 repo's `branding/` are this
+pipeline's own output and evidence nothing about WMO practice. The
+provisioning list must name every face the sheets reference or FOP
+silently falls back to Noto Sans.
 
 Measured off WMO-No. 1364 (mutool stext per-line extraction):
 
