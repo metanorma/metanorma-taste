@@ -177,7 +177,7 @@
 	</xsl:template>
 
 	<xsl:attribute-set name="root-style">
-		<xsl:attribute name="font-family">Verdana, DejaVu Sans, Arial, Calibri, Cambria Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
+		<xsl:attribute name="font-family">Stone Sans ITC TT, Univers LT Std, Arial, Calibri, Cambria Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
 		<xsl:attribute name="font-family-generic">Sans</xsl:attribute>
 		<xsl:attribute name="font-size">10pt</xsl:attribute>
 	</xsl:attribute-set>
@@ -1364,8 +1364,9 @@
 			<xsl:attribute name="line-height">122%</xsl:attribute>
 		</xsl:if>
 		<xsl:if test="not(ancestor::mn:table) and not(ancestor::mn:boilerplate) and not(ancestor::mn:feedback-statement) and not(ancestor::mn:note) and not(ancestor::mn:termnote) and not(ancestor::mn:admonition) and not(ancestor::mn:li)">
-			<!-- WMO body: Verdana on the measured 121% pitch (12.1pt
-				 on 10pt in WMO-No. 1364) with a full paragraph step -->
+			<!-- WMO body: Stone Sans Medium at the pitch measured in the
+				 WMO-No. 1364/574 element analysis (taste#273): 121%
+				 (12.1pt on 10pt) with a full paragraph step -->
 			<xsl:attribute name="line-height">121%</xsl:attribute>
 			<xsl:attribute name="space-after">10pt</xsl:attribute>
 		</xsl:if>
