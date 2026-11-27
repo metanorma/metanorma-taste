@@ -37,8 +37,11 @@ base-override:
     # The WMO brand faces first (no monospace face exists in the WMO
     # publications measured — WMO-No. 574 embeds none); Source Code Pro
     # stays for Metanorma sourcecode, Source Han Sans for CJK, STIX Two
-    # Math for formulas. Courier New is a system face.
-    fonts: Stone Sans ITC TT;PF Bague Sans Pro;Univers LT Std;Source Code Pro;Source Han Sans;STIX Two Math
+    # Math for formulas. Courier New is a system face. Univers LT Std is
+    # provisioned in the formula but is not listed here: fontist
+    # resolves faces by family name and the Univers faces carry
+    # numbered sub-family names (Univers LT Std 55 and friends).
+    fonts: Stone Sans ITC TT;PF Bague Sans Pro;Source Code Pro;Source Han Sans;STIX Two Math
     output-extensions: xml,html,pdf,doc
 doctypes:
   # Governance publications (B5): plain Pantone covers
