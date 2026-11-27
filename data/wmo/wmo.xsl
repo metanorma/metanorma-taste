@@ -177,7 +177,7 @@
 	</xsl:template>
 
 	<xsl:attribute-set name="root-style">
-		<xsl:attribute name="font-family">Stone Sans ITC TT, Univers LT Std, Arial, Calibri, Cambria Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
+		<xsl:attribute name="font-family">Stone Sans ITC TT, Arial, Calibri, Cambria Math, <xsl:value-of select="$font_noto_sans"/></xsl:attribute>
 		<xsl:attribute name="font-family-generic">Sans</xsl:attribute>
 		<xsl:attribute name="font-size">10pt</xsl:attribute>
 	</xsl:attribute-set>
