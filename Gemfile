@@ -51,7 +51,7 @@ gem "suma", github: "metanorma/suma", branch: "main"
 gem "metanorma-plugin-lutaml", github: "metanorma/metanorma-plugin-lutaml", branch: "main"
 # relaton 3.0.0 is released; the α-era exact pin sorts below it and
 # conflicts with released metanorma-document's `relaton ~> 3.0` floor
-gem "relaton", "~> 3.0"
+gem "relaton", "~> 3.1.8"
 gem "relaton-render", "~> 3.0"
 # coherent core mains: the α relaton line needs them (released ones cap render at 1.x)
 gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
